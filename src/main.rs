@@ -1,0 +1,33 @@
+extern crate sdl2;
+extern crate xfight_ecs;
+
+mod scenes;
+
+use scenes::fight::FightScene;
+use sdl2::image::InitFlag;
+use xfight_ecs::systems::drawing::DrawingSystem;
+
+fn main() -> Result<(), String> {
+    let sdl_context = sdl2::init()?;
+    let video_subsystem = sdl_context.video()?;
+    sdl2::image::init(InitFlag::PNG)?;
+    let window = video_subsystem
+        .window("X-Fight", 800, 600)
+        .position_centered()
+        .build()
+        .expect("Failed to create window");
+    let mut canvas = window
+        .into_canvas()
+        .build()
+        .expect("Failed to create canvas");
+    let texture_creator = canvas.texture_creator();
+    let mut event_pump = sdl_context.event_pump()?;
+
+    // SYSTEMS
+    let mut drawing_system = DrawingSystem::init(&mut canvas)?;
+
+    // SCENE
+    let mut scene = FightScene::init(&texture_creator, &mut drawing_system);
+
+    scene.run(&mut event_pump, &mut drawing_system)
+}
