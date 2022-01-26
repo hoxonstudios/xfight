@@ -4,22 +4,25 @@ use sdl2::{
     event::Event, keyboard::Keycode, render::TextureCreator, video::WindowContext, EventPump,
 };
 use xfight_ecs::{
-    components::{AnimationComponent, Entity, PhysicsComponent, ShapeComponent},
+    components::{
+        AnimationComponent, Entity, InputComponent, MovementComponent, PhysicsComponent,
+        ShapeComponent,
+    },
     systems::{
         animation::AnimationSystem, drawing::DrawingSystem, input::InputSystem,
-        physics::PhysicsSystem,
+        movement::MovementSystem, physics::PhysicsSystem,
     },
 };
 
 use self::fighters::ryu::{self, RYU_SPRITE_PATH};
 
 pub struct FightScene {
-    keys: Vec<Keycode>,
-
     entities: Vec<Entity>,
+    inputs: Vec<InputComponent>,
     shapes: Vec<ShapeComponent>,
     physics: Vec<PhysicsComponent>,
     animations: Vec<AnimationComponent>,
+    movements: Vec<MovementComponent>,
 }
 
 impl FightScene {
@@ -28,12 +31,12 @@ impl FightScene {
         drawing_system: &mut DrawingSystem<'a>,
     ) -> FightScene {
         let mut scene = FightScene {
-            keys: vec![],
-
             entities: vec![],
+            inputs: vec![],
             shapes: vec![],
             physics: vec![],
             animations: vec![],
+            movements: vec![],
         };
         drawing_system
             .load_texture(&texture_creator, RYU_SPRITE_PATH)
@@ -44,6 +47,8 @@ impl FightScene {
             &mut scene.shapes,
             &mut scene.physics,
             &mut scene.animations,
+            &mut scene.movements,
+            &mut scene.inputs,
             (100.0, 400.0),
             false,
         );
@@ -52,6 +57,8 @@ impl FightScene {
             &mut scene.shapes,
             &mut scene.physics,
             &mut scene.animations,
+            &mut scene.movements,
+            &mut scene.inputs,
             (600.0, 400.0),
             true,
         );
@@ -76,9 +83,26 @@ impl FightScene {
                 }
             }
 
-            self.keys = InputSystem::run(event_pump);
-            PhysicsSystem::run(&self.entities, &mut self.physics, &mut self.shapes);
-            AnimationSystem::run(&self.entities, &mut self.animations, &mut self.shapes);
+            InputSystem::run(
+                event_pump,
+                &self.entities,
+                &mut self.inputs,
+                &mut self.movements,
+            );
+            MovementSystem::run(&mut self.movements);
+            AnimationSystem::run(
+                &self.entities,
+                &mut self.animations,
+                &mut self.shapes,
+                &self.physics,
+                &self.movements,
+            );
+            PhysicsSystem::run(
+                &self.entities,
+                &mut self.physics,
+                &mut self.shapes,
+                &self.movements,
+            );
             drawing_system.run(&self.shapes)?;
         }
 
