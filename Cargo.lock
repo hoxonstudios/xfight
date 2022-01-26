@@ -60,12 +60,4 @@ name = "xfight"
 version = "0.1.0"
 dependencies = [
  "sdl2",
- "xfight_ecs",
-]
-
-[[package]]
-name = "xfight_ecs"
-version = "0.1.0"
-dependencies = [
- "sdl2",
 ]

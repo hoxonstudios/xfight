@@ -7,4 +7,3 @@ edition = "2021"
 
 [dependencies]
 sdl2 = { version = "0.35.1", features = ["image"] }
-xfight_ecs = { path = "../xfight-ecs", version = "0.1.0"}

@@ -1,11 +1,12 @@
 extern crate sdl2;
-extern crate xfight_ecs;
 
+mod components;
 mod scenes;
+mod systems;
 
 use scenes::fight::FightScene;
 use sdl2::image::InitFlag;
-use xfight_ecs::systems::drawing::DrawingSystem;
+use systems::drawing::DrawingSystem;
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;

@@ -3,26 +3,18 @@ pub mod fighters;
 use sdl2::{
     event::Event, keyboard::Keycode, render::TextureCreator, video::WindowContext, EventPump,
 };
-use xfight_ecs::{
-    components::{
-        AnimationComponent, Entity, InputComponent, MovementComponent, PhysicsComponent,
-        ShapeComponent,
-    },
-    systems::{
-        animation::AnimationSystem, drawing::DrawingSystem, input::InputSystem,
-        movement::MovementSystem, physics::PhysicsSystem,
-    },
+
+use crate::{
+    components::{AnimatedArchetype, Entity},
+    systems::{animation::AnimationSystem, drawing::DrawingSystem},
 };
 
 use self::fighters::ryu::{self, RYU_SPRITE_PATH};
 
 pub struct FightScene {
     entities: Vec<Entity>,
-    inputs: Vec<InputComponent>,
-    shapes: Vec<ShapeComponent>,
-    physics: Vec<PhysicsComponent>,
-    animations: Vec<AnimationComponent>,
-    movements: Vec<MovementComponent>,
+
+    animated: AnimatedArchetype,
 }
 
 impl FightScene {
@@ -32,33 +24,26 @@ impl FightScene {
     ) -> FightScene {
         let mut scene = FightScene {
             entities: vec![],
-            inputs: vec![],
-            shapes: vec![],
-            physics: vec![],
-            animations: vec![],
-            movements: vec![],
+
+            animated: AnimatedArchetype {
+                shape: vec![],
+                animation: vec![],
+            },
         };
         drawing_system
             .load_texture(&texture_creator, RYU_SPRITE_PATH)
             .unwrap();
 
+        // INIT FIGHTERS
         ryu::init(
             &mut scene.entities,
-            &mut scene.shapes,
-            &mut scene.physics,
-            &mut scene.animations,
-            &mut scene.movements,
-            &mut scene.inputs,
+            &mut scene.animated,
             (100.0, 400.0),
             false,
         );
         ryu::init(
             &mut scene.entities,
-            &mut scene.shapes,
-            &mut scene.physics,
-            &mut scene.animations,
-            &mut scene.movements,
-            &mut scene.inputs,
+            &mut scene.animated,
             (600.0, 400.0),
             true,
         );
@@ -83,27 +68,13 @@ impl FightScene {
                 }
             }
 
-            InputSystem::run(
-                event_pump,
-                &self.entities,
-                &mut self.inputs,
-                &mut self.movements,
-            );
-            MovementSystem::run(&mut self.movements);
             AnimationSystem::run(
-                &self.entities,
-                &mut self.animations,
-                &mut self.shapes,
-                &self.physics,
-                &self.movements,
+                self.animated
+                    .shape
+                    .iter_mut()
+                    .zip(self.animated.animation.iter_mut()),
             );
-            PhysicsSystem::run(
-                &self.entities,
-                &mut self.physics,
-                &mut self.shapes,
-                &self.movements,
-            );
-            drawing_system.run(&self.shapes)?;
+            drawing_system.run(self.animated.shape.iter())?;
         }
 
         Ok(())
