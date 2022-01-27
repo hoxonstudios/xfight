@@ -5,8 +5,11 @@ use sdl2::{
 };
 
 use crate::{
-    components::{AnimatedArchetype, Entity},
-    systems::{animation::AnimationSystem, drawing::DrawingSystem},
+    components::{
+        fighter::{Direction, Player},
+        Entity, FighterArchetype,
+    },
+    systems::{animation::AnimationSystem, drawing::DrawingSystem, fight::FightSystem},
 };
 
 use self::fighters::ryu::{self, RYU_SPRITE_PATH};
@@ -14,7 +17,7 @@ use self::fighters::ryu::{self, RYU_SPRITE_PATH};
 pub struct FightScene {
     entities: Vec<Entity>,
 
-    animated: AnimatedArchetype,
+    fighter: FighterArchetype,
 }
 
 impl FightScene {
@@ -25,9 +28,11 @@ impl FightScene {
         let mut scene = FightScene {
             entities: vec![],
 
-            animated: AnimatedArchetype {
+            fighter: FighterArchetype {
                 shape: vec![],
                 animation: vec![],
+                fighter: vec![],
+                physics: vec![],
             },
         };
         drawing_system
@@ -37,15 +42,17 @@ impl FightScene {
         // INIT FIGHTERS
         ryu::init(
             &mut scene.entities,
-            &mut scene.animated,
+            &mut scene.fighter,
             (100.0, 400.0),
-            false,
+            Player::One,
+            Direction::Right,
         );
         ryu::init(
             &mut scene.entities,
-            &mut scene.animated,
+            &mut scene.fighter,
             (600.0, 400.0),
-            true,
+            Player::Two,
+            Direction::Left,
         );
 
         return scene;
@@ -67,14 +74,27 @@ impl FightScene {
                     _ => {}
                 }
             }
+            let keys = event_pump
+                .keyboard_state()
+                .pressed_scancodes()
+                .filter_map(Keycode::from_scancode)
+                .collect::<Vec<Keycode>>();
 
+            FightSystem::run(
+                &keys,
+                self.fighter
+                    .fighter
+                    .iter_mut()
+                    .zip(self.fighter.animation.iter_mut())
+                    .zip(self.fighter.physics.iter_mut()),
+            );
             AnimationSystem::run(
-                self.animated
+                self.fighter
                     .shape
                     .iter_mut()
-                    .zip(self.animated.animation.iter_mut()),
+                    .zip(self.fighter.animation.iter_mut()),
             );
-            drawing_system.run(self.animated.shape.iter())?;
+            drawing_system.run(self.fighter.shape.iter())?;
         }
 
         Ok(())
