@@ -25,13 +25,15 @@ impl<'a> DrawingSystem<'a> {
             textures: vec![],
         })
     }
-    pub fn load_texture(
+    pub fn load_textures(
         &mut self,
         creator: &'a TextureCreator<WindowContext>,
-        path: &'static str,
+        paths: &[&'static str],
     ) -> Result<(), String> {
-        let texture = creator.load_texture(Path::new(path))?;
-        self.textures.push(texture);
+        for &path in paths {
+            let texture = creator.load_texture(Path::new(path))?;
+            self.textures.push(texture);
+        }
 
         return Ok(());
     }
@@ -39,12 +41,15 @@ impl<'a> DrawingSystem<'a> {
         &mut self,
         entities: impl Iterator<Item = &'b ShapeComponent>,
     ) -> Result<(), String> {
+        self.canvas.set_draw_color(Color::BLACK);
         self.canvas.clear();
 
         for shape in entities {
             let (x, y) = shape.position;
             let (width, height) = shape.size;
             let (flip_horizontal, flip_vertical) = shape.flipped;
+            let view_x = x as i32 - (width as i32 / 2);
+            let view_y = y as i32 - (height as i32 / 2);
 
             match shape.texture {
                 ShapeTexture {
@@ -57,7 +62,7 @@ impl<'a> DrawingSystem<'a> {
                     self.canvas.copy_ex(
                         texture,
                         Rect::new(position.0, position.1, size.0, size.1),
-                        Some(Rect::new(x as i32, y as i32, width, height)),
+                        Some(Rect::new(view_x, view_y, width, height)),
                         0.0,
                         None,
                         flip_horizontal,

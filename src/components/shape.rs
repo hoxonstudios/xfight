@@ -1,6 +1,5 @@
 #[derive(Copy, Clone)]
 pub struct ShapeComponent {
-    pub entity: usize,
     pub position: (f32, f32),
     pub size: (u32, u32),
     pub flipped: (bool, bool),

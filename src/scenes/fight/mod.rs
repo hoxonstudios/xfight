@@ -1,23 +1,20 @@
-pub mod fighters;
+mod fighters;
+mod floor;
 
 use sdl2::{
     event::Event, keyboard::Keycode, render::TextureCreator, video::WindowContext, EventPump,
 };
 
 use crate::{
-    components::{
-        fighter::{Direction, Player},
-        Entity, FighterArchetype,
-    },
-    systems::{animation::AnimationSystem, drawing::DrawingSystem, fight::FightSystem},
+    components::{FighterArchetype, ShapeArchetype},
+    systems::{self, drawing::DrawingSystem},
 };
 
-use self::fighters::ryu::{self, RYU_SPRITE_PATH};
+use self::{fighters::ryu::sprites::RYU_SPRITE_PATH, floor::sprites::FLOOR_SPRITE_PATH};
 
 pub struct FightScene {
-    entities: Vec<Entity>,
-
-    fighter: FighterArchetype,
+    shapes: ShapeArchetype,
+    fighters: FighterArchetype,
 }
 
 impl FightScene {
@@ -26,34 +23,22 @@ impl FightScene {
         drawing_system: &mut DrawingSystem<'a>,
     ) -> FightScene {
         let mut scene = FightScene {
-            entities: vec![],
-
-            fighter: FighterArchetype {
+            shapes: ShapeArchetype { shape: vec![] },
+            fighters: FighterArchetype {
                 shape: vec![],
-                animation: vec![],
-                fighter: vec![],
                 physics: vec![],
             },
         };
         drawing_system
-            .load_texture(&texture_creator, RYU_SPRITE_PATH)
+            .load_textures(&texture_creator, &[RYU_SPRITE_PATH, FLOOR_SPRITE_PATH])
             .unwrap();
 
+        // INIT SHAPES
+        scene.shapes.init_floor();
+
         // INIT FIGHTERS
-        ryu::init(
-            &mut scene.entities,
-            &mut scene.fighter,
-            (100.0, 400.0),
-            Player::One,
-            Direction::Right,
-        );
-        ryu::init(
-            &mut scene.entities,
-            &mut scene.fighter,
-            (600.0, 400.0),
-            Player::Two,
-            Direction::Left,
-        );
+        scene.fighters.init_ryu((100.0, 350.0), false);
+        scene.fighters.init_ryu((600.0, 350.0), true);
 
         return scene;
     }
@@ -74,27 +59,19 @@ impl FightScene {
                     _ => {}
                 }
             }
-            let keys = event_pump
+            let _ = event_pump
                 .keyboard_state()
                 .pressed_scancodes()
                 .filter_map(Keycode::from_scancode)
                 .collect::<Vec<Keycode>>();
 
-            FightSystem::run(
-                &keys,
-                self.fighter
-                    .fighter
+            systems::physics::run(
+                self.fighters
+                    .physics
                     .iter_mut()
-                    .zip(self.fighter.animation.iter_mut())
-                    .zip(self.fighter.physics.iter_mut()),
+                    .zip(self.fighters.shape.iter_mut()),
             );
-            AnimationSystem::run(
-                self.fighter
-                    .shape
-                    .iter_mut()
-                    .zip(self.fighter.animation.iter_mut()),
-            );
-            drawing_system.run(self.fighter.shape.iter())?;
+            drawing_system.run(self.shapes.shape.iter().chain(self.fighters.shape.iter()))?;
         }
 
         Ok(())

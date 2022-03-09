@@ -1,5 +1,6 @@
 use crate::components::shape::ShapeTexture;
 
+pub const RYU_SPRITE_PATH: &'static str = "assets/ryu.png";
 const RYU_TEXTURE_INDEX: usize = 0;
 
 // STAND
