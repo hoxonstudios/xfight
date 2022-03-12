@@ -43,7 +43,7 @@ impl PhysicsSystem {
             physics.position.1 += physics.velocity.1;
 
             physics.velocity.0 += physics.acceleration.0;
-            physics.velocity.1 += physics.acceleration.1 + if physics.gravity { 0.1 } else { 0.0 };
+            physics.velocity.1 += physics.acceleration.1 + if physics.gravity { 0.2 } else { 0.0 };
 
             for j in 0..i {
                 let compare = &compare_vec[j];

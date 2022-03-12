@@ -27,7 +27,7 @@ fn main() -> Result<(), String> {
     let mut scene = FightScene {
         entity: 0,
         physics: PhysicsSystem::init(),
-        drawing: DrawingSystem::init(&mut canvas)?,
+        drawing: DrawingSystem::init(&mut canvas, &texture_creator)?,
     };
     scene.init(&texture_creator);
     scene.run(&mut event_pump)

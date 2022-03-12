@@ -1,11 +1,11 @@
 pub mod sprites;
 
 use crate::systems::{
-    drawing::ShapeComponent,
+    drawing::{ShapeComponent, ShapeTexture},
     physics::{PhysicsComponent, RigidBody},
 };
 
-use self::sprites::FLOOR_SPRITE;
+use self::sprites::{FLOOR_SPRITE, FLOOR_TEXTURE_PATH};
 
 use super::FightScene;
 
@@ -26,13 +26,22 @@ impl<'a> FightScene<'a> {
                 gravity: false,
             },
         );
+        let texture_index = self
+            .drawing
+            .texture_store
+            .load_texture(FLOOR_TEXTURE_PATH)
+            .expect("Failed to load floor texture");
+
         self.drawing.store.insert_component(
             entity,
             ShapeComponent {
                 entity,
                 size: (800, 100),
                 flipped: (false, false),
-                texture: FLOOR_SPRITE,
+                texture: ShapeTexture {
+                    texture_index,
+                    sprite: FLOOR_SPRITE,
+                },
             },
         );
 

@@ -1,4 +1,4 @@
-use std::{path::Path, time::Duration};
+use std::{collections::HashMap, path::Path, time::Duration};
 
 use sdl2::{
     image::LoadTexture,
@@ -18,41 +18,41 @@ pub struct ShapeComponent {
     pub texture: ShapeTexture,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 pub struct ShapeTexture {
     pub texture_index: usize,
+    pub sprite: TextureSprite,
+}
+
+#[derive(Copy, Clone)]
+pub struct TextureSprite {
     pub position: (i32, i32),
     pub size: (u32, u32),
 }
 
 pub struct DrawingSystem<'a> {
     canvas: &'a mut Canvas<Window>,
-    textures: Vec<Texture<'a>>,
+    pub texture_store: TextureStore<'a>,
     pub store: ComponentStore<ShapeComponent>,
 }
 impl<'a> DrawingSystem<'a> {
-    pub fn init(canvas: &'a mut Canvas<Window>) -> Result<DrawingSystem<'a>, String> {
+    pub fn init(
+        canvas: &'a mut Canvas<Window>,
+        creator: &'a TextureCreator<WindowContext>,
+    ) -> Result<DrawingSystem<'a>, String> {
         canvas.set_draw_color(Color::RGB(0, 0, 0));
         canvas.clear();
         canvas.present();
 
         Ok(DrawingSystem {
             canvas,
-            textures: vec![],
+            texture_store: TextureStore {
+                index_map: HashMap::new(),
+                textures: vec![],
+                creator,
+            },
             store: ComponentStore::<ShapeComponent>::init(),
         })
-    }
-    pub fn load_textures(
-        &mut self,
-        creator: &'a TextureCreator<WindowContext>,
-        paths: &[&'static str],
-    ) -> Result<(), String> {
-        for &path in paths {
-            let texture = creator.load_texture(Path::new(path))?;
-            self.textures.push(texture);
-        }
-
-        return Ok(());
     }
 
     pub fn update(&mut self, physics_system: &PhysicsSystem) -> Result<(), String> {
@@ -70,10 +70,9 @@ impl<'a> DrawingSystem<'a> {
                 match shape.texture {
                     ShapeTexture {
                         texture_index,
-                        position,
-                        size,
+                        sprite: TextureSprite { position, size },
                     } => {
-                        let texture = &self.textures[texture_index];
+                        let texture = &self.texture_store.textures[texture_index];
 
                         self.canvas.copy_ex(
                             texture,
@@ -93,5 +92,23 @@ impl<'a> DrawingSystem<'a> {
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
 
         Ok(())
+    }
+}
+
+pub struct TextureStore<'a> {
+    index_map: HashMap<&'static str, usize>,
+    textures: Vec<Texture<'a>>,
+    creator: &'a TextureCreator<WindowContext>,
+}
+impl<'a> TextureStore<'a> {
+    pub fn load_texture(&mut self, path: &'static str) -> Result<usize, String> {
+        if let Some(&index) = self.index_map.get(path) {
+            return Ok(index);
+        } else {
+            let texture = self.creator.load_texture(Path::new(path))?;
+            self.textures.push(texture);
+
+            return Ok(self.textures.len() - 1);
+        }
     }
 }

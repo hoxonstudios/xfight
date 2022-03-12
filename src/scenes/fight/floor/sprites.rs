@@ -1,10 +1,8 @@
-use crate::systems::drawing::ShapeTexture;
+use crate::systems::drawing::TextureSprite;
 
-pub const FLOOR_SPRITE_PATH: &'static str = "assets/floor.png";
-const FLOOR_SPRITE_INDEX: usize = 1;
+pub const FLOOR_TEXTURE_PATH: &'static str = "assets/floor.png";
 
-pub const FLOOR_SPRITE: ShapeTexture = ShapeTexture {
-    texture_index: FLOOR_SPRITE_INDEX,
+pub const FLOOR_SPRITE: TextureSprite = TextureSprite {
     position: (0, 0),
     size: (800, 200),
 };

@@ -7,8 +7,6 @@ use sdl2::{
 
 use crate::systems::{drawing::DrawingSystem, physics::PhysicsSystem};
 
-use self::{fighters::ryu::sprites::RYU_SPRITE_PATH, floor::sprites::FLOOR_SPRITE_PATH};
-
 pub struct FightScene<'a> {
     pub entity: usize,
     pub physics: PhysicsSystem,
@@ -17,10 +15,6 @@ pub struct FightScene<'a> {
 
 impl<'a> FightScene<'a> {
     pub fn init(&mut self, texture_creator: &'a TextureCreator<WindowContext>) {
-        self.drawing
-            .load_textures(&texture_creator, &[RYU_SPRITE_PATH, FLOOR_SPRITE_PATH])
-            .unwrap();
-
         // INIT SHAPES
         self.init_floor();
 

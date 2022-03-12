@@ -3,12 +3,12 @@ pub mod sprites;
 use crate::{
     scenes::fight::FightScene,
     systems::{
-        drawing::ShapeComponent,
+        drawing::{ShapeComponent, ShapeTexture},
         physics::{PhysicsComponent, RigidBody},
     },
 };
 
-use self::sprites::RYU_STAND_1;
+use self::sprites::{RYU_STAND_1, RYU_TEXTURE_PATH};
 
 impl<'a> FightScene<'a> {
     pub fn init_ryu(&mut self, position: (f32, f32), flipped: bool) {
@@ -28,13 +28,22 @@ impl<'a> FightScene<'a> {
                 gravity: true,
             },
         );
+        let texture_index = self
+            .drawing
+            .texture_store
+            .load_texture(RYU_TEXTURE_PATH)
+            .expect("Failed to load Ryu texture");
+
         self.drawing.store.insert_component(
             entity,
             ShapeComponent {
                 entity,
                 size: (50, 90),
                 flipped: (flipped, false),
-                texture: RYU_STAND_1,
+                texture: ShapeTexture {
+                    texture_index,
+                    sprite: RYU_STAND_1,
+                },
             },
         );
 
