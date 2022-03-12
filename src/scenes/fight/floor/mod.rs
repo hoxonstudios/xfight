@@ -21,6 +21,7 @@ impl<'a> FightScene<'a> {
                 acceleration: (0.0, 0.0),
                 rigid_body: Some(RigidBody {
                     size: (400.0, 50.0),
+                    solid: true,
                 }),
                 gravity: false,
             },

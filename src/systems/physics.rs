@@ -13,18 +13,26 @@ pub struct PhysicsComponent {
 #[derive(Copy, Clone)]
 pub struct RigidBody {
     pub size: (f32, f32),
+    pub solid: bool,
+}
+
+pub struct Collision {
+    pub entities: (usize, usize),
 }
 
 pub struct PhysicsSystem {
+    pub collisions: Vec<Collision>,
     pub store: ComponentStore<PhysicsComponent>,
 }
 impl PhysicsSystem {
     pub fn init() -> PhysicsSystem {
         PhysicsSystem {
+            collisions: vec![],
             store: ComponentStore::<PhysicsComponent>::init(),
         }
     }
     pub fn update(&mut self) {
+        self.collisions.clear();
         let physics_vec = self.store.data_mut();
         let compare_vec = physics_vec.clone();
         let length = physics_vec.len();
@@ -51,24 +59,31 @@ impl PhysicsSystem {
                         let r2_y1 = compare.position.1 - rb2.size.1;
                         let r2_y2 = compare.position.1 + rb2.size.1;
 
+                        // Check collision
                         let collide_in_x = r1_x1 <= r2_x2 && r1_x2 >= r2_x1;
                         let collide_in_y = r1_y1 <= r2_y2 && r1_y2 >= r2_y1;
                         let collide = collide_in_x && collide_in_y;
 
                         if collide {
-                            if physics.velocity.0 > 0.0 && r1_x1 < r2_x1 {
-                                physics.position.0 -= r1_x2 - r2_x1;
-                                physics.velocity.0 = 0.0;
-                            } else if physics.velocity.0 < 0.0 && r1_x2 > r2_x2 {
-                                physics.position.0 += r2_x2 - r1_x1;
-                                physics.velocity.0 = 0.0;
-                            }
-                            if physics.velocity.1 > 0.0 && r1_y1 < r2_y1 {
-                                physics.position.1 -= r1_y2 - r2_y1;
-                                physics.velocity.1 = 0.0;
-                            } else if physics.velocity.1 < 0.0 && r1_y2 > r2_y2 {
-                                physics.position.0 += r2_y2 - r1_y1;
-                                physics.velocity.1 = 0.0;
+                            self.collisions.push(Collision {
+                                entities: (physics.entity, compare.entity),
+                            });
+                            if rb1.solid && rb2.solid {
+                                // Avoid overlapping
+                                if physics.velocity.0 > 0.0 && r1_x1 < r2_x1 {
+                                    physics.position.0 -= r1_x2 - r2_x1;
+                                    physics.velocity.0 = 0.0;
+                                } else if physics.velocity.0 < 0.0 && r1_x2 > r2_x2 {
+                                    physics.position.0 += r2_x2 - r1_x1;
+                                    physics.velocity.0 = 0.0;
+                                }
+                                if physics.velocity.1 > 0.0 && r1_y1 < r2_y1 {
+                                    physics.position.1 -= r1_y2 - r2_y1;
+                                    physics.velocity.1 = 0.0;
+                                } else if physics.velocity.1 < 0.0 && r1_y2 > r2_y2 {
+                                    physics.position.0 += r2_y2 - r1_y1;
+                                    physics.velocity.1 = 0.0;
+                                }
                             }
                         }
                     }
