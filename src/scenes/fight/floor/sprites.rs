@@ -1,4 +1,4 @@
-use crate::components::shape::ShapeTexture;
+use crate::systems::drawing::ShapeTexture;
 
 pub const FLOOR_SPRITE_PATH: &'static str = "assets/floor.png";
 const FLOOR_SPRITE_INDEX: usize = 1;

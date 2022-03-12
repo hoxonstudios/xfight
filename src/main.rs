@@ -1,12 +1,11 @@
 extern crate sdl2;
 
-mod components;
 mod scenes;
 mod systems;
 
 use scenes::fight::FightScene;
 use sdl2::image::InitFlag;
-use systems::drawing::DrawingSystem;
+use systems::{drawing::DrawingSystem, physics::PhysicsSystem};
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
@@ -24,11 +23,12 @@ fn main() -> Result<(), String> {
     let texture_creator = canvas.texture_creator();
     let mut event_pump = sdl_context.event_pump()?;
 
-    // SYSTEMS
-    let mut drawing_system = DrawingSystem::init(&mut canvas)?;
-
     // SCENE
-    let mut scene = FightScene::init(&texture_creator, &mut drawing_system);
-
-    scene.run(&mut event_pump, &mut drawing_system)
+    let mut scene = FightScene {
+        entity: 0,
+        physics: PhysicsSystem::init(),
+        drawing: DrawingSystem::init(&mut canvas)?,
+    };
+    scene.init(&texture_creator);
+    scene.run(&mut event_pump)
 }

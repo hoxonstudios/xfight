@@ -1,16 +1,40 @@
 pub mod sprites;
 
-use crate::components::{shape::ShapeComponent, ShapeArchetype};
+use crate::systems::{
+    drawing::ShapeComponent,
+    physics::{PhysicsComponent, RigidBody},
+};
 
 use self::sprites::FLOOR_SPRITE;
 
-impl ShapeArchetype {
+use super::FightScene;
+
+impl<'a> FightScene<'a> {
     pub fn init_floor(&mut self) {
-        self.shape.push(ShapeComponent {
-            position: (400.0, 550.0),
-            size: (800, 100),
-            flipped: (false, false),
-            texture: FLOOR_SPRITE,
-        })
+        let entity = self.entity;
+        self.physics.store.insert_component(
+            entity,
+            PhysicsComponent {
+                entity,
+                position: (400.0, 550.0),
+                velocity: (0.0, 0.0),
+                acceleration: (0.0, 0.0),
+                rigid_body: Some(RigidBody {
+                    size: (400.0, 50.0),
+                }),
+                gravity: false,
+            },
+        );
+        self.drawing.store.insert_component(
+            entity,
+            ShapeComponent {
+                entity,
+                size: (800, 100),
+                flipped: (false, false),
+                texture: FLOOR_SPRITE,
+            },
+        );
+
+        self.entity += 1;
     }
 }

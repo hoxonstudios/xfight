@@ -1,4 +1,4 @@
-use crate::components::shape::ShapeTexture;
+use crate::systems::drawing::ShapeTexture;
 
 pub const RYU_SPRITE_PATH: &'static str = "assets/ryu.png";
 const RYU_TEXTURE_INDEX: usize = 0;
