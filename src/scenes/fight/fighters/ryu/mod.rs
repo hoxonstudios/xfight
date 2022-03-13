@@ -5,14 +5,23 @@ use crate::{
     systems::{
         drawing::{ShapeComponent, ShapeTexture},
         physics::{PhysicsComponent, RigidBody},
+        walking::{WalkingComponent, WalkingDirection},
     },
 };
 
-use self::sprites::{RYU_STAND_1, RYU_TEXTURE_PATH};
+use self::sprites::{
+    RYU_STAND_1, RYU_TEXTURE_PATH, RYU_WALKING_1, RYU_WALKING_2, RYU_WALKING_3, RYU_WALKING_4,
+    RYU_WALKING_5, RYU_WALKING_6,
+};
 
 impl<'a> FightScene<'a> {
     pub fn init_ryu(&mut self, position: (f32, f32), flipped: bool) {
         let entity = self.entity;
+        let texture_index = self
+            .drawing
+            .texture_store
+            .load_texture(RYU_TEXTURE_PATH)
+            .expect("Failed to load Ryu texture");
 
         self.physics.store.insert_component(
             entity,
@@ -22,18 +31,12 @@ impl<'a> FightScene<'a> {
                 velocity: (0.0, 0.0),
                 acceleration: (0.0, 0.0),
                 rigid_body: Some(RigidBody {
-                    size: (25.0, 45.0),
+                    size: (10.0, 45.0),
                     solid: true,
                 }),
                 gravity: true,
             },
         );
-        let texture_index = self
-            .drawing
-            .texture_store
-            .load_texture(RYU_TEXTURE_PATH)
-            .expect("Failed to load Ryu texture");
-
         self.drawing.store.insert_component(
             entity,
             ShapeComponent {
@@ -44,6 +47,27 @@ impl<'a> FightScene<'a> {
                     texture_index,
                     sprite: RYU_STAND_1,
                 },
+            },
+        );
+        self.walking.store.insert_component(
+            entity,
+            WalkingComponent {
+                entity,
+                activated: Some(if flipped {
+                    WalkingDirection::ForwardToLeft
+                } else {
+                    WalkingDirection::ForwardToRight
+                }),
+                direction: None,
+                sprites: [
+                    RYU_WALKING_1,
+                    RYU_WALKING_2,
+                    RYU_WALKING_3,
+                    RYU_WALKING_4,
+                    RYU_WALKING_5,
+                    RYU_WALKING_6,
+                ],
+                sprite_step: (0, 0),
             },
         );
 

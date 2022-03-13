@@ -59,7 +59,7 @@ impl<'a> DrawingSystem<'a> {
         self.canvas.set_draw_color(Color::BLACK);
         self.canvas.clear();
 
-        for shape in self.store.data().iter() {
+        for shape in self.store.data() {
             if let Some(physics) = physics_system.store.get_component(shape.entity) {
                 let (x, y) = physics.position;
                 let (width, height) = shape.size;

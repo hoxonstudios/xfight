@@ -5,16 +5,17 @@ use sdl2::{
     event::Event, keyboard::Keycode, render::TextureCreator, video::WindowContext, EventPump,
 };
 
-use crate::systems::{drawing::DrawingSystem, physics::PhysicsSystem};
+use crate::systems::{drawing::DrawingSystem, physics::PhysicsSystem, walking::WalkingSystem};
 
 pub struct FightScene<'a> {
     pub entity: usize,
     pub physics: PhysicsSystem,
     pub drawing: DrawingSystem<'a>,
+    pub walking: WalkingSystem,
 }
 
 impl<'a> FightScene<'a> {
-    pub fn init(&mut self, texture_creator: &'a TextureCreator<WindowContext>) {
+    pub fn init(&mut self) {
         // INIT SHAPES
         self.init_floor();
 
@@ -41,6 +42,7 @@ impl<'a> FightScene<'a> {
                 .filter_map(Keycode::from_scancode)
                 .collect::<Vec<Keycode>>();
 
+            self.walking.update(&mut self.physics, &mut self.drawing);
             self.physics.update();
             self.drawing.update(&self.physics)?;
         }

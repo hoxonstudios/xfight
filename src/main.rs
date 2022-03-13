@@ -5,7 +5,7 @@ mod systems;
 
 use scenes::fight::FightScene;
 use sdl2::image::InitFlag;
-use systems::{drawing::DrawingSystem, physics::PhysicsSystem};
+use systems::{drawing::DrawingSystem, physics::PhysicsSystem, walking::WalkingSystem};
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
@@ -28,7 +28,8 @@ fn main() -> Result<(), String> {
         entity: 0,
         physics: PhysicsSystem::init(),
         drawing: DrawingSystem::init(&mut canvas, &texture_creator)?,
+        walking: WalkingSystem::init(),
     };
-    scene.init(&texture_creator);
+    scene.init();
     scene.run(&mut event_pump)
 }
