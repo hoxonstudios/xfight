@@ -16,9 +16,9 @@ impl<T: Copy> ComponentStore<T> {
     pub fn data_mut(&mut self) -> &mut Vec<T> {
         &mut self.components
     }
-    pub fn get_component(&self, id: usize) -> Option<&T> {
-        if id < self.entities.len() {
-            if let Some(index) = self.entities[id] {
+    pub fn get_component(&self, entity: usize) -> Option<&T> {
+        if entity < self.entities.len() {
+            if let Some(index) = self.entities[entity] {
                 Some(&self.components[index])
             } else {
                 None
@@ -27,9 +27,9 @@ impl<T: Copy> ComponentStore<T> {
             None
         }
     }
-    pub fn get_mut_component(&mut self, id: usize) -> Option<&mut T> {
-        if id < self.entities.len() {
-            if let Some(index) = self.entities[id] {
+    pub fn get_mut_component(&mut self, entity: usize) -> Option<&mut T> {
+        if entity < self.entities.len() {
+            if let Some(index) = self.entities[entity] {
                 Some(&mut self.components[index])
             } else {
                 None
@@ -38,26 +38,26 @@ impl<T: Copy> ComponentStore<T> {
             None
         }
     }
-    pub fn insert_component(&mut self, id: usize, component: T) {
+    pub fn insert_component(&mut self, entity: usize, component: T) {
         let last = self.entities.len();
-        if id >= self.entities.len() {
-            for _ in last..id {
+        if entity >= self.entities.len() {
+            for _ in last..entity {
                 self.entities.push(Option::None);
             }
             self.entities.push(Some(self.components.len()));
         } else {
-            self.entities[id] = Some(self.components.len());
+            self.entities[entity] = Some(self.components.len());
         }
         self.components.push(component);
     }
-    pub fn delete_component(&mut self, id: usize) {
-        if let Some(index) = self.entities[id] {
+    pub fn delete_component(&mut self, entity: usize) {
+        if let Some(index) = self.entities[entity] {
             self.components[index] = self.components[self.components.len() - 1];
             self.components.pop();
         }
-        if id < self.entities.len() - 1 {
-            self.entities[id] = None;
-        } else if id == self.entities.len() - 1 {
+        if entity < self.entities.len() - 1 {
+            self.entities[entity] = None;
+        } else if entity == self.entities.len() - 1 {
             self.entities.pop();
         }
     }

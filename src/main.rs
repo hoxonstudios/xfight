@@ -6,7 +6,7 @@ mod systems;
 use scenes::fight::FightScene;
 use sdl2::image::InitFlag;
 use systems::{
-    aim::AimSystem, drawing::DrawingSystem, physics::PhysicsSystem, stand::StandSystem,
+    drawing::DrawingSystem, movement::MovementSystem, physics::PhysicsSystem, stand::StandSystem,
     walking::WalkingSystem,
 };
 
@@ -31,7 +31,7 @@ fn main() -> Result<(), String> {
         entity: 0,
         physics: PhysicsSystem::init(),
         drawing: DrawingSystem::init(&mut canvas, &texture_creator)?,
-        aim: AimSystem::init(),
+        movement: MovementSystem::init(),
         stand: StandSystem::init(),
         walking: WalkingSystem::init(),
     };

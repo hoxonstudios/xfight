@@ -3,8 +3,8 @@ pub mod sprites;
 use crate::{
     scenes::fight::FightScene,
     systems::{
-        aim::{AimComponent, AimDirection},
         drawing::{ShapeComponent, ShapeTexture},
+        movement::{AimDirection, MovementAction, MovementComponent},
         physics::{PhysicsComponent, RigidBody},
         stand::StandComponent,
         walking::WalkingComponent,
@@ -51,18 +51,19 @@ impl<'a> FightScene<'a> {
                 },
             },
         );
-        self.aim.store.insert_component(
+        self.movement.store.insert_component(
             entity,
-            AimComponent {
+            MovementComponent {
                 entity,
+                action: MovementAction::None,
                 direction: AimDirection::Right,
+                grounded: false,
             },
         );
         self.stand.store.insert_component(
             entity,
             StandComponent {
                 entity,
-                activated: true,
                 sprites: [RYU_STAND_1, RYU_STAND_2, RYU_STAND_3, RYU_STAND_4],
                 sprite_step: (0, 0),
             },
@@ -71,7 +72,6 @@ impl<'a> FightScene<'a> {
             entity,
             WalkingComponent {
                 entity,
-                activated: None,
                 direction: None,
                 sprites: [
                     RYU_WALKING_1,

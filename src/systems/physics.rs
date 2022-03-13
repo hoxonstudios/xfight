@@ -18,6 +18,7 @@ pub struct RigidBody {
 
 pub struct Collision {
     pub entities: (usize, usize),
+    pub sides: ([bool; 4], [bool; 4]),
 }
 
 pub struct PhysicsSystem {
@@ -66,66 +67,55 @@ impl PhysicsSystem {
                         if collide {
                             let x_vel_difference = compare1.velocity.0 - compare2.velocity.0;
                             let y_vel_difference = compare1.velocity.1 - compare2.velocity.1;
-                            let x_collide_side = if x_vel_difference < 0.0 {
-                                XCollisionSide::Left
-                            } else if x_vel_difference > 0.0 {
-                                XCollisionSide::Right
+                            let [left_rollback, up_rollback, right_rollback, down_rollback] = [
+                                (r2_x2 - r1_x1) / -x_vel_difference,
+                                (r2_y2 - r1_y1) / -y_vel_difference,
+                                (r1_x2 - r2_x1) / x_vel_difference,
+                                (r1_y2 - r2_y1) / y_vel_difference,
+                            ]
+                            .map(|r| if r > 1.0 { 0.0 } else { r });
+
+                            let rollback_time_x = if left_rollback > 0.0 {
+                                left_rollback
+                            } else if right_rollback > 0.0 {
+                                right_rollback
                             } else {
-                                XCollisionSide::None
+                                0.0
                             };
-                            let y_collide_side = if y_vel_difference < 0.0 {
-                                YCollisionSide::Up
-                            } else if y_vel_difference > 0.0 {
-                                YCollisionSide::Down
+
+                            let rollback_time_y = if up_rollback > 0.0 {
+                                up_rollback
+                            } else if down_rollback > 0.0 {
+                                down_rollback
                             } else {
-                                YCollisionSide::None
-                            };
-                            let rollback_time_y = match y_collide_side {
-                                YCollisionSide::None => 0.0,
-                                YCollisionSide::Up => (r2_y2 - r1_y1) / -y_vel_difference,
-                                YCollisionSide::Down => (r1_y2 - r2_y1) / y_vel_difference,
-                            };
-                            let rollback_time_x = match x_collide_side {
-                                XCollisionSide::None => 0.0,
-                                XCollisionSide::Left => (r2_x2 - r1_x1) / -x_vel_difference,
-                                XCollisionSide::Right => (r1_x2 - r2_x1) / x_vel_difference,
+                                0.0
                             };
 
                             collisions_rollback[i] = (
-                                if rollback_time_x <= 1.0
-                                    && rollback_time_x > collisions_rollback[i].0
-                                {
-                                    rollback_time_x
-                                } else {
-                                    collisions_rollback[i].0
-                                },
-                                if rollback_time_y <= 1.0
-                                    && rollback_time_y > collisions_rollback[i].1
-                                {
-                                    rollback_time_y
-                                } else {
-                                    collisions_rollback[i].1
-                                },
+                                rollback_time_x.max(collisions_rollback[i].0),
+                                rollback_time_y.max(collisions_rollback[i].1),
                             );
                             collisions_rollback[j] = (
-                                if rollback_time_x <= 1.0
-                                    && rollback_time_x > collisions_rollback[j].0
-                                {
-                                    rollback_time_x
-                                } else {
-                                    collisions_rollback[j].0
-                                },
-                                if rollback_time_y <= 1.0
-                                    && rollback_time_y > collisions_rollback[j].1
-                                {
-                                    rollback_time_y
-                                } else {
-                                    collisions_rollback[j].1
-                                },
+                                rollback_time_x.max(collisions_rollback[j].0),
+                                rollback_time_y.max(collisions_rollback[j].1),
                             );
 
                             self.collisions.push(Collision {
                                 entities: (compare1.entity, compare2.entity),
+                                sides: (
+                                    [
+                                        left_rollback > 0.0,
+                                        up_rollback > 0.0,
+                                        right_rollback > 0.0,
+                                        down_rollback > 0.0,
+                                    ],
+                                    [
+                                        right_rollback > 0.0,
+                                        down_rollback > 0.0,
+                                        left_rollback > 0.0,
+                                        up_rollback > 0.0,
+                                    ],
+                                ),
                             });
                         }
                     }
@@ -166,15 +156,4 @@ impl PhysicsSystem {
 
         return collide;
     }
-}
-
-enum XCollisionSide {
-    Left,
-    Right,
-    None,
-}
-enum YCollisionSide {
-    Up,
-    Down,
-    None,
 }

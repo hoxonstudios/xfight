@@ -4,7 +4,7 @@ mod floor;
 use sdl2::{event::Event, keyboard::Keycode, EventPump};
 
 use crate::systems::{
-    aim::AimSystem, drawing::DrawingSystem, physics::PhysicsSystem, stand::StandSystem,
+    drawing::DrawingSystem, movement::MovementSystem, physics::PhysicsSystem, stand::StandSystem,
     walking::WalkingSystem,
 };
 
@@ -12,7 +12,7 @@ pub struct FightScene<'a> {
     pub entity: usize,
     pub physics: PhysicsSystem,
     pub drawing: DrawingSystem<'a>,
-    pub aim: AimSystem,
+    pub movement: MovementSystem,
     pub stand: StandSystem,
     pub walking: WalkingSystem,
 }
@@ -45,10 +45,10 @@ impl<'a> FightScene<'a> {
                 .filter_map(Keycode::from_scancode)
                 .collect::<Vec<Keycode>>();
 
-            self.aim.update(&self.physics, &mut self.drawing);
-            self.stand.update(&mut self.drawing);
+            self.movement.update(&self.physics, &mut self.drawing);
+            self.stand.update(&mut self.drawing, &self.movement);
             self.walking
-                .update(&mut self.physics, &mut self.drawing, &self.aim);
+                .update(&mut self.physics, &mut self.drawing, &self.movement);
             self.physics.update();
             self.drawing.update(&self.physics)?;
         }
