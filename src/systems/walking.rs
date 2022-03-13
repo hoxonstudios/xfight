@@ -6,7 +6,7 @@ use super::{
 };
 
 const WALKING_SPRITES_COUNT: usize = 6;
-const WALKING_FRAMES_PER_SPRITE: u8 = 2;
+const WALKING_FRAMES: u8 = 2;
 const WALKING_VELOCITY: f32 = 1.0;
 
 #[derive(Copy, Clone)]
@@ -44,14 +44,14 @@ impl WalkingSystem {
                 walking.direction = walking.activated;
                 walking.sprite_step = (0, 0);
             } else {
-                if walking.sprite_step.1 >= WALKING_FRAMES_PER_SPRITE {
+                if walking.sprite_step.1 >= WALKING_FRAMES {
                     walking.sprite_step.0 += 1;
                     walking.sprite_step.1 = 0;
+                    if walking.sprite_step.0 >= WALKING_SPRITES_COUNT {
+                        walking.sprite_step = (0, 0)
+                    }
                 } else {
                     walking.sprite_step.1 += 1;
-                }
-                if walking.sprite_step.0 >= WALKING_SPRITES_COUNT {
-                    walking.sprite_step = (0, 0)
                 }
             }
             if let Some(direction) = walking.direction {
