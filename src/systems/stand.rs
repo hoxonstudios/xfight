@@ -36,6 +36,7 @@ impl StandSystem {
                 let activated = match movement {
                     MovementComponent {
                         grounded: true,
+                        attacking: false,
                         action: MovementAction::None,
                         ..
                     } => true,

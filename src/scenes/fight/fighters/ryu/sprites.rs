@@ -44,3 +44,17 @@ pub const RYU_WALKING_6: TextureSprite = TextureSprite {
     position: (450, 0),
     size: (49, 90),
 };
+
+// PUNCH
+pub const RYU_LIGHT_PUNCH_1: TextureSprite = TextureSprite {
+    position: (0, 107),
+    size: (45, 100),
+};
+pub const RYU_LIGHT_PUNCH_2: TextureSprite = TextureSprite {
+    position: (50, 107),
+    size: (60, 100),
+};
+pub const RYU_LIGHT_PUNCH_3: TextureSprite = TextureSprite {
+    position: (115, 107),
+    size: (45, 100),
+};

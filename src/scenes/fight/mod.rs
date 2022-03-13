@@ -8,6 +8,7 @@ use crate::systems::{
     input::{Controller, InputSystem},
     movement::MovementSystem,
     physics::PhysicsSystem,
+    punch::PunchSystem,
     stand::StandSystem,
     walking::WalkingSystem,
 };
@@ -20,6 +21,7 @@ pub struct FightScene<'a> {
     pub movement: MovementSystem,
     pub stand: StandSystem,
     pub walking: WalkingSystem,
+    pub punch: PunchSystem,
 }
 
 impl<'a> FightScene<'a> {
@@ -47,6 +49,7 @@ impl<'a> FightScene<'a> {
 
             self.input.update(&mut self.movement);
             self.movement.update(&self.physics, &mut self.drawing);
+            self.punch.update(&mut self.drawing, &mut self.movement);
             self.stand
                 .update(&mut self.physics, &mut self.drawing, &self.movement);
             self.walking

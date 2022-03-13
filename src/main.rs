@@ -7,7 +7,7 @@ use scenes::fight::FightScene;
 use sdl2::image::InitFlag;
 use systems::{
     drawing::DrawingSystem, input::InputSystem, movement::MovementSystem, physics::PhysicsSystem,
-    stand::StandSystem, walking::WalkingSystem,
+    punch::PunchSystem, stand::StandSystem, walking::WalkingSystem,
 };
 
 fn main() -> Result<(), String> {
@@ -35,6 +35,7 @@ fn main() -> Result<(), String> {
         movement: MovementSystem::init(),
         stand: StandSystem::init(),
         walking: WalkingSystem::init(),
+        punch: PunchSystem::init(),
     };
     scene.init();
     scene.run()

@@ -38,7 +38,8 @@ impl<'a> InputSystem<'a> {
                     Controller::One => pressed_keys.controllers[0],
                     Controller::Two => pressed_keys.controllers[1],
                 };
-                movement.incoming = match controller {
+                movement.action = match controller {
+                    ControllerMap { punch: true, .. } => MovementAction::Punch,
                     ControllerMap { left: true, .. } => MovementAction::WalkLeft,
                     ControllerMap { right: true, .. } => MovementAction::WalkRight,
                     _ => MovementAction::None,
@@ -60,10 +61,12 @@ impl<'a> InputSystem<'a> {
                 ControllerMap {
                     left: keys.contains(&Keycode::A),
                     right: keys.contains(&Keycode::D),
+                    punch: keys.contains(&Keycode::T),
                 },
                 ControllerMap {
                     left: keys.contains(&Keycode::Left),
                     right: keys.contains(&Keycode::Right),
+                    punch: keys.contains(&Keycode::Kp4),
                 },
             ],
         }
@@ -78,4 +81,5 @@ struct PressedKeys {
 struct ControllerMap {
     left: bool,
     right: bool,
+    punch: bool,
 }

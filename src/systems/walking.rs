@@ -44,24 +44,28 @@ impl WalkingSystem {
                 let direction = match movement {
                     MovementComponent {
                         grounded: true,
+                        attacking: false,
                         action: MovementAction::WalkLeft,
                         direction: AimDirection::Left,
                         ..
                     } => Some(WalkingDirection::Forward),
                     MovementComponent {
                         grounded: true,
+                        attacking: false,
                         action: MovementAction::WalkRight,
                         direction: AimDirection::Right,
                         ..
                     } => Some(WalkingDirection::Forward),
                     MovementComponent {
                         grounded: true,
+                        attacking: false,
                         action: MovementAction::WalkLeft,
                         direction: AimDirection::Right,
                         ..
                     } => Some(WalkingDirection::Backward),
                     MovementComponent {
                         grounded: true,
+                        attacking: false,
                         action: MovementAction::WalkRight,
                         direction: AimDirection::Left,
                         ..
