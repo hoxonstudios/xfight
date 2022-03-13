@@ -2,6 +2,7 @@ use super::{
     drawing::{DrawingSystem, TextureSprite},
     helpers::ComponentStore,
     movement::{AimDirection, MovementAction, MovementComponent, MovementSystem},
+    physics::PhysicsSystem,
 };
 
 const STAND_SPRITE_COUNT: usize = 4;
@@ -25,6 +26,7 @@ impl StandSystem {
     }
     pub fn update<'a>(
         &mut self,
+        physics_system: &mut PhysicsSystem,
         drawing_system: &mut DrawingSystem<'a>,
         movement_system: &MovementSystem,
     ) {
@@ -41,6 +43,9 @@ impl StandSystem {
                 };
                 if activated {
                     let (sprite, frame) = &mut stand.sprite_step;
+                    if let Some(physics) = physics_system.store.get_mut_component(entity) {
+                        physics.velocity.0 = 0.0;
+                    }
                     if *frame >= STAND_FRAMES {
                         *sprite += 1;
                         *frame = 0;

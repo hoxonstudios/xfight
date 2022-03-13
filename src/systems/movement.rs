@@ -3,6 +3,7 @@ use super::{drawing::DrawingSystem, helpers::ComponentStore, physics::PhysicsSys
 #[derive(Copy, Clone)]
 pub struct MovementComponent {
     pub entity: usize,
+    pub incoming: MovementAction,
     pub action: MovementAction,
     pub direction: AimDirection,
     pub grounded: bool,
@@ -51,6 +52,24 @@ impl MovementSystem {
                     };
                 }
             }
+
+            movement.action = match movement.action {
+                MovementAction::None => match movement.incoming {
+                    MovementAction::None => MovementAction::None,
+                    MovementAction::WalkLeft => MovementAction::WalkLeft,
+                    MovementAction::WalkRight => MovementAction::WalkRight,
+                },
+                MovementAction::WalkLeft => match movement.incoming {
+                    MovementAction::None => MovementAction::None,
+                    MovementAction::WalkLeft => MovementAction::WalkLeft,
+                    MovementAction::WalkRight => MovementAction::WalkRight,
+                },
+                MovementAction::WalkRight => match movement.incoming {
+                    MovementAction::None => MovementAction::None,
+                    MovementAction::WalkLeft => MovementAction::WalkLeft,
+                    MovementAction::WalkRight => MovementAction::WalkRight,
+                },
+            };
         }
     }
     fn is_grounded(entity: usize, physics_system: &PhysicsSystem) -> bool {

@@ -1,10 +1,14 @@
 mod fighters;
 mod floor;
 
-use sdl2::{event::Event, keyboard::Keycode, EventPump};
+use sdl2::{event::Event, keyboard::Keycode};
 
 use crate::systems::{
-    drawing::DrawingSystem, movement::MovementSystem, physics::PhysicsSystem, stand::StandSystem,
+    drawing::DrawingSystem,
+    input::{Controller, InputSystem},
+    movement::MovementSystem,
+    physics::PhysicsSystem,
+    stand::StandSystem,
     walking::WalkingSystem,
 };
 
@@ -12,6 +16,7 @@ pub struct FightScene<'a> {
     pub entity: usize,
     pub physics: PhysicsSystem,
     pub drawing: DrawingSystem<'a>,
+    pub input: InputSystem<'a>,
     pub movement: MovementSystem,
     pub stand: StandSystem,
     pub walking: WalkingSystem,
@@ -23,13 +28,13 @@ impl<'a> FightScene<'a> {
         self.init_floor();
 
         // INIT FIGHTERS
-        self.init_ryu((100.0, 350.0));
-        self.init_ryu((600.0, 350.0));
+        self.init_ryu((100.0, 350.0), Controller::One);
+        self.init_ryu((600.0, 350.0), Controller::Two);
     }
 
-    pub fn run(&mut self, event_pump: &mut EventPump) -> Result<(), String> {
+    pub fn run(&mut self) -> Result<(), String> {
         'running: loop {
-            for event in event_pump.poll_iter() {
+            for event in self.input.event_pump.poll_iter() {
                 match event {
                     Event::Quit { .. }
                     | Event::KeyDown {
@@ -39,14 +44,11 @@ impl<'a> FightScene<'a> {
                     _ => {}
                 }
             }
-            let _ = event_pump
-                .keyboard_state()
-                .pressed_scancodes()
-                .filter_map(Keycode::from_scancode)
-                .collect::<Vec<Keycode>>();
 
+            self.input.update(&mut self.movement);
             self.movement.update(&self.physics, &mut self.drawing);
-            self.stand.update(&mut self.drawing, &self.movement);
+            self.stand
+                .update(&mut self.physics, &mut self.drawing, &self.movement);
             self.walking
                 .update(&mut self.physics, &mut self.drawing, &self.movement);
             self.physics.update();

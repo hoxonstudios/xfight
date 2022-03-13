@@ -4,6 +4,7 @@ use crate::{
     scenes::fight::FightScene,
     systems::{
         drawing::{ShapeComponent, ShapeTexture},
+        input::{Controller, InputComponent},
         movement::{AimDirection, MovementAction, MovementComponent},
         physics::{PhysicsComponent, RigidBody},
         stand::StandComponent,
@@ -17,7 +18,7 @@ use self::sprites::{
 };
 
 impl<'a> FightScene<'a> {
-    pub fn init_ryu(&mut self, position: (f32, f32)) {
+    pub fn init_ryu(&mut self, position: (f32, f32), controller: Controller) {
         let entity = self.entity;
         let texture_index = self
             .drawing
@@ -51,10 +52,14 @@ impl<'a> FightScene<'a> {
                 },
             },
         );
+        self.input
+            .store
+            .insert_component(entity, InputComponent { entity, controller });
         self.movement.store.insert_component(
             entity,
             MovementComponent {
                 entity,
+                incoming: MovementAction::None,
                 action: MovementAction::None,
                 direction: AimDirection::Right,
                 grounded: false,
