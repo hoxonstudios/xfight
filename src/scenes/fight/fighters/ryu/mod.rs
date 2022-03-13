@@ -3,6 +3,7 @@ pub mod sprites;
 use crate::{
     scenes::fight::FightScene,
     systems::{
+        aim::{AimComponent, AimDirection},
         drawing::{ShapeComponent, ShapeTexture},
         physics::{PhysicsComponent, RigidBody},
         walking::{WalkingComponent, WalkingDirection},
@@ -15,7 +16,7 @@ use self::sprites::{
 };
 
 impl<'a> FightScene<'a> {
-    pub fn init_ryu(&mut self, position: (f32, f32), flipped: bool) {
+    pub fn init_ryu(&mut self, position: (f32, f32)) {
         let entity = self.entity;
         let texture_index = self
             .drawing
@@ -42,22 +43,25 @@ impl<'a> FightScene<'a> {
             ShapeComponent {
                 entity,
                 size: (50, 90),
-                flipped: (flipped, false),
+                flipped: (false, false),
                 texture: ShapeTexture {
                     texture_index,
                     sprite: RYU_STAND_1,
                 },
             },
         );
+        self.aim.store.insert_component(
+            entity,
+            AimComponent {
+                entity,
+                direction: AimDirection::Right,
+            },
+        );
         self.walking.store.insert_component(
             entity,
             WalkingComponent {
                 entity,
-                activated: Some(if flipped {
-                    WalkingDirection::ForwardToLeft
-                } else {
-                    WalkingDirection::ForwardToRight
-                }),
+                activated: Some(WalkingDirection::Forward),
                 direction: None,
                 sprites: [
                     RYU_WALKING_1,

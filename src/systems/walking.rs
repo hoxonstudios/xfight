@@ -1,4 +1,5 @@
 use super::{
+    aim::{AimDirection, AimSystem},
     drawing::{DrawingSystem, TextureSprite},
     helpers::ComponentStore,
     physics::PhysicsSystem,
@@ -19,10 +20,8 @@ pub struct WalkingComponent {
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum WalkingDirection {
-    ForwardToRight,
-    ForwardToLeft,
-    BackwardToRight,
-    BackwardToLeft,
+    Forward,
+    Backward,
 }
 
 pub struct WalkingSystem {
@@ -38,6 +37,7 @@ impl WalkingSystem {
         &mut self,
         physics_system: &mut PhysicsSystem,
         drawing_system: &mut DrawingSystem<'a>,
+        aim_system: &AimSystem,
     ) {
         for walking in self.store.data_mut() {
             if walking.activated != walking.direction {
@@ -57,21 +57,17 @@ impl WalkingSystem {
             if let Some(direction) = walking.direction {
                 if let Some(drawing) = drawing_system.store.get_mut_component(walking.entity) {
                     drawing.texture.sprite = walking.sprites[walking.sprite_step.0];
-                    drawing.flipped = match direction {
-                        WalkingDirection::ForwardToLeft => (true, false),
-                        WalkingDirection::BackwardToLeft => (false, false),
-                        WalkingDirection::BackwardToRight => (true, false),
-                        WalkingDirection::ForwardToRight => (false, false),
-                    };
                 }
                 if let Some(physics) = physics_system.store.get_mut_component(walking.entity) {
-                    physics.acceleration = (0.0, 0.0);
-                    physics.velocity.0 = match direction {
-                        WalkingDirection::BackwardToLeft => -WALKING_VELOCITY,
-                        WalkingDirection::BackwardToRight => WALKING_VELOCITY,
-                        WalkingDirection::ForwardToLeft => -WALKING_VELOCITY,
-                        WalkingDirection::ForwardToRight => WALKING_VELOCITY,
-                    };
+                    if let Some(aim) = aim_system.store.get_component(walking.entity) {
+                        physics.acceleration = (0.0, 0.0);
+                        physics.velocity.0 = match (direction, aim.direction) {
+                            (WalkingDirection::Backward, AimDirection::Right) => -WALKING_VELOCITY,
+                            (WalkingDirection::Backward, AimDirection::Left) => WALKING_VELOCITY,
+                            (WalkingDirection::Forward, AimDirection::Left) => -WALKING_VELOCITY,
+                            (WalkingDirection::Forward, AimDirection::Right) => WALKING_VELOCITY,
+                        };
+                    }
                 }
             }
         }
