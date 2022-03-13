@@ -3,10 +3,9 @@ pub mod sprites;
 use crate::{
     scenes::fight::FightScene,
     systems::{
-        drawing::{ShapeComponent, ShapeTexture},
         input::{Controller, InputComponent},
         movement::{AimDirection, MovementAction, MovementComponent},
-        physics::{PhysicsComponent, RigidBody},
+        physics::{PhysicsComponent, RigidBody, Shape},
         punch::PunchComponent,
         stand::StandComponent,
         walking::WalkingComponent,
@@ -36,22 +35,15 @@ impl<'a> FightScene<'a> {
                 velocity: (0.0, 0.0),
                 acceleration: (0.0, 0.0),
                 rigid_body: Some(RigidBody {
-                    size: (10.0, 45.0),
+                    padding: (0.0, 0.0, 0.0, 0.0),
                     solid: true,
                 }),
-                gravity: true,
-            },
-        );
-        self.drawing.store.insert_component(
-            entity,
-            ShapeComponent {
-                entity,
-                size: (50, 90),
-                flipped: (false, false),
-                texture: ShapeTexture {
+                shape: Shape {
+                    flipped: (false, false),
                     texture_index,
                     sprite: RYU_STAND_1,
                 },
+                gravity: true,
             },
         );
         self.input

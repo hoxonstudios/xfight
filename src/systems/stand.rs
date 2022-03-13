@@ -1,8 +1,7 @@
 use super::{
-    drawing::{DrawingSystem, TextureSprite},
     helpers::ComponentStore,
     movement::{AimDirection, MovementAction, MovementComponent, MovementSystem},
-    physics::PhysicsSystem,
+    physics::{PhysicsSystem, TextureSprite},
 };
 
 const STAND_SPRITE_COUNT: usize = 4;
@@ -27,7 +26,6 @@ impl StandSystem {
     pub fn update<'a>(
         &mut self,
         physics_system: &mut PhysicsSystem,
-        drawing_system: &mut DrawingSystem<'a>,
         movement_system: &MovementSystem,
     ) {
         for stand in self.store.data_mut() {
@@ -46,23 +44,21 @@ impl StandSystem {
                     let (sprite, frame) = &mut stand.sprite_step;
                     if let Some(physics) = physics_system.store.get_mut_component(entity) {
                         physics.velocity.0 = 0.0;
-                    }
-                    if *frame >= STAND_FRAMES {
-                        *sprite += 1;
-                        *frame = 0;
-                        if *sprite >= STAND_SPRITE_COUNT {
-                            *sprite = 0;
+                        if *frame >= STAND_FRAMES {
+                            *sprite += 1;
                             *frame = 0;
-                        }
-                        if let Some(shape) = drawing_system.store.get_mut_component(stand.entity) {
-                            shape.texture.sprite = stand.sprites[*sprite];
-                            shape.flipped.0 = match movement.direction {
+                            if *sprite >= STAND_SPRITE_COUNT {
+                                *sprite = 0;
+                                *frame = 0;
+                            }
+                            physics.shape.sprite = stand.sprites[*sprite];
+                            physics.shape.flipped.0 = match movement.direction {
                                 AimDirection::Left => true,
                                 AimDirection::Right => false,
-                            }
+                            };
+                        } else {
+                            *frame += 1;
                         }
-                    } else {
-                        *frame += 1;
                     }
                 }
             }

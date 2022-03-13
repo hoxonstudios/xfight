@@ -48,12 +48,10 @@ impl<'a> FightScene<'a> {
             }
 
             self.input.update(&mut self.movement);
-            self.movement.update(&self.physics, &mut self.drawing);
-            self.punch.update(&mut self.drawing, &mut self.movement);
-            self.stand
-                .update(&mut self.physics, &mut self.drawing, &self.movement);
-            self.walking
-                .update(&mut self.physics, &mut self.drawing, &self.movement);
+            self.movement.update(&mut self.physics);
+            self.punch.update(&mut self.physics, &mut self.movement);
+            self.stand.update(&mut self.physics, &self.movement);
+            self.walking.update(&mut self.physics, &self.movement);
             self.physics.update();
             self.drawing.update(&self.physics)?;
         }

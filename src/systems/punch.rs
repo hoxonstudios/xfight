@@ -1,7 +1,7 @@
 use super::{
-    drawing::{DrawingSystem, TextureSprite},
     helpers::ComponentStore,
     movement::{MovementAction, MovementSystem},
+    physics::{PhysicsSystem, TextureSprite},
 };
 
 const PUNCH_SPRITE_COUNT: usize = 3;
@@ -26,7 +26,7 @@ impl PunchSystem {
     }
     pub fn update<'a>(
         &mut self,
-        drawing_system: &mut DrawingSystem<'a>,
+        physics_system: &mut PhysicsSystem,
         movement_system: &mut MovementSystem,
     ) {
         for punch in self.store.data_mut() {
@@ -42,8 +42,8 @@ impl PunchSystem {
                             punch.active = false;
                             movement.attacking = false;
                         }
-                        if let Some(drawing) = drawing_system.store.get_mut_component(entity) {
-                            drawing.texture.sprite = punch.sprites[*sprite];
+                        if let Some(physics) = physics_system.store.get_mut_component(entity) {
+                            physics.shape.sprite = punch.sprites[*sprite];
                         }
                     } else {
                         *frame += 1;
@@ -55,8 +55,8 @@ impl PunchSystem {
                         punch.active = true;
                         *sprite = 0;
                         *frame = 0;
-                        if let Some(drawing) = drawing_system.store.get_mut_component(entity) {
-                            drawing.texture.sprite = punch.sprites[*sprite];
+                        if let Some(physics) = physics_system.store.get_mut_component(entity) {
+                            physics.shape.sprite = punch.sprites[*sprite];
                         }
                     }
                 }

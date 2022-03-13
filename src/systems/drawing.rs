@@ -3,37 +3,18 @@ use std::{collections::HashMap, path::Path, time::Duration};
 use sdl2::{
     image::LoadTexture,
     pixels::Color,
-    rect::Rect,
+    rect::{Point, Rect},
     render::{Canvas, Texture, TextureCreator},
     video::{Window, WindowContext},
 };
 
-use super::{helpers::ComponentStore, physics::PhysicsSystem};
+use super::physics::{PhysicsSystem, Shape};
 
-#[derive(Copy, Clone)]
-pub struct ShapeComponent {
-    pub entity: usize,
-    pub size: (u32, u32),
-    pub flipped: (bool, bool),
-    pub texture: ShapeTexture,
-}
-
-#[derive(Copy, Clone)]
-pub struct ShapeTexture {
-    pub texture_index: usize,
-    pub sprite: TextureSprite,
-}
-
-#[derive(Copy, Clone)]
-pub struct TextureSprite {
-    pub position: (i32, i32),
-    pub size: (u32, u32),
-}
+const DEBUG_POSITION: bool = true;
 
 pub struct DrawingSystem<'a> {
     canvas: &'a mut Canvas<Window>,
     pub texture_store: TextureStore<'a>,
-    pub store: ComponentStore<ShapeComponent>,
 }
 impl<'a> DrawingSystem<'a> {
     pub fn init(
@@ -51,7 +32,6 @@ impl<'a> DrawingSystem<'a> {
                 textures: vec![],
                 creator,
             },
-            store: ComponentStore::<ShapeComponent>::init(),
         })
     }
 
@@ -59,29 +39,40 @@ impl<'a> DrawingSystem<'a> {
         self.canvas.set_draw_color(Color::BLACK);
         self.canvas.clear();
 
-        for shape in self.store.data() {
-            if let Some(physics) = physics_system.store.get_component(shape.entity) {
-                let (x, y) = physics.position;
-                let (width, height) = shape.size;
-                let (flip_horizontal, flip_vertical) = shape.flipped;
-                let view_x = x as i32 - (width as i32 / 2);
-                let view_y = y as i32 - (height as i32 / 2);
+        for physics in physics_system.store.data() {
+            let shape = physics.shape;
+            let (pos_x, pos_y) = physics.position;
 
-                match shape.texture {
-                    ShapeTexture {
-                        texture_index,
-                        sprite: TextureSprite { position, size },
-                    } => {
-                        let texture = &self.texture_store.textures[texture_index];
+            match shape {
+                Shape {
+                    texture_index,
+                    sprite,
+                    flipped,
+                } => {
+                    let texture = &self.texture_store.textures[texture_index];
+                    let (width, height) = sprite.size();
+                    let (padding_left, padding_top, _, _) = sprite.padding(flipped);
+                    let x = sprite.area.0 as i32;
+                    let y = sprite.area.1 as i32;
 
-                        self.canvas.copy_ex(
-                            texture,
-                            Rect::new(position.0, position.1, size.0, size.1),
-                            Some(Rect::new(view_x, view_y, width, height)),
-                            0.0,
-                            None,
-                            flip_horizontal,
-                            flip_vertical,
+                    let view_x = (pos_x - padding_left as f32) as i32;
+                    let view_y = (pos_y - padding_top as f32) as i32;
+                    let src = Rect::new(x, y, width, height);
+                    let dst = Some(Rect::new(view_x, view_y, width, height));
+
+                    self.canvas
+                        .copy_ex(texture, src, dst, 0.0, None, flipped.0, flipped.1)?;
+
+                    if DEBUG_POSITION {
+                        self.canvas.set_draw_color(Color::RGB(0, 255, 0));
+                        self.canvas.draw_rect(dst.unwrap())?;
+                        self.canvas.draw_line(
+                            Point::new(view_x, pos_y as i32),
+                            Point::new(view_x + width as i32, pos_y as i32),
+                        )?;
+                        self.canvas.draw_line(
+                            Point::new(pos_x as i32, view_y),
+                            Point::new(pos_x as i32, view_y + height as i32),
                         )?;
                     }
                 }

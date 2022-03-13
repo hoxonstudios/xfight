@@ -1,8 +1,7 @@
 use super::{
-    drawing::{DrawingSystem, TextureSprite},
     helpers::ComponentStore,
     movement::{AimDirection, MovementAction, MovementComponent, MovementSystem},
-    physics::PhysicsSystem,
+    physics::{PhysicsSystem, TextureSprite},
 };
 
 const WALKING_SPRITES_COUNT: usize = 6;
@@ -35,7 +34,6 @@ impl WalkingSystem {
     pub fn update<'a>(
         &mut self,
         physics_system: &mut PhysicsSystem,
-        drawing_system: &mut DrawingSystem<'a>,
         movement_system: &MovementSystem,
     ) {
         for walking in self.store.data_mut() {
@@ -88,10 +86,8 @@ impl WalkingSystem {
                     }
                 }
                 if let Some(direction) = walking.direction {
-                    if let Some(drawing) = drawing_system.store.get_mut_component(walking.entity) {
-                        drawing.texture.sprite = walking.sprites[walking.sprite_step.0];
-                    }
                     if let Some(physics) = physics_system.store.get_mut_component(walking.entity) {
+                        physics.shape.sprite = walking.sprites[walking.sprite_step.0];
                         physics.acceleration = (0.0, 0.0);
                         physics.velocity.0 = match (direction, movement.direction) {
                             (WalkingDirection::Backward, AimDirection::Right) => -WALKING_VELOCITY,
