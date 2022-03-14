@@ -6,8 +6,8 @@ mod systems;
 use scenes::fight::FightScene;
 use sdl2::image::InitFlag;
 use systems::{
-    drawing::DrawingSystem, input::InputSystem, movement::MovementSystem, physics::PhysicsSystem,
-    punch::PunchSystem, stand::StandSystem, walking::WalkingSystem,
+    basic_attack::BasicAttackSystem, drawing::DrawingSystem, input::InputSystem,
+    movement::MovementSystem, physics::PhysicsSystem, stand::StandSystem, walking::WalkingSystem,
 };
 
 fn main() -> Result<(), String> {
@@ -35,7 +35,7 @@ fn main() -> Result<(), String> {
         movement: MovementSystem::init(),
         stand: StandSystem::init(),
         walking: WalkingSystem::init(),
-        punch: PunchSystem::init(),
+        basic_attack: BasicAttackSystem::init(),
     };
     scene.init();
     scene.run()

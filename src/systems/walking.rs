@@ -43,28 +43,28 @@ impl WalkingSystem {
                     MovementComponent {
                         grounded: true,
                         attacking: false,
-                        action: MovementAction::WalkLeft,
+                        action: Some(MovementAction::WalkLeft),
                         direction: AimDirection::Left,
                         ..
                     } => Some(WalkingDirection::Forward),
                     MovementComponent {
                         grounded: true,
                         attacking: false,
-                        action: MovementAction::WalkRight,
+                        action: Some(MovementAction::WalkRight),
                         direction: AimDirection::Right,
                         ..
                     } => Some(WalkingDirection::Forward),
                     MovementComponent {
                         grounded: true,
                         attacking: false,
-                        action: MovementAction::WalkLeft,
+                        action: Some(MovementAction::WalkLeft),
                         direction: AimDirection::Right,
                         ..
                     } => Some(WalkingDirection::Backward),
                     MovementComponent {
                         grounded: true,
                         attacking: false,
-                        action: MovementAction::WalkRight,
+                        action: Some(MovementAction::WalkRight),
                         direction: AimDirection::Left,
                         ..
                     } => Some(WalkingDirection::Backward),
@@ -74,7 +74,8 @@ impl WalkingSystem {
                 if direction != walking.direction {
                     walking.direction = direction;
                     walking.sprite_step = (0, 0);
-                } else {
+                }
+                if let Some(direction) = walking.direction {
                     if walking.sprite_step.1 >= WALKING_FRAMES {
                         walking.sprite_step.0 += 1;
                         walking.sprite_step.1 = 0;
@@ -84,8 +85,6 @@ impl WalkingSystem {
                     } else {
                         walking.sprite_step.1 += 1;
                     }
-                }
-                if let Some(direction) = walking.direction {
                     if let Some(physics) = physics_system.store.get_mut_component(walking.entity) {
                         physics.shape.sprite = walking.sprites[walking.sprite_step.0];
                         physics.acceleration = (0.0, 0.0);

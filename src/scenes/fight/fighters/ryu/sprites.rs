@@ -45,7 +45,7 @@ pub const RYU_WALKING_6: TextureSprite = TextureSprite {
     area: (454, 20, 485, 93),
 };
 
-// PUNCH
+// LIGHT PUNCH
 pub const RYU_LIGHT_PUNCH_1: TextureSprite = TextureSprite {
     center: (18, 159),
     area: (2, 130, 41, 209),
@@ -57,4 +57,26 @@ pub const RYU_LIGHT_PUNCH_2: TextureSprite = TextureSprite {
 pub const RYU_LIGHT_PUNCH_3: TextureSprite = TextureSprite {
     center: (132, 159),
     area: (116, 130, 155, 209),
+};
+
+// STRONG_PUNCH
+pub const RYU_STRONG_PUNCH_1: TextureSprite = TextureSprite {
+    center: (185, 159),
+    area: (169, 130, 208, 209),
+};
+pub const RYU_STRONG_PUNCH_2: TextureSprite = TextureSprite {
+    center: (244, 158),
+    area: (220, 125, 261, 208),
+};
+pub const RYU_STRONG_PUNCH_3: TextureSprite = TextureSprite {
+    center: (300, 158),
+    area: (279, 126, 343, 208),
+};
+pub const RYU_STRONG_PUNCH_4: TextureSprite = TextureSprite {
+    center: (379, 158),
+    area: (355, 126, 401, 208),
+};
+pub const RYU_STRONG_PUNCH_5: TextureSprite = TextureSprite {
+    center: (426, 159),
+    area: (410, 130, 449, 209),
 };

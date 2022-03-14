@@ -59,67 +59,19 @@ impl PhysicsSystem {
             for j in 0..i {
                 let compare1 = &destination_vec[i];
                 let compare2 = &destination_vec[j];
-                if let Some(rb1) = compare1.rigid_body {
-                    if let Some(rb2) = compare2.rigid_body {
-                        let r1_padding = compare1.shape.sprite.padding(compare1.shape.flipped);
-                        let r2_padding = compare2.shape.sprite.padding(compare2.shape.flipped);
-                        let r1_x1 = compare1.position.0 - (r1_padding.0 as f32 - rb1.padding.0);
-                        let r1_x2 = compare1.position.0 + (r1_padding.2 as f32 - rb1.padding.2);
-                        let r1_y1 = compare1.position.1 - (r1_padding.1 as f32 - rb1.padding.1);
-                        let r1_y2 = compare1.position.1 + (r1_padding.3 as f32 - rb1.padding.3);
-
-                        let r2_x1 = compare2.position.0 - (r2_padding.0 as f32 - rb2.padding.0);
-                        let r2_x2 = compare2.position.0 + (r2_padding.2 as f32 - rb2.padding.2);
-                        let r2_y1 = compare2.position.1 - (r2_padding.1 as f32 - rb2.padding.1);
-                        let r2_y2 = compare2.position.1 + (r2_padding.3 as f32 - rb2.padding.3);
-
-                        let collide = PhysicsSystem::check_collision(
-                            (r1_x1, r1_y1, r1_x2, r1_y2),
-                            (r2_x1, r2_y1, r2_x2, r2_y2),
-                        );
-
+                if let Some(rect1) = PhysicsSystem::get_collision_rect(compare1) {
+                    if let Some(rect2) = PhysicsSystem::get_collision_rect(compare2) {
+                        let collide = PhysicsSystem::check_collision(rect1, rect2);
                         if collide {
-                            let r1_width = r1_x2 - r1_x1;
-                            let r1_height = r1_y2 - r1_y1;
-                            let x_vel_delta = compare1.velocity.0 - compare2.velocity.0;
-                            let y_vel_delta = compare1.velocity.1 - compare2.velocity.1;
-                            let up = (r2_y2 - r1_y1) / -y_vel_delta;
-                            let down = (r1_y2 - r2_y1) / y_vel_delta;
-                            let left = (r2_x2 - r1_x1) / -x_vel_delta;
-                            let right = (r1_x2 - r2_x1) / x_vel_delta;
-                            let x_time_delta = left.max(right);
-                            let y_time_delta = up.max(down);
+                            let (left, up, right, down) = PhysicsSystem::get_collision_sides(
+                                rect1,
+                                compare1.velocity,
+                                rect2,
+                                compare2.velocity,
+                            );
 
-                            let (collided_left, collided_right) =
-                                if x_vel_delta == 0.0 || x_time_delta > y_time_delta {
-                                    (false, false)
-                                } else {
-                                    if right > 0.0 && right < r1_width {
-                                        (false, true)
-                                    } else if left > 0.0 && left < r1_width {
-                                        (true, false)
-                                    } else {
-                                        (false, false)
-                                    }
-                                };
-
-                            let (collided_up, collided_down) =
-                                if y_vel_delta == 0.0 || y_time_delta > x_time_delta {
-                                    (false, false)
-                                } else {
-                                    if up > 0.0 && up < r1_height {
-                                        (true, false)
-                                    } else if down > 0.0 && down < r1_height {
-                                        (false, true)
-                                    } else {
-                                        (false, false)
-                                    }
-                                };
-
-                            let collision1 =
-                                [collided_left, collided_up, collided_right, collided_down];
-                            let collision2 =
-                                [collided_right, collided_down, collided_left, collided_up];
+                            let collision1 = [left, up, right, down];
+                            let collision2 = [right, down, left, up];
 
                             for k in 0..4 {
                                 collisions[i][k] |= collision1[k];
@@ -163,6 +115,19 @@ impl PhysicsSystem {
         physics.velocity.0 += physics.acceleration.0;
         physics.velocity.1 += physics.acceleration.1 + if physics.gravity { 0.2 } else { 0.0 };
     }
+    fn get_collision_rect(physics: &PhysicsComponent) -> Option<(f32, f32, f32, f32)> {
+        if let Some(rb) = physics.rigid_body {
+            let padding = physics.shape.sprite.padding(physics.shape.flipped);
+            let x1 = physics.position.0 - (padding.0 as f32 - rb.padding.0);
+            let x2 = physics.position.0 + (padding.2 as f32 - rb.padding.2);
+            let y1 = physics.position.1 - (padding.1 as f32 - rb.padding.1);
+            let y2 = physics.position.1 + (padding.3 as f32 - rb.padding.3);
+
+            return Some((x1, y1, x2, y2));
+        } else {
+            None
+        }
+    }
     fn check_collision(rect1: (f32, f32, f32, f32), rect2: (f32, f32, f32, f32)) -> bool {
         let (r1_x1, r1_y1, r1_x2, r1_y2) = rect1;
         let (r2_x1, r2_y1, r2_x2, r2_y2) = rect2;
@@ -172,6 +137,53 @@ impl PhysicsSystem {
         let collide = collide_in_x && collide_in_y;
 
         return collide;
+    }
+    fn get_collision_sides(
+        rect1: (f32, f32, f32, f32),
+        velocity1: (f32, f32),
+        rect2: (f32, f32, f32, f32),
+        velocity2: (f32, f32),
+    ) -> (bool, bool, bool, bool) {
+        let (r1_x1, r1_y1, r1_x2, r1_y2) = rect1;
+        let (r2_x1, r2_y1, r2_x2, r2_y2) = rect2;
+        let (r1_vel_x, r1_vel_y) = velocity1;
+        let (r2_vel_x, r2_vel_y) = velocity2;
+        let r1_width = r1_x2 - r1_x1;
+        let r1_height = r1_y2 - r1_y1;
+        let x_vel_delta = r1_vel_x - r2_vel_x;
+        let y_vel_delta = r1_vel_y - r2_vel_y;
+        let up = (r2_y2 - r1_y1) / -y_vel_delta;
+        let down = (r1_y2 - r2_y1) / y_vel_delta;
+        let left = (r2_x2 - r1_x1) / -x_vel_delta;
+        let right = (r1_x2 - r2_x1) / x_vel_delta;
+        let x_time_delta = left.max(right);
+        let y_time_delta = up.max(down);
+
+        let (collided_left, collided_right) = if x_vel_delta == 0.0 || x_time_delta > y_time_delta {
+            (false, false)
+        } else {
+            if right > 0.0 && right < r1_width {
+                (false, true)
+            } else if left > 0.0 && left < r1_width {
+                (true, false)
+            } else {
+                (false, false)
+            }
+        };
+
+        let (collided_up, collided_down) = if y_vel_delta == 0.0 || y_time_delta > x_time_delta {
+            (false, false)
+        } else {
+            if up > 0.0 && up < r1_height {
+                (true, false)
+            } else if down > 0.0 && down < r1_height {
+                (false, true)
+            } else {
+                (false, false)
+            }
+        };
+
+        return (collided_left, collided_up, collided_right, collided_down);
     }
 }
 

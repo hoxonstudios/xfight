@@ -3,17 +3,17 @@ use super::{helpers::ComponentStore, physics::PhysicsSystem};
 #[derive(Copy, Clone)]
 pub struct MovementComponent {
     pub entity: usize,
-    pub action: MovementAction,
+    pub action: Option<MovementAction>,
     pub direction: AimDirection,
     pub grounded: bool,
     pub attacking: bool,
 }
 #[derive(Copy, Clone)]
 pub enum MovementAction {
-    None,
     WalkRight,
     WalkLeft,
-    Punch,
+    LightPunch,
+    StrongPunch,
 }
 #[derive(Copy, Clone)]
 pub enum AimDirection {

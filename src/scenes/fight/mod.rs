@@ -4,11 +4,11 @@ mod floor;
 use sdl2::{event::Event, keyboard::Keycode};
 
 use crate::systems::{
+    basic_attack::BasicAttackSystem,
     drawing::DrawingSystem,
     input::{Controller, InputSystem},
     movement::MovementSystem,
     physics::PhysicsSystem,
-    punch::PunchSystem,
     stand::StandSystem,
     walking::WalkingSystem,
 };
@@ -21,7 +21,7 @@ pub struct FightScene<'a> {
     pub movement: MovementSystem,
     pub stand: StandSystem,
     pub walking: WalkingSystem,
-    pub punch: PunchSystem,
+    pub basic_attack: BasicAttackSystem,
 }
 
 impl<'a> FightScene<'a> {
@@ -49,7 +49,8 @@ impl<'a> FightScene<'a> {
 
             self.input.update(&mut self.movement);
             self.movement.update(&mut self.physics);
-            self.punch.update(&mut self.physics, &mut self.movement);
+            self.basic_attack
+                .update(&mut self.physics, &mut self.movement);
             self.stand.update(&mut self.physics, &self.movement);
             self.walking.update(&mut self.physics, &self.movement);
             self.physics.update();

@@ -3,10 +3,10 @@ pub mod sprites;
 use crate::{
     scenes::fight::FightScene,
     systems::{
+        basic_attack::BasicAttackComponent,
         input::{Controller, InputComponent},
-        movement::{AimDirection, MovementAction, MovementComponent},
+        movement::{AimDirection, MovementComponent},
         physics::{PhysicsComponent, RigidBody, Shape},
-        punch::PunchComponent,
         stand::StandComponent,
         walking::WalkingComponent,
     },
@@ -14,8 +14,9 @@ use crate::{
 
 use self::sprites::{
     RYU_LIGHT_PUNCH_1, RYU_LIGHT_PUNCH_2, RYU_LIGHT_PUNCH_3, RYU_STAND_1, RYU_STAND_2, RYU_STAND_3,
-    RYU_STAND_4, RYU_TEXTURE_PATH, RYU_WALKING_1, RYU_WALKING_2, RYU_WALKING_3, RYU_WALKING_4,
-    RYU_WALKING_5, RYU_WALKING_6,
+    RYU_STAND_4, RYU_STRONG_PUNCH_1, RYU_STRONG_PUNCH_2, RYU_STRONG_PUNCH_3, RYU_STRONG_PUNCH_4,
+    RYU_STRONG_PUNCH_5, RYU_TEXTURE_PATH, RYU_WALKING_1, RYU_WALKING_2, RYU_WALKING_3,
+    RYU_WALKING_4, RYU_WALKING_5, RYU_WALKING_6,
 };
 
 impl<'a> FightScene<'a> {
@@ -53,7 +54,7 @@ impl<'a> FightScene<'a> {
             entity,
             MovementComponent {
                 entity,
-                action: MovementAction::None,
+                action: None,
                 direction: AimDirection::Right,
                 grounded: false,
                 attacking: false,
@@ -83,13 +84,20 @@ impl<'a> FightScene<'a> {
                 sprite_step: (0, 0),
             },
         );
-        self.punch.store.insert_component(
+        self.basic_attack.store.insert_component(
             entity,
-            PunchComponent {
+            BasicAttackComponent {
                 entity,
-                active: false,
+                active: None,
                 sprite_step: (0, 0),
-                sprites: [RYU_LIGHT_PUNCH_1, RYU_LIGHT_PUNCH_2, RYU_LIGHT_PUNCH_3],
+                light_punch: [RYU_LIGHT_PUNCH_1, RYU_LIGHT_PUNCH_2, RYU_LIGHT_PUNCH_3],
+                strong_punch: [
+                    RYU_STRONG_PUNCH_1,
+                    RYU_STRONG_PUNCH_2,
+                    RYU_STRONG_PUNCH_3,
+                    RYU_STRONG_PUNCH_4,
+                    RYU_STRONG_PUNCH_5,
+                ],
             },
         );
 

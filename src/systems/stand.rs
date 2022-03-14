@@ -1,6 +1,6 @@
 use super::{
     helpers::ComponentStore,
-    movement::{AimDirection, MovementAction, MovementComponent, MovementSystem},
+    movement::{AimDirection, MovementComponent, MovementSystem},
     physics::{PhysicsSystem, TextureSprite},
 };
 
@@ -35,7 +35,7 @@ impl StandSystem {
                     MovementComponent {
                         grounded: true,
                         attacking: false,
-                        action: MovementAction::None,
+                        action: None,
                         ..
                     } => true,
                     _ => false,

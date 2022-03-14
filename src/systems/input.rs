@@ -39,10 +39,15 @@ impl<'a> InputSystem<'a> {
                     Controller::Two => pressed_keys.controllers[1],
                 };
                 movement.action = match controller {
-                    ControllerMap { punch: true, .. } => MovementAction::Punch,
-                    ControllerMap { left: true, .. } => MovementAction::WalkLeft,
-                    ControllerMap { right: true, .. } => MovementAction::WalkRight,
-                    _ => MovementAction::None,
+                    ControllerMap {
+                        strong_punch: true, ..
+                    } => Some(MovementAction::StrongPunch),
+                    ControllerMap {
+                        light_punch: true, ..
+                    } => Some(MovementAction::LightPunch),
+                    ControllerMap { left: true, .. } => Some(MovementAction::WalkLeft),
+                    ControllerMap { right: true, .. } => Some(MovementAction::WalkRight),
+                    _ => None,
                 };
             }
         }
@@ -61,12 +66,14 @@ impl<'a> InputSystem<'a> {
                 ControllerMap {
                     left: keys.contains(&Keycode::A),
                     right: keys.contains(&Keycode::D),
-                    punch: keys.contains(&Keycode::T),
+                    strong_punch: keys.contains(&Keycode::T),
+                    light_punch: keys.contains(&Keycode::G),
                 },
                 ControllerMap {
                     left: keys.contains(&Keycode::Left),
                     right: keys.contains(&Keycode::Right),
-                    punch: keys.contains(&Keycode::Kp4),
+                    strong_punch: keys.contains(&Keycode::Kp4),
+                    light_punch: keys.contains(&Keycode::Kp1),
                 },
             ],
         }
@@ -81,5 +88,6 @@ struct PressedKeys {
 struct ControllerMap {
     left: bool,
     right: bool,
-    punch: bool,
+    light_punch: bool,
+    strong_punch: bool,
 }
