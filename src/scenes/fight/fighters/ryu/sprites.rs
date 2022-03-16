@@ -4,7 +4,7 @@ pub const RYU_TEXTURE_PATH: &'static str = "assets/ryu.png";
 // STAND
 pub const RYU_STAND_1: TextureSprite = TextureSprite {
     center: (19, 42),
-    area: (0, 14, 40, 92),
+    area: (4, 14, 40, 92),
 };
 pub const RYU_STAND_2: TextureSprite = TextureSprite {
     center: (68, 42),
@@ -79,4 +79,32 @@ pub const RYU_STRONG_PUNCH_4: TextureSprite = TextureSprite {
 pub const RYU_STRONG_PUNCH_5: TextureSprite = TextureSprite {
     center: (426, 159),
     area: (410, 130, 449, 209),
+};
+
+// LIGHT KICK
+pub const RYU_LIGHT_KICK_1: TextureSprite = TextureSprite {
+    center: (523, 290),
+    area: (511, 258, 542, 340),
+};
+pub const RYU_LIGHT_KICK_2: TextureSprite = TextureSprite {
+    center: (585, 290),
+    area: (569, 260, 619, 340),
+};
+pub const RYU_LIGHT_KICK_3: TextureSprite = TextureSprite {
+    center: (652, 290),
+    area: (641, 258, 672, 340),
+};
+
+// STRONG KICK
+pub const RYU_STRONG_KICK_1: TextureSprite = TextureSprite {
+    center: (23, 288),
+    area: (1, 257, 42, 338),
+};
+pub const RYU_STRONG_KICK_2: TextureSprite = TextureSprite {
+    center: (84, 288),
+    area: (57, 255, 126, 338),
+};
+pub const RYU_STRONG_KICK_3: TextureSprite = TextureSprite {
+    center: (152, 288),
+    area: (130, 257, 171, 338),
 };

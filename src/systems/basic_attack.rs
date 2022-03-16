@@ -6,6 +6,8 @@ use super::{
 
 const LIGHT_PUNCH_SPRITES_COUNT: (usize, u8) = (3, 2);
 const STRONG_PUNCH_SPRITES_COUNT: (usize, u8) = (5, 2);
+const LIGHT_KICK_SPRITES_COUNT: (usize, u8) = (3, 2);
+const STRONG_KICK_SPRITES_COUNT: (usize, u8) = (3, 2);
 
 #[derive(Copy, Clone)]
 pub struct BasicAttackComponent {
@@ -14,11 +16,15 @@ pub struct BasicAttackComponent {
     pub sprite_step: (usize, u8),
     pub light_punch: [TextureSprite; LIGHT_PUNCH_SPRITES_COUNT.0],
     pub strong_punch: [TextureSprite; STRONG_PUNCH_SPRITES_COUNT.0],
+    pub light_kick: [TextureSprite; LIGHT_KICK_SPRITES_COUNT.0],
+    pub strong_kick: [TextureSprite; STRONG_KICK_SPRITES_COUNT.0],
 }
 #[derive(Copy, Clone)]
 pub enum BasicAttackMovement {
     LightPunch,
     StrongPunch,
+    LightKick,
+    StrongKick,
 }
 
 pub struct BasicAttackSystem {
@@ -57,6 +63,12 @@ impl BasicAttackSystem {
                                 BasicAttackMovement::StrongPunch => {
                                     physics.shape.sprite = attack.strong_punch[*sprite];
                                 }
+                                BasicAttackMovement::LightKick => {
+                                    physics.shape.sprite = attack.light_kick[*sprite];
+                                }
+                                BasicAttackMovement::StrongKick => {
+                                    physics.shape.sprite = attack.strong_kick[*sprite];
+                                }
                             }
                         } else {
                             *frame += 1;
@@ -81,6 +93,22 @@ impl BasicAttackSystem {
                                         physics.velocity.0 = 0.0;
                                         physics.shape.sprite = attack.strong_punch[*sprite];
                                     }
+                                    MovementAction::LightKick => {
+                                        movement.attacking = true;
+                                        attack.active = Some(BasicAttackMovement::LightKick);
+                                        *sprite = 0;
+                                        *frame = 0;
+                                        physics.velocity.0 = 0.0;
+                                        physics.shape.sprite = attack.light_kick[*sprite];
+                                    }
+                                    MovementAction::StrongKick => {
+                                        movement.attacking = true;
+                                        attack.active = Some(BasicAttackMovement::StrongKick);
+                                        *sprite = 0;
+                                        *frame = 0;
+                                        physics.velocity.0 = 0.0;
+                                        physics.shape.sprite = attack.strong_kick[*sprite];
+                                    }
                                     _ => {}
                                 };
                             }
@@ -95,6 +123,8 @@ impl BasicAttackSystem {
         match &movement {
             BasicAttackMovement::LightPunch => LIGHT_PUNCH_SPRITES_COUNT,
             BasicAttackMovement::StrongPunch => STRONG_PUNCH_SPRITES_COUNT,
+            BasicAttackMovement::LightKick => LIGHT_KICK_SPRITES_COUNT,
+            BasicAttackMovement::StrongKick => STRONG_KICK_SPRITES_COUNT,
         }
     }
 }

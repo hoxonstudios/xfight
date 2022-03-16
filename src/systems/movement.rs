@@ -14,6 +14,8 @@ pub enum MovementAction {
     WalkLeft,
     LightPunch,
     StrongPunch,
+    LightKick,
+    StrongKick,
 }
 #[derive(Copy, Clone)]
 pub enum AimDirection {
