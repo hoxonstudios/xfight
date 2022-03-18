@@ -1,7 +1,8 @@
 use super::{
+    damage::{DamagePoint, DamageSystem},
     helpers::ComponentStore,
     movement::{MovementAction, MovementSystem},
-    physics::{PhysicsSystem, TextureSprite},
+    physics::{PhysicsSystem, Sprite},
 };
 
 const LIGHT_PUNCH_SPRITES_COUNT: (usize, u8) = (3, 2);
@@ -14,10 +15,10 @@ pub struct BasicAttackComponent {
     pub entity: usize,
     pub active: Option<BasicAttackMovement>,
     pub sprite_step: (usize, u8),
-    pub light_punch: [TextureSprite; LIGHT_PUNCH_SPRITES_COUNT.0],
-    pub strong_punch: [TextureSprite; STRONG_PUNCH_SPRITES_COUNT.0],
-    pub light_kick: [TextureSprite; LIGHT_KICK_SPRITES_COUNT.0],
-    pub strong_kick: [TextureSprite; STRONG_KICK_SPRITES_COUNT.0],
+    pub light_punch: [(Sprite, Option<DamagePoint>); LIGHT_PUNCH_SPRITES_COUNT.0],
+    pub strong_punch: [(Sprite, Option<DamagePoint>); STRONG_PUNCH_SPRITES_COUNT.0],
+    pub light_kick: [(Sprite, Option<DamagePoint>); LIGHT_KICK_SPRITES_COUNT.0],
+    pub strong_kick: [(Sprite, Option<DamagePoint>); STRONG_KICK_SPRITES_COUNT.0],
 }
 #[derive(Copy, Clone)]
 pub enum BasicAttackMovement {
@@ -40,77 +41,59 @@ impl BasicAttackSystem {
         &mut self,
         physics_system: &mut PhysicsSystem,
         movement_system: &mut MovementSystem,
+        damage_system: &mut DamageSystem,
     ) {
         for attack in self.store.data_mut() {
             let entity = attack.entity;
-            let (sprite, frame) = &mut attack.sprite_step;
+            let (sprite_index, frame) = &mut attack.sprite_step;
             if let Some(movement) = movement_system.store.get_mut_component(entity) {
                 if let Some(physics) = physics_system.store.get_mut_component(entity) {
+                    if !movement.attacking {
+                        if let Some(action) = movement.action {
+                            let attack_movement = match action {
+                                MovementAction::LightPunch => Some(BasicAttackMovement::LightPunch),
+                                MovementAction::StrongPunch => {
+                                    Some(BasicAttackMovement::StrongPunch)
+                                }
+                                MovementAction::LightKick => Some(BasicAttackMovement::LightKick),
+                                MovementAction::StrongKick => Some(BasicAttackMovement::StrongKick),
+                                _ => None,
+                            };
+                            if let Some(_) = attack_movement {
+                                movement.attacking = true;
+                                attack.active = attack_movement;
+                                *sprite_index = 0;
+                                *frame = 0;
+                                physics.velocity.0 = 0.0;
+                            }
+                        }
+                    }
                     if let Some(active) = attack.active {
                         let (sprites, frames) = BasicAttackSystem::get_movement_sprites(&active);
-                        if *frame >= frames {
+                        let (sprite, damage_point) = match active {
+                            BasicAttackMovement::LightPunch => attack.light_punch[*sprite_index],
+                            BasicAttackMovement::StrongPunch => attack.strong_punch[*sprite_index],
+                            BasicAttackMovement::LightKick => attack.light_kick[*sprite_index],
+                            BasicAttackMovement::StrongKick => attack.strong_kick[*sprite_index],
+                        };
+                        if *frame == 0 {
+                            physics.shape.sprite = sprite;
+                            if let Some(damage) =
+                                damage_system.damage_store.get_mut_component(entity)
+                            {
+                                damage.damage = damage_point;
+                                damage.consumed = false;
+                            }
+                        }
+                        if *frame < frames {
+                            *frame += 1;
+                        } else {
                             *frame = 0;
-                            *sprite += 1;
-                            if *sprite >= sprites {
-                                *sprite = 0;
+                            *sprite_index += 1;
+                            if *sprite_index >= sprites {
+                                *sprite_index = 0;
                                 attack.active = None;
                                 movement.attacking = false;
-                            }
-                            match active {
-                                BasicAttackMovement::LightPunch => {
-                                    physics.shape.sprite = attack.light_punch[*sprite];
-                                }
-                                BasicAttackMovement::StrongPunch => {
-                                    physics.shape.sprite = attack.strong_punch[*sprite];
-                                }
-                                BasicAttackMovement::LightKick => {
-                                    physics.shape.sprite = attack.light_kick[*sprite];
-                                }
-                                BasicAttackMovement::StrongKick => {
-                                    physics.shape.sprite = attack.strong_kick[*sprite];
-                                }
-                            }
-                        } else {
-                            *frame += 1;
-                        }
-                    } else {
-                        if !movement.attacking {
-                            if let Some(action) = movement.action {
-                                match action {
-                                    MovementAction::LightPunch => {
-                                        movement.attacking = true;
-                                        attack.active = Some(BasicAttackMovement::LightPunch);
-                                        *sprite = 0;
-                                        *frame = 0;
-                                        physics.velocity.0 = 0.0;
-                                        physics.shape.sprite = attack.light_punch[*sprite];
-                                    }
-                                    MovementAction::StrongPunch => {
-                                        movement.attacking = true;
-                                        attack.active = Some(BasicAttackMovement::StrongPunch);
-                                        *sprite = 0;
-                                        *frame = 0;
-                                        physics.velocity.0 = 0.0;
-                                        physics.shape.sprite = attack.strong_punch[*sprite];
-                                    }
-                                    MovementAction::LightKick => {
-                                        movement.attacking = true;
-                                        attack.active = Some(BasicAttackMovement::LightKick);
-                                        *sprite = 0;
-                                        *frame = 0;
-                                        physics.velocity.0 = 0.0;
-                                        physics.shape.sprite = attack.light_kick[*sprite];
-                                    }
-                                    MovementAction::StrongKick => {
-                                        movement.attacking = true;
-                                        attack.active = Some(BasicAttackMovement::StrongKick);
-                                        *sprite = 0;
-                                        *frame = 0;
-                                        physics.velocity.0 = 0.0;
-                                        physics.shape.sprite = attack.strong_kick[*sprite];
-                                    }
-                                    _ => {}
-                                };
                             }
                         }
                     }

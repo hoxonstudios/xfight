@@ -1,7 +1,7 @@
 use super::{
     helpers::ComponentStore,
     movement::{AimDirection, MovementAction, MovementComponent, MovementSystem},
-    physics::{PhysicsSystem, TextureSprite},
+    physics::{PhysicsSystem, Sprite},
 };
 
 const WALKING_SPRITES_COUNT: usize = 6;
@@ -12,7 +12,7 @@ const WALKING_VELOCITY: f32 = 1.0;
 pub struct WalkingComponent {
     pub entity: usize,
     pub direction: Option<WalkingDirection>,
-    pub sprites: [TextureSprite; WALKING_SPRITES_COUNT],
+    pub sprites: [Sprite; WALKING_SPRITES_COUNT],
     pub sprite_step: (usize, u8),
 }
 

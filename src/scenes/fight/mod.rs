@@ -5,6 +5,7 @@ use sdl2::{event::Event, keyboard::Keycode};
 
 use crate::systems::{
     basic_attack::BasicAttackSystem,
+    damage::{DamageSystem, Player},
     drawing::DrawingSystem,
     input::{Controller, InputSystem},
     movement::MovementSystem,
@@ -22,6 +23,7 @@ pub struct FightScene<'a> {
     pub stand: StandSystem,
     pub walking: WalkingSystem,
     pub basic_attack: BasicAttackSystem,
+    pub damage: DamageSystem,
 }
 
 impl<'a> FightScene<'a> {
@@ -30,8 +32,8 @@ impl<'a> FightScene<'a> {
         self.init_floor();
 
         // INIT FIGHTERS
-        self.init_ryu((100.0, 350.0), Controller::One);
-        self.init_ryu((600.0, 350.0), Controller::Two);
+        self.init_ryu((100.0, 350.0), Controller::One, Player::One);
+        self.init_ryu((600.0, 350.0), Controller::Two, Player::Two);
     }
 
     pub fn run(&mut self) -> Result<(), String> {
@@ -50,10 +52,11 @@ impl<'a> FightScene<'a> {
             self.input.update(&mut self.movement);
             self.movement.update(&mut self.physics);
             self.basic_attack
-                .update(&mut self.physics, &mut self.movement);
+                .update(&mut self.physics, &mut self.movement, &mut self.damage);
             self.stand.update(&mut self.physics, &self.movement);
             self.walking.update(&mut self.physics, &self.movement);
             self.physics.update();
+            self.damage.update(&self.physics);
             self.drawing.update(&self.physics)?;
         }
 

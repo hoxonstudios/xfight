@@ -51,14 +51,12 @@ impl<'a> DrawingSystem<'a> {
                 } => {
                     let texture = &self.texture_store.textures[texture_index];
                     let (width, height) = sprite.size();
-                    let (padding_left, padding_top, _, _) = sprite.padding(flipped);
                     let x = sprite.area.0 as i32;
                     let y = sprite.area.1 as i32;
 
-                    let view_x = (pos_x - padding_left as f32) as i32;
-                    let view_y = (pos_y - padding_top as f32) as i32;
-                    let src = Rect::new(x, y, width, height);
-                    let dst = Some(Rect::new(view_x, view_y, width, height));
+                    let (view_x, view_y, _, _) = physics.absolute_position();
+                    let src = Rect::new(x, y, width as u32, height as u32);
+                    let dst = Some(Rect::new(view_x, view_y, width as u32, height as u32));
 
                     self.canvas
                         .copy_ex(texture, src, dst, 0.0, None, flipped.0, flipped.1)?;

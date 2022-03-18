@@ -1,7 +1,7 @@
 use super::{
     helpers::ComponentStore,
     movement::{AimDirection, MovementComponent, MovementSystem},
-    physics::{PhysicsSystem, TextureSprite},
+    physics::{PhysicsSystem, Sprite},
 };
 
 const STAND_SPRITE_COUNT: usize = 4;
@@ -10,7 +10,7 @@ const STAND_FRAMES: u8 = 3;
 #[derive(Copy, Clone)]
 pub struct StandComponent {
     pub entity: usize,
-    pub sprites: [TextureSprite; 4],
+    pub sprites: [Sprite; 4],
     pub sprite_step: (usize, u8),
 }
 

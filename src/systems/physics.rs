@@ -13,19 +13,19 @@ pub struct PhysicsComponent {
 
 #[derive(Copy, Clone)]
 pub struct RigidBody {
-    pub padding: (f32, f32, f32, f32),
+    pub padding: (i32, i32, i32, i32),
     pub solid: bool,
 }
 #[derive(Copy, Clone)]
 pub struct Shape {
     pub texture_index: usize,
     pub flipped: (bool, bool),
-    pub sprite: TextureSprite,
+    pub sprite: Sprite,
 }
 #[derive(Copy, Clone)]
-pub struct TextureSprite {
-    pub center: (u32, u32),
-    pub area: (u32, u32, u32, u32),
+pub struct Sprite {
+    pub center: (i32, i32),
+    pub area: (i32, i32, i32, i32),
 }
 
 #[derive(Copy, Clone)]
@@ -59,8 +59,8 @@ impl PhysicsSystem {
             for j in 0..i {
                 let compare1 = &destination_vec[i];
                 let compare2 = &destination_vec[j];
-                if let Some(rect1) = PhysicsSystem::get_collision_rect(compare1) {
-                    if let Some(rect2) = PhysicsSystem::get_collision_rect(compare2) {
+                if let Some(rect1) = compare1.absolute_rigid_body() {
+                    if let Some(rect2) = compare2.absolute_rigid_body() {
                         let collide = PhysicsSystem::check_collision(rect1, rect2);
                         if collide {
                             let (left, up, right, down) = PhysicsSystem::get_collision_sides(
@@ -115,20 +115,7 @@ impl PhysicsSystem {
         physics.velocity.0 += physics.acceleration.0;
         physics.velocity.1 += physics.acceleration.1 + if physics.gravity { 0.2 } else { 0.0 };
     }
-    fn get_collision_rect(physics: &PhysicsComponent) -> Option<(f32, f32, f32, f32)> {
-        if let Some(rb) = physics.rigid_body {
-            let padding = physics.shape.sprite.padding(physics.shape.flipped);
-            let x1 = physics.position.0 - (padding.0 as f32 - rb.padding.0);
-            let x2 = physics.position.0 + (padding.2 as f32 - rb.padding.2);
-            let y1 = physics.position.1 - (padding.1 as f32 - rb.padding.1);
-            let y2 = physics.position.1 + (padding.3 as f32 - rb.padding.3);
-
-            return Some((x1, y1, x2, y2));
-        } else {
-            None
-        }
-    }
-    fn check_collision(rect1: (f32, f32, f32, f32), rect2: (f32, f32, f32, f32)) -> bool {
+    fn check_collision(rect1: (i32, i32, i32, i32), rect2: (i32, i32, i32, i32)) -> bool {
         let (r1_x1, r1_y1, r1_x2, r1_y2) = rect1;
         let (r2_x1, r2_y1, r2_x2, r2_y2) = rect2;
 
@@ -139,9 +126,9 @@ impl PhysicsSystem {
         return collide;
     }
     fn get_collision_sides(
-        rect1: (f32, f32, f32, f32),
+        rect1: (i32, i32, i32, i32),
         velocity1: (f32, f32),
-        rect2: (f32, f32, f32, f32),
+        rect2: (i32, i32, i32, i32),
         velocity2: (f32, f32),
     ) -> (bool, bool, bool, bool) {
         let (r1_x1, r1_y1, r1_x2, r1_y2) = rect1;
@@ -152,19 +139,19 @@ impl PhysicsSystem {
         let r1_height = r1_y2 - r1_y1;
         let x_vel_delta = r1_vel_x - r2_vel_x;
         let y_vel_delta = r1_vel_y - r2_vel_y;
-        let up = (r2_y2 - r1_y1) / -y_vel_delta;
-        let down = (r1_y2 - r2_y1) / y_vel_delta;
-        let left = (r2_x2 - r1_x1) / -x_vel_delta;
-        let right = (r1_x2 - r2_x1) / x_vel_delta;
+        let up = (r2_y2 - r1_y1) as f32 / -y_vel_delta;
+        let down = (r1_y2 - r2_y1) as f32 / y_vel_delta;
+        let left = (r2_x2 - r1_x1) as f32 / -x_vel_delta;
+        let right = (r1_x2 - r2_x1) as f32 / x_vel_delta;
         let x_time_delta = left.max(right);
         let y_time_delta = up.max(down);
 
         let (collided_left, collided_right) = if x_vel_delta == 0.0 || x_time_delta > y_time_delta {
             (false, false)
         } else {
-            if right > 0.0 && right < r1_width {
+            if right > 0.0 && right < r1_width as f32 {
                 (false, true)
-            } else if left > 0.0 && left < r1_width {
+            } else if left > 0.0 && left < r1_width as f32 {
                 (true, false)
             } else {
                 (false, false)
@@ -174,9 +161,9 @@ impl PhysicsSystem {
         let (collided_up, collided_down) = if y_vel_delta == 0.0 || y_time_delta > x_time_delta {
             (false, false)
         } else {
-            if up > 0.0 && up < r1_height {
+            if up > 0.0 && up < r1_height as f32 {
                 (true, false)
-            } else if down > 0.0 && down < r1_height {
+            } else if down > 0.0 && down < r1_height as f32 {
                 (false, true)
             } else {
                 (false, false)
@@ -187,28 +174,46 @@ impl PhysicsSystem {
     }
 }
 
-impl TextureSprite {
-    pub fn size(&self) -> (u32, u32) {
-        (self.area.2 - self.area.0, self.area.3 - self.area.1)
-    }
-    pub fn padding(&self, flipped: (bool, bool)) -> (u32, u32, u32, u32) {
-        let left = self.center.0 - self.area.0;
-        let top = self.center.1 - self.area.1;
-        let right = self.area.2 - self.center.0;
-        let bottom = self.area.3 - self.center.1;
+impl PhysicsComponent {
+    pub fn absolute_position(&self) -> (i32, i32, i32, i32) {
+        let sprite = self.shape.sprite;
+        let x = self.position.0 as i32;
+        let y = self.position.1 as i32;
+        let left = sprite.area.0 - sprite.center.0;
+        let top = sprite.area.1 - sprite.center.1;
+        let right = sprite.area.2 - sprite.center.0;
+        let bottom = sprite.area.3 - sprite.center.1;
 
-        if flipped.0 {
-            if flipped.1 {
-                (right, bottom, left, top)
-            } else {
-                (right, top, left, bottom)
-            }
-        } else {
-            if flipped.1 {
-                (left, bottom, right, top)
-            } else {
-                (left, top, right, bottom)
-            }
+        match self.shape.flipped {
+            (false, false) => (x + left, y + top, x + right, y + bottom),
+            (true, false) => (x - right, y + top, x - left, y + bottom),
+            (false, true) => (x + left, y - bottom, x + right, y - top),
+            (true, true) => (x - right, y - bottom, x - left, y - top),
         }
+    }
+    pub fn absolute_rigid_body(&self) -> Option<(i32, i32, i32, i32)> {
+        if let Some(rigid_body) = self.rigid_body {
+            let sprite = self.shape.sprite;
+            let x = self.position.0 as i32;
+            let y = self.position.1 as i32;
+            let left = sprite.area.0 - sprite.center.0 + rigid_body.padding.0;
+            let top = sprite.area.1 - sprite.center.1 + rigid_body.padding.1;
+            let right = sprite.area.2 - sprite.center.0 - rigid_body.padding.2;
+            let bottom = sprite.area.3 - sprite.center.1 - rigid_body.padding.3;
+
+            Some(match self.shape.flipped {
+                (false, false) => (x + left, y + top, x + right, y + bottom),
+                (true, false) => (x - right, y + top, x - left, y + bottom),
+                (false, true) => (x + left, y - bottom, x + right, y - top),
+                (true, true) => (x - right, y - bottom, x - left, y - top),
+            })
+        } else {
+            None
+        }
+    }
+}
+impl Sprite {
+    pub fn size(&self) -> (i32, i32) {
+        (self.area.2 - self.area.0, self.area.3 - self.area.1)
     }
 }
