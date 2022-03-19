@@ -7,6 +7,7 @@ pub struct MovementComponent {
     pub direction: AimDirection,
     pub grounded: bool,
     pub attacking: bool,
+    pub stunt: bool,
 }
 #[derive(Copy, Clone)]
 pub enum MovementAction {

@@ -11,6 +11,7 @@ use crate::systems::{
     movement::MovementSystem,
     physics::PhysicsSystem,
     stand::StandSystem,
+    stun::StunSystem,
     walking::WalkingSystem,
 };
 
@@ -24,6 +25,7 @@ pub struct FightScene<'a> {
     pub walking: WalkingSystem,
     pub basic_attack: BasicAttackSystem,
     pub damage: DamageSystem,
+    pub stun: StunSystem,
 }
 
 impl<'a> FightScene<'a> {
@@ -50,6 +52,8 @@ impl<'a> FightScene<'a> {
             }
 
             self.input.update(&mut self.movement);
+            self.stun
+                .update(&self.damage, &mut self.movement, &mut self.physics);
             self.movement.update(&mut self.physics);
             self.basic_attack
                 .update(&mut self.physics, &mut self.movement, &mut self.damage);

@@ -35,6 +35,7 @@ impl StandSystem {
                     MovementComponent {
                         grounded: true,
                         attacking: false,
+                        stunt: false,
                         action: None,
                         ..
                     } => true,

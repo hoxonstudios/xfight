@@ -43,6 +43,7 @@ impl WalkingSystem {
                     MovementComponent {
                         grounded: true,
                         attacking: false,
+                        stunt: false,
                         action: Some(MovementAction::WalkLeft),
                         direction: AimDirection::Left,
                         ..
@@ -50,6 +51,7 @@ impl WalkingSystem {
                     MovementComponent {
                         grounded: true,
                         attacking: false,
+                        stunt: false,
                         action: Some(MovementAction::WalkRight),
                         direction: AimDirection::Right,
                         ..
@@ -57,6 +59,7 @@ impl WalkingSystem {
                     MovementComponent {
                         grounded: true,
                         attacking: false,
+                        stunt: false,
                         action: Some(MovementAction::WalkLeft),
                         direction: AimDirection::Right,
                         ..
@@ -64,6 +67,7 @@ impl WalkingSystem {
                     MovementComponent {
                         grounded: true,
                         attacking: false,
+                        stunt: false,
                         action: Some(MovementAction::WalkRight),
                         direction: AimDirection::Left,
                         ..

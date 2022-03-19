@@ -8,4 +8,5 @@ pub mod basic_attack;
 pub mod damage;
 pub mod movement;
 pub mod stand;
+pub mod stun;
 pub mod walking;

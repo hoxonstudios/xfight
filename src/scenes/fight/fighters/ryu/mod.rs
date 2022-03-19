@@ -9,12 +9,13 @@ use crate::{
         movement::{AimDirection, MovementComponent},
         physics::{PhysicsComponent, RigidBody, Shape},
         stand::StandComponent,
+        stun::StunComponent,
         walking::WalkingComponent,
     },
 };
 
 use self::sprites::{
-    RYU_LIGHT_KICK, RYU_LIGHT_PUNCH, RYU_STAND, RYU_STRONG_KICK, RYU_STRONG_PUNCH,
+    RYU_LIGHT_KICK, RYU_LIGHT_PUNCH, RYU_STAND, RYU_STRONG_KICK, RYU_STRONG_PUNCH, RYU_STUNT,
     RYU_TEXTURE_PATH, RYU_WALKING,
 };
 
@@ -57,6 +58,7 @@ impl<'a> FightScene<'a> {
                 direction: AimDirection::Right,
                 grounded: false,
                 attacking: false,
+                stunt: false,
             },
         );
         self.stand.store.insert_component(
@@ -91,6 +93,15 @@ impl<'a> FightScene<'a> {
                 entity,
                 player,
                 health: 100,
+            },
+        );
+        self.stun.store.insert_component(
+            entity,
+            StunComponent {
+                entity,
+                health: None,
+                sprite: RYU_STUNT,
+                stunt_frame: None,
             },
         );
         self.basic_attack.store.insert_component(

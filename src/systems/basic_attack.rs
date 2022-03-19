@@ -48,7 +48,8 @@ impl BasicAttackSystem {
             let (sprite_index, frame) = &mut attack.sprite_step;
             if let Some(movement) = movement_system.store.get_mut_component(entity) {
                 if let Some(physics) = physics_system.store.get_mut_component(entity) {
-                    if !movement.attacking {
+                    let able_to_attack = !movement.attacking && !movement.stunt;
+                    if able_to_attack {
                         if let Some(action) = movement.action {
                             let attack_movement = match action {
                                 MovementAction::LightPunch => Some(BasicAttackMovement::LightPunch),
