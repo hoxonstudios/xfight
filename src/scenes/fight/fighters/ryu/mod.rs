@@ -8,6 +8,7 @@ use crate::{
         damage::{DamageAction, DamageComponent},
         health::{HealthAction, HealthComponent, Player},
         input::{Controller, InputComponent},
+        jump::JumpComponent,
         movement::{AimDirection, MovementComponent},
         position::{PositionAction, PositionComponent},
         shape::{ShapeAction, ShapeComponent},
@@ -89,6 +90,13 @@ impl<'a> FightScene<'a> {
                 entity,
                 sprites: RYU_STAND,
                 sprite_step: (0, 0),
+            },
+        );
+        self.jump.store.insert_component(
+            entity,
+            JumpComponent {
+                entity,
+                active: false,
             },
         );
         self.walking.store.insert_component(

@@ -51,6 +51,7 @@ impl<'a> InputSystem<'a> {
                     ControllerMap {
                         light_kick: true, ..
                     } => Some(MovementAction::LightKick),
+                    ControllerMap { up: true, .. } => Some(MovementAction::JumpStraight),
                     ControllerMap { left: true, .. } => Some(MovementAction::WalkLeft),
                     ControllerMap { right: true, .. } => Some(MovementAction::WalkRight),
                     _ => None,
@@ -70,6 +71,7 @@ impl<'a> InputSystem<'a> {
         PressedKeys {
             controllers: [
                 ControllerMap {
+                    up: keys.contains(&Keycode::W),
                     left: keys.contains(&Keycode::A),
                     right: keys.contains(&Keycode::D),
                     strong_punch: keys.contains(&Keycode::T),
@@ -78,6 +80,7 @@ impl<'a> InputSystem<'a> {
                     light_kick: keys.contains(&Keycode::J),
                 },
                 ControllerMap {
+                    up: keys.contains(&Keycode::Up),
                     left: keys.contains(&Keycode::Left),
                     right: keys.contains(&Keycode::Right),
                     strong_punch: keys.contains(&Keycode::Kp4),
@@ -98,6 +101,7 @@ struct PressedKeys {
 struct ControllerMap {
     left: bool,
     right: bool,
+    up: bool,
     light_punch: bool,
     strong_punch: bool,
     light_kick: bool,

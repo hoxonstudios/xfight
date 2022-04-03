@@ -10,6 +10,7 @@ use crate::systems::{
     drawing::DrawingSystem,
     health::{HealthSystem, Player},
     input::{Controller, InputSystem},
+    jump::JumpSystem,
     movement::MovementSystem,
     position::PositionSystem,
     shape::ShapeSystem,
@@ -34,6 +35,7 @@ pub struct FightScene<'a> {
     pub damage: DamageSystem,
     pub health: HealthSystem,
     pub stun: StunSystem,
+    pub jump: JumpSystem,
 }
 
 impl<'a> FightScene<'a> {
@@ -76,6 +78,7 @@ impl<'a> FightScene<'a> {
             );
             self.stand
                 .update(&self.movement, &mut self.shape, &mut self.velocity);
+            self.jump.update(&mut self.movement, &mut self.velocity);
             self.walking
                 .update(&mut self.shape, &mut self.velocity, &mut self.movement);
             self.shape.update();

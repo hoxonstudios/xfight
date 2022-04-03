@@ -7,7 +7,7 @@ use super::{
 
 const WALKING_SPRITES_COUNT: usize = 6;
 const WALKING_FRAMES: u8 = 2;
-const WALKING_VELOCITY: f32 = 1.0;
+const WALKING_VELOCITY: f32 = 2.0;
 
 #[derive(Copy, Clone)]
 pub struct WalkingComponent {

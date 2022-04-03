@@ -7,9 +7,9 @@ use scenes::fight::FightScene;
 use sdl2::image::InitFlag;
 use systems::{
     basic_attack::BasicAttackSystem, collision::CollisionSystem, damage::DamageSystem,
-    drawing::DrawingSystem, health::HealthSystem, input::InputSystem, movement::MovementSystem,
-    position::PositionSystem, shape::ShapeSystem, stand::StandSystem, stun::StunSystem,
-    velocity::VelocitySystem, walking::WalkingSystem,
+    drawing::DrawingSystem, health::HealthSystem, input::InputSystem, jump::JumpSystem,
+    movement::MovementSystem, position::PositionSystem, shape::ShapeSystem, stand::StandSystem,
+    stun::StunSystem, velocity::VelocitySystem, walking::WalkingSystem,
 };
 
 fn main() -> Result<(), String> {
@@ -44,6 +44,7 @@ fn main() -> Result<(), String> {
         damage: DamageSystem::init(),
         health: HealthSystem::init(),
         stun: StunSystem::init(),
+        jump: JumpSystem::init(),
     };
     scene.init();
     scene.run()

@@ -67,9 +67,11 @@ impl BasicAttackSystem {
                                 attack.active = attack_movement;
                                 *sprite_index = 0;
                                 *frame = 0;
-                                velocity.action = VelocityAction::Change {
-                                    velocity: (0.0, velocity.velocity.1),
-                                };
+                                if movement.grounded {
+                                    velocity.action = VelocityAction::Change {
+                                        velocity: (0.0, velocity.velocity.1),
+                                    };
+                                }
                             }
                         }
                     }

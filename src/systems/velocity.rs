@@ -3,7 +3,7 @@ use super::{
     position::{PositionAction, PositionSystem},
 };
 
-const GRAVITY_ACCELERATION: f32 = 0.2;
+const GRAVITY_ACCELERATION: f32 = 0.5;
 
 #[derive(Copy, Clone)]
 pub struct VelocityComponent {
