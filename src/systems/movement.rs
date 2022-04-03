@@ -1,4 +1,9 @@
-use super::{helpers::ComponentStore, physics::PhysicsSystem};
+use super::{
+    collision::CollisionSystem,
+    helpers::ComponentStore,
+    position::PositionSystem,
+    shape::{ShapeAction, ShapeSystem},
+};
 
 #[derive(Copy, Clone)]
 pub struct MovementComponent {
@@ -33,41 +38,59 @@ impl MovementSystem {
             store: ComponentStore::<MovementComponent>::init(),
         }
     }
-    pub fn update<'a>(&mut self, physics_system: &mut PhysicsSystem) {
-        let max_position = self.get_max_position(physics_system);
+    pub fn update<'a>(
+        &mut self,
+        shape_system: &mut ShapeSystem,
+        position_system: &PositionSystem,
+        collision_system: &CollisionSystem,
+    ) {
+        let max_position = self.get_max_position(position_system);
         for movement in self.store.data_mut() {
             let entity = movement.entity;
-            movement.grounded = MovementSystem::is_grounded(entity, physics_system);
+            movement.grounded = MovementSystem::is_grounded(entity, collision_system);
 
-            if let Some(physics) = physics_system.store.get_mut_component(entity) {
-                movement.direction = if physics.position.0 < max_position {
-                    AimDirection::Right
-                } else {
-                    AimDirection::Left
-                };
-                physics.shape.flipped.0 = match movement.direction {
-                    AimDirection::Right => false,
-                    AimDirection::Left => true,
-                };
+            if let Some(shape) = shape_system.store.get_mut_component(entity) {
+                if let Some(position) = position_system.store.get_component(entity) {
+                    let (flipped_x, direction) = if position.x < max_position {
+                        (false, AimDirection::Right)
+                    } else {
+                        (true, AimDirection::Left)
+                    };
+                    movement.direction = direction;
+                    match shape.action {
+                        ShapeAction::None => {
+                            shape.action = ShapeAction::Update {
+                                sprite: shape.sprite,
+                                flipped: (flipped_x, shape.flipped.1),
+                            };
+                        }
+                        ShapeAction::Update { sprite, flipped } => {
+                            shape.action = ShapeAction::Update {
+                                sprite,
+                                flipped: (flipped_x, flipped.1),
+                            };
+                        }
+                    }
+                }
             }
         }
     }
-    fn is_grounded(entity: usize, physics_system: &PhysicsSystem) -> bool {
-        physics_system
+    fn is_grounded(entity: usize, collision_system: &CollisionSystem) -> bool {
+        collision_system
             .collisions
             .iter()
-            .find(|&c| {
-                (c.entities.0 == entity && c.sides.0[3]) || (c.entities.1 == entity && c.sides.1[3])
+            .find(|&(c1, c2)| {
+                (c1.entity == entity && c1.sides[3]) || (c2.entity == entity && c2.sides[3])
             })
             .is_some()
     }
-    fn get_max_position(&self, physics_system: &PhysicsSystem) -> f32 {
+    fn get_max_position(&self, position_system: &PositionSystem) -> f32 {
         self.store
             .data()
             .iter()
             .map(|m| {
-                if let Some(physics) = physics_system.store.get_component(m.entity) {
-                    physics.position.0
+                if let Some(position) = position_system.store.get_component(m.entity) {
+                    position.x
                 } else {
                     0.0
                 }

@@ -1,7 +1,8 @@
 use super::{
     helpers::ComponentStore,
     movement::{AimDirection, MovementAction, MovementComponent, MovementSystem},
-    physics::{PhysicsSystem, Sprite},
+    shape::{ShapeAction, ShapeSystem, Sprite},
+    velocity::{VelocityAction, VelocitySystem},
 };
 
 const WALKING_SPRITES_COUNT: usize = 6;
@@ -33,7 +34,8 @@ impl WalkingSystem {
     }
     pub fn update<'a>(
         &mut self,
-        physics_system: &mut PhysicsSystem,
+        shape_system: &mut ShapeSystem,
+        velocity_system: &mut VelocitySystem,
         movement_system: &MovementSystem,
     ) {
         for walking in self.store.data_mut() {
@@ -89,14 +91,21 @@ impl WalkingSystem {
                     } else {
                         walking.sprite_step.1 += 1;
                     }
-                    if let Some(physics) = physics_system.store.get_mut_component(walking.entity) {
-                        physics.shape.sprite = walking.sprites[walking.sprite_step.0];
-                        physics.acceleration = (0.0, 0.0);
-                        physics.velocity.0 = match (direction, movement.direction) {
+                    if let Some(shape) = shape_system.store.get_mut_component(entity) {
+                        shape.action = ShapeAction::Update {
+                            sprite: walking.sprites[walking.sprite_step.0],
+                            flipped: shape.flipped,
+                        };
+                    }
+                    if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
+                        let velocity_x = match (direction, movement.direction) {
                             (WalkingDirection::Backward, AimDirection::Right) => -WALKING_VELOCITY,
                             (WalkingDirection::Backward, AimDirection::Left) => WALKING_VELOCITY,
                             (WalkingDirection::Forward, AimDirection::Left) => -WALKING_VELOCITY,
                             (WalkingDirection::Forward, AimDirection::Right) => WALKING_VELOCITY,
+                        };
+                        velocity.action = VelocityAction::Change {
+                            velocity: (velocity_x, velocity.velocity.1),
                         };
                     }
                 }

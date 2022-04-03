@@ -1,8 +1,9 @@
 use super::{
-    damage::DamageSystem,
+    health::HealthSystem,
     helpers::ComponentStore,
     movement::MovementSystem,
-    physics::{PhysicsSystem, Sprite},
+    shape::{ShapeAction, ShapeSystem, Sprite},
+    velocity::{VelocityAction, VelocitySystem},
 };
 
 const STUNT_FRAMES: u32 = 10;
@@ -26,13 +27,14 @@ impl StunSystem {
     }
     pub fn update(
         &mut self,
-        damage_system: &DamageSystem,
+        health_system: &HealthSystem,
         movement_system: &mut MovementSystem,
-        physics_system: &mut PhysicsSystem,
+        shape_system: &mut ShapeSystem,
+        velocity_system: &mut VelocitySystem,
     ) {
         for stun in self.store.data_mut() {
             let entity = stun.entity;
-            if let Some(health) = damage_system.health_store.get_component(entity) {
+            if let Some(health) = health_system.store.get_component(entity) {
                 match stun.health {
                     None => {
                         stun.health = Some(health.health);
@@ -44,11 +46,20 @@ impl StunSystem {
                                 if health.health < previous_health {
                                     movement.stunt = true;
                                     stun.stunt_frame = Some(0);
-                                    if let Some(physics) =
-                                        physics_system.store.get_mut_component(entity)
+                                    if let Some(shape) =
+                                        shape_system.store.get_mut_component(entity)
                                     {
-                                        physics.shape.sprite = stun.sprite;
-                                        physics.velocity.0 = 0.0;
+                                        shape.action = ShapeAction::Update {
+                                            sprite: stun.sprite,
+                                            flipped: shape.flipped,
+                                        };
+                                    }
+                                    if let Some(velocity) =
+                                        velocity_system.store.get_mut_component(entity)
+                                    {
+                                        velocity.action = VelocityAction::Change {
+                                            velocity: (0.0, velocity.velocity.1),
+                                        };
                                     }
                                 }
                             }

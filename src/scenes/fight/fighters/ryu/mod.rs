@@ -4,12 +4,16 @@ use crate::{
     scenes::fight::FightScene,
     systems::{
         basic_attack::BasicAttackComponent,
-        damage::{DamageComponent, HealthComponent, Player},
+        collision::CollisionComponent,
+        damage::{DamageAction, DamageComponent},
+        health::{HealthAction, HealthComponent, Player},
         input::{Controller, InputComponent},
         movement::{AimDirection, MovementComponent},
-        physics::{PhysicsComponent, RigidBody, Shape},
+        position::{PositionAction, PositionComponent},
+        shape::{ShapeAction, ShapeComponent},
         stand::StandComponent,
         stun::StunComponent,
+        velocity::{VelocityAction, VelocityComponent},
         walking::WalkingComponent,
     },
 };
@@ -22,29 +26,47 @@ use self::sprites::{
 impl<'a> FightScene<'a> {
     pub fn init_ryu(&mut self, position: (f32, f32), controller: Controller, player: Player) {
         let entity = self.entity;
-        let texture_index = self
+        let texture = self
             .drawing
             .texture_store
             .load_texture(RYU_TEXTURE_PATH)
             .expect("Failed to load Ryu texture");
 
-        self.physics.store.insert_component(
+        self.position.store.insert_component(
             entity,
-            PhysicsComponent {
+            PositionComponent {
                 entity,
-                position,
+                action: PositionAction::None,
+                x: position.0,
+                y: position.1,
+            },
+        );
+        self.shape.store.insert_component(
+            entity,
+            ShapeComponent {
+                entity,
+                action: ShapeAction::None,
+                texture,
+                sprite: RYU_STAND[0],
+                flipped: (false, false),
+            },
+        );
+        self.velocity.store.insert_component(
+            entity,
+            VelocityComponent {
+                entity,
+                action: VelocityAction::None,
                 velocity: (0.0, 0.0),
                 acceleration: (0.0, 0.0),
-                rigid_body: Some(RigidBody {
-                    padding: (0, 0, 0, 0),
-                    solid: true,
-                }),
-                shape: Shape {
-                    flipped: (false, false),
-                    texture_index,
-                    sprite: RYU_STAND[0],
-                },
                 gravity: true,
+            },
+        );
+        self.collision.store.insert_component(
+            entity,
+            CollisionComponent {
+                entity,
+                padding: 0,
+                solid: true,
             },
         );
         self.input
@@ -78,19 +100,20 @@ impl<'a> FightScene<'a> {
                 sprite_step: (0, 0),
             },
         );
-        self.damage.damage_store.insert_component(
+        self.damage.store.insert_component(
             entity,
             DamageComponent {
                 entity,
+                action: DamageAction::None,
                 player,
-                consumed: true,
                 damage: None,
             },
         );
-        self.damage.health_store.insert_component(
+        self.health.store.insert_component(
             entity,
             HealthComponent {
                 entity,
+                action: HealthAction::None,
                 player,
                 health: 100,
             },

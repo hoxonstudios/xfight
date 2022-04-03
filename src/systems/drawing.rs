@@ -8,9 +8,12 @@ use sdl2::{
     video::{Window, WindowContext},
 };
 
-use super::physics::{PhysicsSystem, Shape};
+use super::{
+    position::PositionSystem,
+    shape::{ShapeComponent, ShapeSystem},
+};
 
-const DEBUG_POSITION: bool = true;
+const DEBUG_POSITION: bool = false;
 
 pub struct DrawingSystem<'a> {
     canvas: &'a mut Canvas<Window>,
@@ -35,43 +38,47 @@ impl<'a> DrawingSystem<'a> {
         })
     }
 
-    pub fn update(&mut self, physics_system: &PhysicsSystem) -> Result<(), String> {
+    pub fn update(
+        &mut self,
+        position_system: &PositionSystem,
+        shape_system: &ShapeSystem,
+    ) -> Result<(), String> {
         self.canvas.set_draw_color(Color::BLACK);
         self.canvas.clear();
 
-        for physics in physics_system.store.data() {
-            let shape = physics.shape;
-            let (pos_x, pos_y) = physics.position;
+        for shape in shape_system.store.data() {
+            let entity = shape.entity;
+            if let Some(position) = position_system.store.get_component(entity) {
+                match shape {
+                    ShapeComponent {
+                        sprite, flipped, ..
+                    } => {
+                        let texture = &self.texture_store.textures[shape.texture];
+                        let (x1, y1, _, _) = sprite.rect(shape.flipped);
+                        let (width, height) = sprite.size();
+                        let x = sprite.area.0 as i32;
+                        let y = sprite.area.1 as i32;
+                        let view_x = position.x as i32 + x1;
+                        let view_y = position.y as i32 + y1;
 
-            match shape {
-                Shape {
-                    texture_index,
-                    sprite,
-                    flipped,
-                } => {
-                    let texture = &self.texture_store.textures[texture_index];
-                    let (width, height) = sprite.size();
-                    let x = sprite.area.0 as i32;
-                    let y = sprite.area.1 as i32;
+                        let src = Rect::new(x, y, width as u32, height as u32);
+                        let dst = Some(Rect::new(view_x, view_y, width as u32, height as u32));
 
-                    let (view_x, view_y, _, _) = physics.absolute_position();
-                    let src = Rect::new(x, y, width as u32, height as u32);
-                    let dst = Some(Rect::new(view_x, view_y, width as u32, height as u32));
+                        self.canvas
+                            .copy_ex(texture, src, dst, 0.0, None, flipped.0, flipped.1)?;
 
-                    self.canvas
-                        .copy_ex(texture, src, dst, 0.0, None, flipped.0, flipped.1)?;
-
-                    if DEBUG_POSITION {
-                        self.canvas.set_draw_color(Color::RGB(0, 255, 0));
-                        self.canvas.draw_rect(dst.unwrap())?;
-                        self.canvas.draw_line(
-                            Point::new(view_x, pos_y as i32),
-                            Point::new(view_x + width as i32, pos_y as i32),
-                        )?;
-                        self.canvas.draw_line(
-                            Point::new(pos_x as i32, view_y),
-                            Point::new(pos_x as i32, view_y + height as i32),
-                        )?;
+                        if DEBUG_POSITION {
+                            self.canvas.set_draw_color(Color::RGB(0, 255, 0));
+                            self.canvas.draw_rect(dst.unwrap())?;
+                            self.canvas.draw_line(
+                                Point::new(view_x, position.y as i32),
+                                Point::new(view_x + width as i32, position.y as i32),
+                            )?;
+                            self.canvas.draw_line(
+                                Point::new(position.x as i32, view_y),
+                                Point::new(position.x as i32, view_y + height as i32),
+                            )?;
+                        }
                     }
                 }
             }

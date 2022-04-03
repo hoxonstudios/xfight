@@ -1,8 +1,9 @@
 use super::{
-    damage::{DamagePoint, DamageSystem},
+    damage::{DamageAction, DamagePoint, DamageSystem},
     helpers::ComponentStore,
     movement::{MovementAction, MovementSystem},
-    physics::{PhysicsSystem, Sprite},
+    shape::{ShapeAction, ShapeSystem, Sprite},
+    velocity::{VelocityAction, VelocitySystem},
 };
 
 const LIGHT_PUNCH_SPRITES_COUNT: (usize, u8) = (3, 2);
@@ -39,15 +40,16 @@ impl BasicAttackSystem {
     }
     pub fn update<'a>(
         &mut self,
-        physics_system: &mut PhysicsSystem,
         movement_system: &mut MovementSystem,
+        velocity_system: &mut VelocitySystem,
         damage_system: &mut DamageSystem,
+        shape_system: &mut ShapeSystem,
     ) {
         for attack in self.store.data_mut() {
             let entity = attack.entity;
             let (sprite_index, frame) = &mut attack.sprite_step;
             if let Some(movement) = movement_system.store.get_mut_component(entity) {
-                if let Some(physics) = physics_system.store.get_mut_component(entity) {
+                if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
                     let able_to_attack = !movement.attacking && !movement.stunt;
                     if able_to_attack {
                         if let Some(action) = movement.action {
@@ -65,7 +67,9 @@ impl BasicAttackSystem {
                                 attack.active = attack_movement;
                                 *sprite_index = 0;
                                 *frame = 0;
-                                physics.velocity.0 = 0.0;
+                                velocity.action = VelocityAction::Change {
+                                    velocity: (0.0, velocity.velocity.1),
+                                };
                             }
                         }
                     }
@@ -78,12 +82,21 @@ impl BasicAttackSystem {
                             BasicAttackMovement::StrongKick => attack.strong_kick[*sprite_index],
                         };
                         if *frame == 0 {
-                            physics.shape.sprite = sprite;
-                            if let Some(damage) =
-                                damage_system.damage_store.get_mut_component(entity)
-                            {
-                                damage.damage = damage_point;
-                                damage.consumed = false;
+                            if let Some(shape) = shape_system.store.get_mut_component(entity) {
+                                shape.action = ShapeAction::Update {
+                                    sprite,
+                                    flipped: shape.flipped,
+                                };
+                            }
+                            if let Some(damage_point) = damage_point {
+                                if let Some(damage) = damage_system.store.get_mut_component(entity)
+                                {
+                                    if let DamageAction::None = damage.action {
+                                        damage.action = DamageAction::Inflict {
+                                            point: damage_point,
+                                        };
+                                    }
+                                }
                             }
                         }
                         if *frame < frames {

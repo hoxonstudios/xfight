@@ -1,14 +1,24 @@
+use crate::systems::health::HealthAction;
+
 use super::{
+    collision::CollisionSystem,
+    health::{HealthSystem, Player},
     helpers::ComponentStore,
-    physics::{PhysicsComponent, PhysicsSystem},
+    position::PositionSystem,
+    shape::ShapeSystem,
 };
 
 #[derive(Copy, Clone)]
 pub struct DamageComponent {
     pub entity: usize,
+    pub action: DamageAction,
     pub player: Player,
-    pub consumed: bool,
     pub damage: Option<DamagePoint>,
+}
+#[derive(Copy, Clone)]
+pub enum DamageAction {
+    None,
+    Inflict { point: DamagePoint },
 }
 #[derive(Copy, Clone)]
 pub struct DamagePoint {
@@ -16,52 +26,74 @@ pub struct DamagePoint {
     pub power: u32,
 }
 
-#[derive(Copy, Clone)]
-pub struct HealthComponent {
-    pub entity: usize,
-    pub player: Player,
-    pub health: u32,
-}
-
-#[derive(Copy, Clone, PartialEq)]
-pub enum Player {
-    One,
-    Two,
-}
-
 pub struct DamageSystem {
-    pub damage_store: ComponentStore<DamageComponent>,
-    pub health_store: ComponentStore<HealthComponent>,
+    pub store: ComponentStore<DamageComponent>,
 }
 impl DamageSystem {
     pub fn init() -> DamageSystem {
         DamageSystem {
-            damage_store: ComponentStore::<DamageComponent>::init(),
-            health_store: ComponentStore::<HealthComponent>::init(),
+            store: ComponentStore::<DamageComponent>::init(),
         }
     }
-    pub fn update(&mut self, physics_system: &PhysicsSystem) {
-        for damage in self.damage_store.data_mut() {
-            if !damage.consumed {
-                if let Some(damage_point) = damage.damage {
-                    if let Some(damage_physics) = physics_system.store.get_component(damage.entity)
-                    {
-                        for health in self.health_store.data_mut() {
+    pub fn update(
+        &mut self,
+        health_system: &mut HealthSystem,
+        collision_system: &CollisionSystem,
+        position_system: &PositionSystem,
+        shape_system: &ShapeSystem,
+    ) {
+        for damage in self.store.data_mut() {
+            match damage.action {
+                DamageAction::None => {}
+                DamageAction::Inflict { point } => {
+                    damage.damage = Some(point);
+                }
+            }
+            damage.action = DamageAction::None;
+            if let Some(damage_point) = damage.damage {
+                if let Some(damage_position) = position_system.store.get_component(damage.entity) {
+                    if let Some(damage_shape) = shape_system.store.get_component(damage.entity) {
+                        for health in health_system.store.data_mut() {
                             if health.player != damage.player {
-                                if let Some(health_physics) =
-                                    physics_system.store.get_component(health.entity)
+                                if let Some(health_shape) =
+                                    shape_system.store.get_component(health.entity)
                                 {
-                                    if let Some(rigid_body) = health_physics.absolute_rigid_body() {
-                                        if DamageSystem::check_collision(
-                                            DamageSystem::absolute_damage_point(
-                                                damage_physics,
-                                                &damage_point,
-                                            ),
-                                            rigid_body,
-                                        ) {
-                                            health.health -= damage_point.power;
-                                            damage.consumed = true;
-                                            println!("({}) = {}", health.entity, health.health);
+                                    if let Some(health_position) =
+                                        position_system.store.get_component(health.entity)
+                                    {
+                                        if let Some(health_collision) =
+                                            collision_system.store.get_component(health.entity)
+                                        {
+                                            let rect =
+                                                health_shape.sprite.rect(health_shape.flipped);
+                                            let x1 = rect.0
+                                                + health_position.x as i32
+                                                + health_collision.padding;
+                                            let y1 = rect.1
+                                                + health_position.y as i32
+                                                + health_collision.padding;
+                                            let x2 = rect.2 + health_position.x as i32
+                                                - health_collision.padding;
+                                            let y2 = rect.3 + health_position.y as i32
+                                                - health_collision.padding;
+
+                                            if DamageSystem::check_collision(
+                                                DamageSystem::absolute_damage_point(
+                                                    (
+                                                        damage_position.x as i32,
+                                                        damage_position.y as i32,
+                                                    ),
+                                                    damage_shape.flipped,
+                                                    &damage_point,
+                                                ),
+                                                (x1, y1, x2, y2),
+                                            ) {
+                                                health.action = HealthAction::Consume {
+                                                    damage: damage_point.power,
+                                                };
+                                                damage.damage = None;
+                                                println!("({}) = {}", health.entity, health.health);
+                                            }
                                         }
                                     }
                                 }
@@ -73,10 +105,14 @@ impl DamageSystem {
         }
     }
 
-    fn absolute_damage_point(physics: &PhysicsComponent, damage_point: &DamagePoint) -> (i32, i32) {
-        let x = physics.position.0 as i32;
-        let y = physics.position.1 as i32;
-        match physics.shape.flipped {
+    fn absolute_damage_point(
+        position: (i32, i32),
+        flipped: (bool, bool),
+        damage_point: &DamagePoint,
+    ) -> (i32, i32) {
+        let (x, y) = position;
+
+        match flipped {
             (false, false) => (x + damage_point.point.0, y + damage_point.point.1),
             (true, false) => (x - damage_point.point.0, y + damage_point.point.1),
             (false, true) => (x + damage_point.point.0, y - damage_point.point.1),

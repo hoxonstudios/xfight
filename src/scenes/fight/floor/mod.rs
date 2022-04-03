@@ -1,6 +1,10 @@
 pub mod sprites;
 
-use crate::systems::physics::{PhysicsComponent, RigidBody, Shape};
+use crate::systems::{
+    collision::CollisionComponent,
+    position::{PositionAction, PositionComponent},
+    shape::{ShapeAction, ShapeComponent},
+};
 
 use self::sprites::{FLOOR_SPRITE, FLOOR_TEXTURE_PATH};
 
@@ -10,29 +14,37 @@ impl<'a> FightScene<'a> {
     pub fn init_floor(&mut self) {
         let entity = self.entity;
 
-        let texture_index = self
+        let texture = self
             .drawing
             .texture_store
             .load_texture(FLOOR_TEXTURE_PATH)
             .expect("Failed to load floor texture");
 
-        self.physics.store.insert_component(
+        self.position.store.insert_component(
             entity,
-            PhysicsComponent {
+            PositionComponent {
                 entity,
-                position: (400.0, 550.0),
-                velocity: (0.0, 0.0),
-                acceleration: (0.0, 0.0),
-                rigid_body: Some(RigidBody {
-                    padding: (0, 0, 0, 0),
-                    solid: true,
-                }),
-                shape: Shape {
-                    flipped: (false, false),
-                    texture_index,
-                    sprite: FLOOR_SPRITE,
-                },
-                gravity: false,
+                action: PositionAction::None,
+                x: 400.0,
+                y: 550.0,
+            },
+        );
+        self.shape.store.insert_component(
+            entity,
+            ShapeComponent {
+                entity,
+                action: ShapeAction::None,
+                texture,
+                sprite: FLOOR_SPRITE,
+                flipped: (false, false),
+            },
+        );
+        self.collision.store.insert_component(
+            entity,
+            CollisionComponent {
+                entity,
+                padding: 0,
+                solid: true,
             },
         );
 

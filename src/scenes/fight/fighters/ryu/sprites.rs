@@ -1,4 +1,4 @@
-use crate::systems::{damage::DamagePoint, physics::Sprite};
+use crate::systems::{damage::DamagePoint, shape::Sprite};
 
 pub const RYU_TEXTURE_PATH: &'static str = "assets/ryu.png";
 // STAND

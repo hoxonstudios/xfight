@@ -1,4 +1,4 @@
-use crate::systems::physics::Sprite;
+use crate::systems::shape::Sprite;
 
 pub const FLOOR_TEXTURE_PATH: &'static str = "assets/floor.png";
 
