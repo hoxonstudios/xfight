@@ -17,8 +17,8 @@ use crate::{
 };
 
 use self::sprites::{
-    RYU_LIGHT_KICK, RYU_LIGHT_PUNCH, RYU_STAND, RYU_STRONG_KICK, RYU_STRONG_PUNCH, RYU_STUNT,
-    RYU_TEXTURE_PATH, RYU_WALKING,
+    RYU_CRUNCH, RYU_LIGHT_KICK, RYU_LIGHT_PUNCH, RYU_STAND, RYU_STRONG_KICK, RYU_STRONG_PUNCH,
+    RYU_STUNT, RYU_TEXTURE_PATH, RYU_WALKING,
 };
 
 impl<'a> FightScene<'a> {
@@ -89,6 +89,7 @@ impl<'a> FightScene<'a> {
                     standing: RYU_STAND,
                     walking: RYU_WALKING,
                     stunt: RYU_STUNT,
+                    crunching: RYU_CRUNCH,
                     light_punch: RYU_LIGHT_PUNCH,
                     strong_punch: RYU_STRONG_PUNCH,
                     light_kick: RYU_LIGHT_KICK,

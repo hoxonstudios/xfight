@@ -27,6 +27,12 @@ pub const RYU_STUNT: Sprite = Sprite {
     area: (0, 756, 41, 829),
 };
 
+// CRUNCH
+pub const RYU_CRUNCH: Sprite = Sprite {
+    center: (1181, 44),
+    area: (1162, 40, 1199, 94),
+};
+
 // WALKING
 pub const RYU_WALKING: [Sprite; 6] = [
     Sprite {

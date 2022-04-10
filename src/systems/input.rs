@@ -39,6 +39,7 @@ impl<'a> InputSystem<'a> {
                     Controller::Two => pressed_keys.controllers[1],
                 };
                 movement.action = match controller {
+                    ControllerMap { down: true, .. } => Some(MovementAction::Crunch),
                     ControllerMap {
                         strong_punch: true, ..
                     } => Some(MovementAction::StrongPunch),
@@ -72,6 +73,7 @@ impl<'a> InputSystem<'a> {
             controllers: [
                 ControllerMap {
                     up: keys.contains(&Keycode::W),
+                    down: keys.contains(&Keycode::S),
                     left: keys.contains(&Keycode::A),
                     right: keys.contains(&Keycode::D),
                     strong_punch: keys.contains(&Keycode::T),
@@ -81,6 +83,7 @@ impl<'a> InputSystem<'a> {
                 },
                 ControllerMap {
                     up: keys.contains(&Keycode::Up),
+                    down: keys.contains(&Keycode::Down),
                     left: keys.contains(&Keycode::Left),
                     right: keys.contains(&Keycode::Right),
                     strong_punch: keys.contains(&Keycode::Kp4),
@@ -101,6 +104,7 @@ struct PressedKeys {
 struct ControllerMap {
     left: bool,
     right: bool,
+    down: bool,
     up: bool,
     light_punch: bool,
     strong_punch: bool,
