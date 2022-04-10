@@ -8,10 +8,10 @@ use super::{
 const STANDING_FRAMES: (usize, u8) = (4, 3);
 const WALKING_FRAMES: (usize, u8) = (6, 2);
 const STUNT_FRAMES: (usize, u8) = (1, 10);
-const LIGHT_PUNCH_FRAMES: (usize, u8) = (3, 2);
-const STRONG_PUNCH_FRAMES: (usize, u8) = (5, 2);
-const LIGHT_KICK_FRAMES: (usize, u8) = (3, 2);
-const STRONG_KICK_FRAMES: (usize, u8) = (3, 2);
+const LIGHT_PUNCH_FRAMES: (usize, u8) = (3, 3);
+const STRONG_PUNCH_FRAMES: (usize, u8) = (5, 3);
+const LIGHT_KICK_FRAMES: (usize, u8) = (3, 3);
+const STRONG_KICK_FRAMES: (usize, u8) = (3, 3);
 
 const WALKING_VELOCITY: f32 = 2.0;
 
