@@ -14,10 +14,10 @@ const STRONG_PUNCH_FRAMES: (usize, u8) = (5, 3);
 const LIGHT_KICK_FRAMES: (usize, u8) = (3, 3);
 const STRONG_KICK_FRAMES: (usize, u8) = (3, 3);
 
-const CRUNCH_LIGHT_PUNCH_FRAMES: (usize, u8) = (3, 3);
-const CRUNCH_STRONG_PUNCH_FRAMES: (usize, u8) = (5, 3);
-const CRUNCH_LIGHT_KICK_FRAMES: (usize, u8) = (3, 3);
-const CRUNCH_STRONG_KICK_FRAMES: (usize, u8) = (3, 3);
+const CROUCH_LIGHT_PUNCH_FRAMES: (usize, u8) = (3, 3);
+const CROUCH_STRONG_PUNCH_FRAMES: (usize, u8) = (5, 3);
+const CROUCH_LIGHT_KICK_FRAMES: (usize, u8) = (3, 3);
+const CROUCH_STRONG_KICK_FRAMES: (usize, u8) = (3, 3);
 
 const WALKING_VELOCITY: f32 = 2.0;
 
@@ -37,27 +37,27 @@ pub struct MovementSprites {
     pub strong_punch: [(Sprite, Option<DamagePoint>); STRONG_PUNCH_FRAMES.0],
     pub light_kick: [(Sprite, Option<DamagePoint>); LIGHT_KICK_FRAMES.0],
     pub strong_kick: [(Sprite, Option<DamagePoint>); STRONG_KICK_FRAMES.0],
-    pub crunching: Sprite,
-    pub crunch_light_punch: [(Sprite, Option<DamagePoint>); CRUNCH_LIGHT_PUNCH_FRAMES.0],
-    pub crunch_strong_punch: [(Sprite, Option<DamagePoint>); CRUNCH_STRONG_PUNCH_FRAMES.0],
-    pub crunch_light_kick: [(Sprite, Option<DamagePoint>); CRUNCH_LIGHT_KICK_FRAMES.0],
-    pub crunch_strong_kick: [(Sprite, Option<DamagePoint>); CRUNCH_STRONG_KICK_FRAMES.0],
+    pub crouching: Sprite,
+    pub crouch_light_punch: [(Sprite, Option<DamagePoint>); CROUCH_LIGHT_PUNCH_FRAMES.0],
+    pub crouch_strong_punch: [(Sprite, Option<DamagePoint>); CROUCH_STRONG_PUNCH_FRAMES.0],
+    pub crouch_light_kick: [(Sprite, Option<DamagePoint>); CROUCH_LIGHT_KICK_FRAMES.0],
+    pub crouch_strong_kick: [(Sprite, Option<DamagePoint>); CROUCH_STRONG_KICK_FRAMES.0],
 }
 #[derive(Copy, Clone, Debug)]
 pub enum MovementAction {
     WalkRight,
     WalkLeft,
-    Crunch,
+    Crouch,
 
     LightPunch,
     StrongPunch,
     LightKick,
     StrongKick,
 
-    CrunchLightPunch,
-    CrunchStrongPunch,
-    CrunchLightKick,
-    CrunchStrongKick,
+    CrouchLightPunch,
+    CrouchStrongPunch,
+    CrouchLightKick,
+    CrouchStrongKick,
 
     JumpStraight,
 
@@ -91,17 +91,17 @@ pub enum MovementState {
         frame: (usize, u8),
     },
 
-    Crunching,
-    CrunchLightPunching {
+    Crouching,
+    CrouchLightPunching {
         frame: (usize, u8),
     },
-    CrunchStrongPunching {
+    CrouchStrongPunching {
         frame: (usize, u8),
     },
-    CrunchLightKicking {
+    CrouchLightKicking {
         frame: (usize, u8),
     },
-    CrunchStrongKicking {
+    CrouchStrongKicking {
         frame: (usize, u8),
     },
 
@@ -169,10 +169,10 @@ impl MovementSystem {
                         }
                     }
                 }
-                MovementState::Crunching => {
+                MovementState::Crouching => {
                     if let Some(shape) = shape_system.store.get_mut_component(entity) {
                         shape.action = ShapeAction::Update {
-                            sprite: movement.sprites.crunching,
+                            sprite: movement.sprites.crouching,
                             flipped: shape.flipped,
                         };
                     }
@@ -306,14 +306,14 @@ impl MovementSystem {
                         }
                     }
                 }
-                MovementState::CrunchLightPunching {
+                MovementState::CrouchLightPunching {
                     frame: (sprite, frame),
                 } => {
                     if frame == 0 {
                         if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
                             velocity.velocity.0 = 0.0;
                         }
-                        let sprite = movement.sprites.crunch_light_punch[sprite];
+                        let sprite = movement.sprites.crouch_light_punch[sprite];
                         if let Some(shape) = shape_system.store.get_mut_component(entity) {
                             shape.action = ShapeAction::Update {
                                 sprite: sprite.0,
@@ -331,14 +331,14 @@ impl MovementSystem {
                         }
                     }
                 }
-                MovementState::CrunchStrongPunching {
+                MovementState::CrouchStrongPunching {
                     frame: (sprite, frame),
                 } => {
                     if frame == 0 {
                         if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
                             velocity.velocity.0 = 0.0;
                         }
-                        let sprite = movement.sprites.crunch_strong_punch[sprite];
+                        let sprite = movement.sprites.crouch_strong_punch[sprite];
                         if let Some(shape) = shape_system.store.get_mut_component(entity) {
                             shape.action = ShapeAction::Update {
                                 sprite: sprite.0,
@@ -356,14 +356,14 @@ impl MovementSystem {
                         }
                     }
                 }
-                MovementState::CrunchLightKicking {
+                MovementState::CrouchLightKicking {
                     frame: (sprite, frame),
                 } => {
                     if frame == 0 {
                         if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
                             velocity.velocity.0 = 0.0;
                         }
-                        let sprite = movement.sprites.crunch_light_kick[sprite];
+                        let sprite = movement.sprites.crouch_light_kick[sprite];
                         if let Some(shape) = shape_system.store.get_mut_component(entity) {
                             shape.action = ShapeAction::Update {
                                 sprite: sprite.0,
@@ -381,14 +381,14 @@ impl MovementSystem {
                         }
                     }
                 }
-                MovementState::CrunchStrongKicking {
+                MovementState::CrouchStrongKicking {
                     frame: (sprite, frame),
                 } => {
                     if frame == 0 {
                         if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
                             velocity.velocity.0 = 0.0;
                         }
-                        let sprite = movement.sprites.crunch_strong_kick[sprite];
+                        let sprite = movement.sprites.crouch_strong_kick[sprite];
                         if let Some(shape) = shape_system.store.get_mut_component(entity) {
                             shape.action = ShapeAction::Update {
                                 sprite: sprite.0,
@@ -429,7 +429,7 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                 MovementAction::Land => MovementState::Standing {
                     frame: next_infinite_frame(frame, STANDING_FRAMES),
                 },
-                MovementAction::Crunch => MovementState::Crunching,
+                MovementAction::Crouch => MovementState::Crouching,
                 MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                 MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                 MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -443,17 +443,17 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                     frame: (0, 0),
                     direction: WalkingDirection::Right,
                 },
-                MovementAction::CrunchLightPunch => {
-                    MovementState::CrunchLightPunching { frame: (0, 0) }
+                MovementAction::CrouchLightPunch => {
+                    MovementState::CrouchLightPunching { frame: (0, 0) }
                 }
-                MovementAction::CrunchStrongPunch => {
-                    MovementState::CrunchStrongPunching { frame: (0, 0) }
+                MovementAction::CrouchStrongPunch => {
+                    MovementState::CrouchStrongPunching { frame: (0, 0) }
                 }
-                MovementAction::CrunchLightKick => {
-                    MovementState::CrunchLightKicking { frame: (0, 0) }
+                MovementAction::CrouchLightKick => {
+                    MovementState::CrouchLightKicking { frame: (0, 0) }
                 }
-                MovementAction::CrunchStrongKick => {
-                    MovementState::CrunchStrongKicking { frame: (0, 0) }
+                MovementAction::CrouchStrongKick => {
+                    MovementState::CrouchStrongKicking { frame: (0, 0) }
                 }
             },
         },
@@ -466,7 +466,7 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                     Some(action) => match action {
                         MovementAction::Hit => MovementState::Stunt { frame: 0 },
                         MovementAction::Land => MovementState::Standing { frame: (0, 0) },
-                        MovementAction::Crunch => MovementState::Crunching,
+                        MovementAction::Crouch => MovementState::Crouching,
                         MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                         MovementAction::LightPunch => {
                             MovementState::LightPunching { frame: (0, 0) }
@@ -488,28 +488,28 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                             frame: (0, 0),
                             direction: WalkingDirection::Right,
                         },
-                        MovementAction::CrunchLightPunch => {
-                            MovementState::CrunchLightPunching { frame: (0, 0) }
+                        MovementAction::CrouchLightPunch => {
+                            MovementState::CrouchLightPunching { frame: (0, 0) }
                         }
-                        MovementAction::CrunchStrongPunch => {
-                            MovementState::CrunchStrongPunching { frame: (0, 0) }
+                        MovementAction::CrouchStrongPunch => {
+                            MovementState::CrouchStrongPunching { frame: (0, 0) }
                         }
-                        MovementAction::CrunchLightKick => {
-                            MovementState::CrunchLightKicking { frame: (0, 0) }
+                        MovementAction::CrouchLightKick => {
+                            MovementState::CrouchLightKicking { frame: (0, 0) }
                         }
-                        MovementAction::CrunchStrongKick => {
-                            MovementState::CrunchStrongKicking { frame: (0, 0) }
+                        MovementAction::CrouchStrongKick => {
+                            MovementState::CrouchStrongKicking { frame: (0, 0) }
                         }
                     },
                 }
             }
         }
-        MovementState::Crunching => match action {
+        MovementState::Crouching => match action {
             None => MovementState::Standing { frame: (0, 0) },
             Some(action) => match action {
                 MovementAction::Hit => MovementState::Stunt { frame: 0 },
                 MovementAction::Land => MovementState::Standing { frame: (0, 0) },
-                MovementAction::Crunch => MovementState::Crunching,
+                MovementAction::Crouch => MovementState::Crouching,
                 MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                 MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                 MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -523,17 +523,17 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                     frame: (0, 0),
                     direction: WalkingDirection::Right,
                 },
-                MovementAction::CrunchLightPunch => {
-                    MovementState::CrunchLightPunching { frame: (0, 0) }
+                MovementAction::CrouchLightPunch => {
+                    MovementState::CrouchLightPunching { frame: (0, 0) }
                 }
-                MovementAction::CrunchStrongPunch => {
-                    MovementState::CrunchStrongPunching { frame: (0, 0) }
+                MovementAction::CrouchStrongPunch => {
+                    MovementState::CrouchStrongPunching { frame: (0, 0) }
                 }
-                MovementAction::CrunchLightKick => {
-                    MovementState::CrunchLightKicking { frame: (0, 0) }
+                MovementAction::CrouchLightKick => {
+                    MovementState::CrouchLightKicking { frame: (0, 0) }
                 }
-                MovementAction::CrunchStrongKick => {
-                    MovementState::CrunchStrongKicking { frame: (0, 0) }
+                MovementAction::CrouchStrongKick => {
+                    MovementState::CrouchStrongKicking { frame: (0, 0) }
                 }
             },
         },
@@ -542,7 +542,7 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
             Some(action) => match action {
                 MovementAction::Hit => MovementState::Stunt { frame: 0 },
                 MovementAction::Land => MovementState::Standing { frame: (0, 0) },
-                MovementAction::Crunch => MovementState::Crunching,
+                MovementAction::Crouch => MovementState::Crouching,
                 MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                 MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                 MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -568,17 +568,17 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                         direction,
                     },
                 },
-                MovementAction::CrunchLightPunch => {
-                    MovementState::CrunchLightPunching { frame: (0, 0) }
+                MovementAction::CrouchLightPunch => {
+                    MovementState::CrouchLightPunching { frame: (0, 0) }
                 }
-                MovementAction::CrunchStrongPunch => {
-                    MovementState::CrunchStrongPunching { frame: (0, 0) }
+                MovementAction::CrouchStrongPunch => {
+                    MovementState::CrouchStrongPunching { frame: (0, 0) }
                 }
-                MovementAction::CrunchLightKick => {
-                    MovementState::CrunchLightKicking { frame: (0, 0) }
+                MovementAction::CrouchLightKick => {
+                    MovementState::CrouchLightKicking { frame: (0, 0) }
                 }
-                MovementAction::CrunchStrongKick => {
-                    MovementState::CrunchStrongKicking { frame: (0, 0) }
+                MovementAction::CrouchStrongKick => {
+                    MovementState::CrouchStrongKicking { frame: (0, 0) }
                 }
             },
         },
@@ -587,7 +587,7 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
             Some(action) => match action {
                 MovementAction::Hit => MovementState::Stunt { frame: 0 },
                 MovementAction::Land => MovementState::Standing { frame: (0, 0) },
-                MovementAction::Crunch => MovementState::JumpingStraight { starting: false },
+                MovementAction::Crouch => MovementState::JumpingStraight { starting: false },
                 MovementAction::LightKick => MovementState::JumpingStraight { starting: false },
                 MovementAction::LightPunch => MovementState::JumpingStraight { starting: false },
                 MovementAction::StrongKick => MovementState::JumpingStraight { starting: false },
@@ -595,16 +595,16 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                 MovementAction::JumpStraight => MovementState::JumpingStraight { starting: false },
                 MovementAction::WalkLeft => MovementState::JumpingStraight { starting: false },
                 MovementAction::WalkRight => MovementState::JumpingStraight { starting: false },
-                MovementAction::CrunchLightPunch => {
+                MovementAction::CrouchLightPunch => {
                     MovementState::JumpingStraight { starting: false }
                 }
-                MovementAction::CrunchStrongPunch => {
+                MovementAction::CrouchStrongPunch => {
                     MovementState::JumpingStraight { starting: false }
                 }
-                MovementAction::CrunchLightKick => {
+                MovementAction::CrouchLightKick => {
                     MovementState::JumpingStraight { starting: false }
                 }
-                MovementAction::CrunchStrongKick => {
+                MovementAction::CrouchStrongKick => {
                     MovementState::JumpingStraight { starting: false }
                 }
             },
@@ -616,7 +616,7 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                 Some(action) => match action {
                     MovementAction::Hit => MovementState::Stunt { frame: 0 },
                     MovementAction::Land => MovementState::Standing { frame: (0, 0) },
-                    MovementAction::Crunch => MovementState::Crunching,
+                    MovementAction::Crouch => MovementState::Crouching,
                     MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                     MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                     MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -632,17 +632,17 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                         frame: (0, 0),
                         direction: WalkingDirection::Right,
                     },
-                    MovementAction::CrunchLightPunch => {
-                        MovementState::CrunchLightPunching { frame: (0, 0) }
+                    MovementAction::CrouchLightPunch => {
+                        MovementState::CrouchLightPunching { frame: (0, 0) }
                     }
-                    MovementAction::CrunchStrongPunch => {
-                        MovementState::CrunchStrongPunching { frame: (0, 0) }
+                    MovementAction::CrouchStrongPunch => {
+                        MovementState::CrouchStrongPunching { frame: (0, 0) }
                     }
-                    MovementAction::CrunchLightKick => {
-                        MovementState::CrunchLightKicking { frame: (0, 0) }
+                    MovementAction::CrouchLightKick => {
+                        MovementState::CrouchLightKicking { frame: (0, 0) }
                     }
-                    MovementAction::CrunchStrongKick => {
-                        MovementState::CrunchStrongKicking { frame: (0, 0) }
+                    MovementAction::CrouchStrongKick => {
+                        MovementState::CrouchStrongKicking { frame: (0, 0) }
                     }
                 },
             },
@@ -654,7 +654,7 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                 Some(action) => match action {
                     MovementAction::Hit => MovementState::Stunt { frame: 0 },
                     MovementAction::Land => MovementState::Standing { frame: (0, 0) },
-                    MovementAction::Crunch => MovementState::Crunching,
+                    MovementAction::Crouch => MovementState::Crouching,
                     MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                     MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                     MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -670,17 +670,17 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                         frame: (0, 0),
                         direction: WalkingDirection::Right,
                     },
-                    MovementAction::CrunchLightPunch => {
-                        MovementState::CrunchLightPunching { frame: (0, 0) }
+                    MovementAction::CrouchLightPunch => {
+                        MovementState::CrouchLightPunching { frame: (0, 0) }
                     }
-                    MovementAction::CrunchStrongPunch => {
-                        MovementState::CrunchStrongPunching { frame: (0, 0) }
+                    MovementAction::CrouchStrongPunch => {
+                        MovementState::CrouchStrongPunching { frame: (0, 0) }
                     }
-                    MovementAction::CrunchLightKick => {
-                        MovementState::CrunchLightKicking { frame: (0, 0) }
+                    MovementAction::CrouchLightKick => {
+                        MovementState::CrouchLightKicking { frame: (0, 0) }
                     }
-                    MovementAction::CrunchStrongKick => {
-                        MovementState::CrunchStrongKicking { frame: (0, 0) }
+                    MovementAction::CrouchStrongKick => {
+                        MovementState::CrouchStrongKicking { frame: (0, 0) }
                     }
                 },
             },
@@ -692,7 +692,7 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                 Some(action) => match action {
                     MovementAction::Hit => MovementState::Stunt { frame: 0 },
                     MovementAction::Land => MovementState::Standing { frame: (0, 0) },
-                    MovementAction::Crunch => MovementState::Crunching,
+                    MovementAction::Crouch => MovementState::Crouching,
                     MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                     MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                     MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -708,17 +708,17 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                         frame: (0, 0),
                         direction: WalkingDirection::Right,
                     },
-                    MovementAction::CrunchLightPunch => {
-                        MovementState::CrunchLightPunching { frame: (0, 0) }
+                    MovementAction::CrouchLightPunch => {
+                        MovementState::CrouchLightPunching { frame: (0, 0) }
                     }
-                    MovementAction::CrunchStrongPunch => {
-                        MovementState::CrunchStrongPunching { frame: (0, 0) }
+                    MovementAction::CrouchStrongPunch => {
+                        MovementState::CrouchStrongPunching { frame: (0, 0) }
                     }
-                    MovementAction::CrunchLightKick => {
-                        MovementState::CrunchLightKicking { frame: (0, 0) }
+                    MovementAction::CrouchLightKick => {
+                        MovementState::CrouchLightKicking { frame: (0, 0) }
                     }
-                    MovementAction::CrunchStrongKick => {
-                        MovementState::CrunchStrongKicking { frame: (0, 0) }
+                    MovementAction::CrouchStrongKick => {
+                        MovementState::CrouchStrongKicking { frame: (0, 0) }
                     }
                 },
             },
@@ -730,7 +730,7 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                 Some(action) => match action {
                     MovementAction::Hit => MovementState::Stunt { frame: 0 },
                     MovementAction::Land => MovementState::Standing { frame: (0, 0) },
-                    MovementAction::Crunch => MovementState::Crunching,
+                    MovementAction::Crouch => MovementState::Crouching,
                     MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                     MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                     MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -746,30 +746,30 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                         frame: (0, 0),
                         direction: WalkingDirection::Right,
                     },
-                    MovementAction::CrunchLightPunch => {
-                        MovementState::CrunchLightPunching { frame: (0, 0) }
+                    MovementAction::CrouchLightPunch => {
+                        MovementState::CrouchLightPunching { frame: (0, 0) }
                     }
-                    MovementAction::CrunchStrongPunch => {
-                        MovementState::CrunchStrongPunching { frame: (0, 0) }
+                    MovementAction::CrouchStrongPunch => {
+                        MovementState::CrouchStrongPunching { frame: (0, 0) }
                     }
-                    MovementAction::CrunchLightKick => {
-                        MovementState::CrunchLightKicking { frame: (0, 0) }
+                    MovementAction::CrouchLightKick => {
+                        MovementState::CrouchLightKicking { frame: (0, 0) }
                     }
-                    MovementAction::CrunchStrongKick => {
-                        MovementState::CrunchStrongKicking { frame: (0, 0) }
+                    MovementAction::CrouchStrongKick => {
+                        MovementState::CrouchStrongKicking { frame: (0, 0) }
                     }
                 },
             },
         },
-        MovementState::CrunchLightPunching { frame } => {
-            match next_frame(frame, CRUNCH_LIGHT_PUNCH_FRAMES) {
-                Some(frame) => MovementState::CrunchLightPunching { frame },
+        MovementState::CrouchLightPunching { frame } => {
+            match next_frame(frame, CROUCH_LIGHT_PUNCH_FRAMES) {
+                Some(frame) => MovementState::CrouchLightPunching { frame },
                 None => match action {
                     None => MovementState::Standing { frame: (0, 0) },
                     Some(action) => match action {
                         MovementAction::Hit => MovementState::Stunt { frame: 0 },
                         MovementAction::Land => MovementState::Standing { frame: (0, 0) },
-                        MovementAction::Crunch => MovementState::Crunching,
+                        MovementAction::Crouch => MovementState::Crouching,
                         MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                         MovementAction::LightPunch => {
                             MovementState::LightPunching { frame: (0, 0) }
@@ -791,31 +791,31 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                             frame: (0, 0),
                             direction: WalkingDirection::Right,
                         },
-                        MovementAction::CrunchLightPunch => {
-                            MovementState::CrunchLightPunching { frame: (0, 0) }
+                        MovementAction::CrouchLightPunch => {
+                            MovementState::CrouchLightPunching { frame: (0, 0) }
                         }
-                        MovementAction::CrunchStrongPunch => {
-                            MovementState::CrunchStrongPunching { frame: (0, 0) }
+                        MovementAction::CrouchStrongPunch => {
+                            MovementState::CrouchStrongPunching { frame: (0, 0) }
                         }
-                        MovementAction::CrunchLightKick => {
-                            MovementState::CrunchLightKicking { frame: (0, 0) }
+                        MovementAction::CrouchLightKick => {
+                            MovementState::CrouchLightKicking { frame: (0, 0) }
                         }
-                        MovementAction::CrunchStrongKick => {
-                            MovementState::CrunchStrongKicking { frame: (0, 0) }
+                        MovementAction::CrouchStrongKick => {
+                            MovementState::CrouchStrongKicking { frame: (0, 0) }
                         }
                     },
                 },
             }
         }
-        MovementState::CrunchStrongPunching { frame } => {
-            match next_frame(frame, CRUNCH_STRONG_PUNCH_FRAMES) {
-                Some(frame) => MovementState::CrunchStrongPunching { frame },
+        MovementState::CrouchStrongPunching { frame } => {
+            match next_frame(frame, CROUCH_STRONG_PUNCH_FRAMES) {
+                Some(frame) => MovementState::CrouchStrongPunching { frame },
                 None => match action {
                     None => MovementState::Standing { frame: (0, 0) },
                     Some(action) => match action {
                         MovementAction::Hit => MovementState::Stunt { frame: 0 },
                         MovementAction::Land => MovementState::Standing { frame: (0, 0) },
-                        MovementAction::Crunch => MovementState::Crunching,
+                        MovementAction::Crouch => MovementState::Crouching,
                         MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                         MovementAction::LightPunch => {
                             MovementState::LightPunching { frame: (0, 0) }
@@ -837,31 +837,31 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                             frame: (0, 0),
                             direction: WalkingDirection::Right,
                         },
-                        MovementAction::CrunchLightPunch => {
-                            MovementState::CrunchLightPunching { frame: (0, 0) }
+                        MovementAction::CrouchLightPunch => {
+                            MovementState::CrouchLightPunching { frame: (0, 0) }
                         }
-                        MovementAction::CrunchStrongPunch => {
-                            MovementState::CrunchStrongPunching { frame: (0, 0) }
+                        MovementAction::CrouchStrongPunch => {
+                            MovementState::CrouchStrongPunching { frame: (0, 0) }
                         }
-                        MovementAction::CrunchLightKick => {
-                            MovementState::CrunchLightKicking { frame: (0, 0) }
+                        MovementAction::CrouchLightKick => {
+                            MovementState::CrouchLightKicking { frame: (0, 0) }
                         }
-                        MovementAction::CrunchStrongKick => {
-                            MovementState::CrunchStrongKicking { frame: (0, 0) }
+                        MovementAction::CrouchStrongKick => {
+                            MovementState::CrouchStrongKicking { frame: (0, 0) }
                         }
                     },
                 },
             }
         }
-        MovementState::CrunchLightKicking { frame } => {
-            match next_frame(frame, CRUNCH_LIGHT_KICK_FRAMES) {
-                Some(frame) => MovementState::CrunchLightKicking { frame },
+        MovementState::CrouchLightKicking { frame } => {
+            match next_frame(frame, CROUCH_LIGHT_KICK_FRAMES) {
+                Some(frame) => MovementState::CrouchLightKicking { frame },
                 None => match action {
                     None => MovementState::Standing { frame: (0, 0) },
                     Some(action) => match action {
                         MovementAction::Hit => MovementState::Stunt { frame: 0 },
                         MovementAction::Land => MovementState::Standing { frame: (0, 0) },
-                        MovementAction::Crunch => MovementState::Crunching,
+                        MovementAction::Crouch => MovementState::Crouching,
                         MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                         MovementAction::LightPunch => {
                             MovementState::LightPunching { frame: (0, 0) }
@@ -883,31 +883,31 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                             frame: (0, 0),
                             direction: WalkingDirection::Right,
                         },
-                        MovementAction::CrunchLightPunch => {
-                            MovementState::CrunchLightPunching { frame: (0, 0) }
+                        MovementAction::CrouchLightPunch => {
+                            MovementState::CrouchLightPunching { frame: (0, 0) }
                         }
-                        MovementAction::CrunchStrongPunch => {
-                            MovementState::CrunchStrongPunching { frame: (0, 0) }
+                        MovementAction::CrouchStrongPunch => {
+                            MovementState::CrouchStrongPunching { frame: (0, 0) }
                         }
-                        MovementAction::CrunchLightKick => {
-                            MovementState::CrunchLightKicking { frame: (0, 0) }
+                        MovementAction::CrouchLightKick => {
+                            MovementState::CrouchLightKicking { frame: (0, 0) }
                         }
-                        MovementAction::CrunchStrongKick => {
-                            MovementState::CrunchStrongKicking { frame: (0, 0) }
+                        MovementAction::CrouchStrongKick => {
+                            MovementState::CrouchStrongKicking { frame: (0, 0) }
                         }
                     },
                 },
             }
         }
-        MovementState::CrunchStrongKicking { frame } => {
-            match next_frame(frame, CRUNCH_STRONG_KICK_FRAMES) {
-                Some(frame) => MovementState::CrunchStrongKicking { frame },
+        MovementState::CrouchStrongKicking { frame } => {
+            match next_frame(frame, CROUCH_STRONG_KICK_FRAMES) {
+                Some(frame) => MovementState::CrouchStrongKicking { frame },
                 None => match action {
                     None => MovementState::Standing { frame: (0, 0) },
                     Some(action) => match action {
                         MovementAction::Hit => MovementState::Stunt { frame: 0 },
                         MovementAction::Land => MovementState::Standing { frame: (0, 0) },
-                        MovementAction::Crunch => MovementState::Crunching,
+                        MovementAction::Crouch => MovementState::Crouching,
                         MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                         MovementAction::LightPunch => {
                             MovementState::LightPunching { frame: (0, 0) }
@@ -929,17 +929,17 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                             frame: (0, 0),
                             direction: WalkingDirection::Right,
                         },
-                        MovementAction::CrunchLightPunch => {
-                            MovementState::CrunchLightPunching { frame: (0, 0) }
+                        MovementAction::CrouchLightPunch => {
+                            MovementState::CrouchLightPunching { frame: (0, 0) }
                         }
-                        MovementAction::CrunchStrongPunch => {
-                            MovementState::CrunchStrongPunching { frame: (0, 0) }
+                        MovementAction::CrouchStrongPunch => {
+                            MovementState::CrouchStrongPunching { frame: (0, 0) }
                         }
-                        MovementAction::CrunchLightKick => {
-                            MovementState::CrunchLightKicking { frame: (0, 0) }
+                        MovementAction::CrouchLightKick => {
+                            MovementState::CrouchLightKicking { frame: (0, 0) }
                         }
-                        MovementAction::CrunchStrongKick => {
-                            MovementState::CrunchStrongKicking { frame: (0, 0) }
+                        MovementAction::CrouchStrongKick => {
+                            MovementState::CrouchStrongKicking { frame: (0, 0) }
                         }
                     },
                 },

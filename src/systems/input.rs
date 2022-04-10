@@ -43,23 +43,23 @@ impl<'a> InputSystem<'a> {
                         down: true,
                         light_punch: true,
                         ..
-                    } => Some(MovementAction::CrunchLightPunch),
+                    } => Some(MovementAction::CrouchLightPunch),
                     ControllerMap {
                         down: true,
                         strong_punch: true,
                         ..
-                    } => Some(MovementAction::CrunchStrongPunch),
+                    } => Some(MovementAction::CrouchStrongPunch),
                     ControllerMap {
                         down: true,
                         light_kick: true,
                         ..
-                    } => Some(MovementAction::CrunchLightKick),
+                    } => Some(MovementAction::CrouchLightKick),
                     ControllerMap {
                         down: true,
                         strong_kick: true,
                         ..
-                    } => Some(MovementAction::CrunchStrongKick),
-                    ControllerMap { down: true, .. } => Some(MovementAction::Crunch),
+                    } => Some(MovementAction::CrouchStrongKick),
+                    ControllerMap { down: true, .. } => Some(MovementAction::Crouch),
                     ControllerMap {
                         strong_punch: true, ..
                     } => Some(MovementAction::StrongPunch),

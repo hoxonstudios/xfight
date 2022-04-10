@@ -27,8 +27,8 @@ pub const RYU_STUNT: Sprite = Sprite {
     area: (0, 756, 41, 829),
 };
 
-// CRUNCH
-pub const RYU_CRUNCH: Sprite = Sprite {
+// CROUCH
+pub const RYU_CROUCH: Sprite = Sprite {
     center: (1181, 44),
     area: (1162, 40, 1199, 94),
 };
@@ -187,8 +187,8 @@ pub const RYU_STRONG_KICK: [(Sprite, Option<DamagePoint>); 3] = [
     ),
 ];
 
-// CRUNCH LIGHT PUNCH
-pub const RYU_CRUNCH_LIGHT_PUNCH: [(Sprite, Option<DamagePoint>); 3] = [
+// CROUCH LIGHT PUNCH
+pub const RYU_CROUCH_LIGHT_PUNCH: [(Sprite, Option<DamagePoint>); 3] = [
     (
         Sprite {
             center: (30, 419),
@@ -215,8 +215,8 @@ pub const RYU_CRUNCH_LIGHT_PUNCH: [(Sprite, Option<DamagePoint>); 3] = [
     ),
 ];
 
-// CRUNCH STRONG PUNCH
-pub const RYU_CRUNCH_STRONG_PUNCH: [(Sprite, Option<DamagePoint>); 5] = [
+// CROUCH STRONG PUNCH
+pub const RYU_CROUCH_STRONG_PUNCH: [(Sprite, Option<DamagePoint>); 5] = [
     (
         Sprite {
             center: (148, 419),
@@ -257,8 +257,8 @@ pub const RYU_CRUNCH_STRONG_PUNCH: [(Sprite, Option<DamagePoint>); 5] = [
     ),
 ];
 
-// CRUNCH LIGHT KICK
-pub const RYU_CRUNCH_LIGHT_KICK: [(Sprite, Option<DamagePoint>); 3] = [
+// CROUCH LIGHT KICK
+pub const RYU_CROUCH_LIGHT_KICK: [(Sprite, Option<DamagePoint>); 3] = [
     (
         Sprite {
             center: (682, 421),
@@ -285,8 +285,8 @@ pub const RYU_CRUNCH_LIGHT_KICK: [(Sprite, Option<DamagePoint>); 3] = [
     ),
 ];
 
-// CRUNCH STRONG KICK
-pub const RYU_CRUNCH_STRONG_KICK: [(Sprite, Option<DamagePoint>); 3] = [
+// CROUCH STRONG KICK
+pub const RYU_CROUCH_STRONG_KICK: [(Sprite, Option<DamagePoint>); 3] = [
     (
         Sprite {
             center: (867, 421),
