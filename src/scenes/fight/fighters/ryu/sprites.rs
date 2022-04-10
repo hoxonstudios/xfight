@@ -186,3 +186,31 @@ pub const RYU_STRONG_KICK: [(Sprite, Option<DamagePoint>); 3] = [
         None,
     ),
 ];
+
+// CRUNCH LIGHT PUNCH
+pub const RYU_CRUNCH_LIGHT_PUNCH: [(Sprite, Option<DamagePoint>); 3] = [
+    (
+        Sprite {
+            center: (30, 419),
+            area: (11, 415, 53, 469),
+        },
+        None,
+    ),
+    (
+        Sprite {
+            center: (82, 420),
+            area: (63, 415, 120, 470),
+        },
+        Some(DamagePoint {
+            point: (34, 11),
+            power: 5,
+        }),
+    ),
+    (
+        Sprite {
+            center: (30, 419),
+            area: (11, 415, 53, 469),
+        },
+        None,
+    ),
+];

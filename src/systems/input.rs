@@ -39,6 +39,11 @@ impl<'a> InputSystem<'a> {
                     Controller::Two => pressed_keys.controllers[1],
                 };
                 movement.action = match controller {
+                    ControllerMap {
+                        down: true,
+                        light_punch: true,
+                        ..
+                    } => Some(MovementAction::CrunchLightPunch),
                     ControllerMap { down: true, .. } => Some(MovementAction::Crunch),
                     ControllerMap {
                         strong_punch: true, ..
