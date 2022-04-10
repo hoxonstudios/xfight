@@ -1,13 +1,12 @@
 use super::{
     collision::CollisionSystem,
     helpers::ComponentStore,
-    movement::{MovementAction, MovementSystem},
+    movement::{MovementAction, MovementState, MovementSystem},
 };
 
 #[derive(Copy, Clone)]
 pub struct GroundComponent {
     pub entity: usize,
-    pub grounded: bool,
 }
 
 pub struct GroundSystem {
@@ -27,12 +26,9 @@ impl GroundSystem {
         for ground in self.store.data_mut() {
             let entity = ground.entity;
             if let Some(movement) = movement_system.store.get_mut_component(entity) {
-                if let Some(MovementAction::JumpStraight) = movement.action {
-                    ground.grounded = false;
-                } else if !ground.grounded {
+                if let MovementState::JumpingStraight { starting: false } = movement.state {
                     if GroundSystem::is_grounded(entity, collision_system) {
                         movement.action = Some(MovementAction::Land);
-                        ground.grounded = true;
                     }
                 }
             }

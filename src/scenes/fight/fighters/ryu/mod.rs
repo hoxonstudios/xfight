@@ -76,13 +76,9 @@ impl<'a> FightScene<'a> {
                 direction: AimDirection::Right,
             },
         );
-        self.ground.store.insert_component(
-            entity,
-            GroundComponent {
-                entity,
-                grounded: false,
-            },
-        );
+        self.ground
+            .store
+            .insert_component(entity, GroundComponent { entity });
         self.movement.store.insert_component(
             entity,
             MovementComponent {
