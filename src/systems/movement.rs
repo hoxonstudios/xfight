@@ -171,6 +171,9 @@ impl MovementSystem {
                     frame: (sprite, frame),
                 } => {
                     if frame == 0 {
+                        if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
+                            velocity.velocity.0 = 0.0;
+                        }
                         let sprite = movement.sprites.light_kick[sprite];
                         if let Some(shape) = shape_system.store.get_mut_component(entity) {
                             shape.action = ShapeAction::Update {
@@ -193,6 +196,9 @@ impl MovementSystem {
                     frame: (sprite, frame),
                 } => {
                     if frame == 0 {
+                        if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
+                            velocity.velocity.0 = 0.0;
+                        }
                         let sprite = movement.sprites.light_punch[sprite];
                         if let Some(shape) = shape_system.store.get_mut_component(entity) {
                             shape.action = ShapeAction::Update {
@@ -215,6 +221,9 @@ impl MovementSystem {
                     frame: (sprite, frame),
                 } => {
                     if frame == 0 {
+                        if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
+                            velocity.velocity.0 = 0.0;
+                        }
                         let sprite = movement.sprites.strong_kick[sprite];
                         if let Some(shape) = shape_system.store.get_mut_component(entity) {
                             shape.action = ShapeAction::Update {
@@ -237,6 +246,9 @@ impl MovementSystem {
                     frame: (sprite, frame),
                 } => {
                     if frame == 0 {
+                        if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
+                            velocity.velocity.0 = 0.0;
+                        }
                         let sprite = movement.sprites.strong_punch[sprite];
                         if let Some(shape) = shape_system.store.get_mut_component(entity) {
                             shape.action = ShapeAction::Update {
