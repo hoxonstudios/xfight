@@ -214,3 +214,101 @@ pub const RYU_CRUNCH_LIGHT_PUNCH: [(Sprite, Option<DamagePoint>); 3] = [
         None,
     ),
 ];
+
+// CRUNCH STRONG PUNCH
+pub const RYU_CRUNCH_STRONG_PUNCH: [(Sprite, Option<DamagePoint>); 5] = [
+    (
+        Sprite {
+            center: (148, 419),
+            area: (129, 415, 171, 469),
+        },
+        None,
+    ),
+    (
+        Sprite {
+            center: (202, 419),
+            area: (183, 415, 223, 469),
+        },
+        None,
+    ),
+    (
+        Sprite {
+            center: (254, 419),
+            area: (235, 414, 290, 469),
+        },
+        Some(DamagePoint {
+            point: (33, 9),
+            power: 5,
+        }),
+    ),
+    (
+        Sprite {
+            center: (202, 419),
+            area: (183, 415, 223, 469),
+        },
+        None,
+    ),
+    (
+        Sprite {
+            center: (148, 419),
+            area: (129, 415, 171, 469),
+        },
+        None,
+    ),
+];
+
+// CRUNCH LIGHT KICK
+pub const RYU_CRUNCH_LIGHT_KICK: [(Sprite, Option<DamagePoint>); 3] = [
+    (
+        Sprite {
+            center: (682, 421),
+            area: (663, 414, 706, 471),
+        },
+        None,
+    ),
+    (
+        Sprite {
+            center: (735, 422),
+            area: (716, 413, 782, 472),
+        },
+        Some(DamagePoint {
+            point: (40, 42),
+            power: 5,
+        }),
+    ),
+    (
+        Sprite {
+            center: (682, 421),
+            area: (663, 414, 706, 471),
+        },
+        None,
+    ),
+];
+
+// CRUNCH STRONG KICK
+pub const RYU_CRUNCH_STRONG_KICK: [(Sprite, Option<DamagePoint>); 3] = [
+    (
+        Sprite {
+            center: (867, 421),
+            area: (849, 414, 892, 471),
+        },
+        None,
+    ),
+    (
+        Sprite {
+            center: (929, 419),
+            area: (902, 422, 986, 469),
+        },
+        Some(DamagePoint {
+            point: (51, 45),
+            power: 5,
+        }),
+    ),
+    (
+        Sprite {
+            center: (867, 421),
+            area: (849, 414, 892, 471),
+        },
+        None,
+    ),
+];

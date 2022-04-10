@@ -44,6 +44,21 @@ impl<'a> InputSystem<'a> {
                         light_punch: true,
                         ..
                     } => Some(MovementAction::CrunchLightPunch),
+                    ControllerMap {
+                        down: true,
+                        strong_punch: true,
+                        ..
+                    } => Some(MovementAction::CrunchStrongPunch),
+                    ControllerMap {
+                        down: true,
+                        light_kick: true,
+                        ..
+                    } => Some(MovementAction::CrunchLightKick),
+                    ControllerMap {
+                        down: true,
+                        strong_kick: true,
+                        ..
+                    } => Some(MovementAction::CrunchStrongKick),
                     ControllerMap { down: true, .. } => Some(MovementAction::Crunch),
                     ControllerMap {
                         strong_punch: true, ..
