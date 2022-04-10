@@ -4,20 +4,17 @@ mod floor;
 use sdl2::{event::Event, keyboard::Keycode};
 
 use crate::systems::{
-    basic_attack::BasicAttackSystem,
+    aim::AimSystem,
     collision::CollisionSystem,
     damage::DamageSystem,
     drawing::DrawingSystem,
+    ground::GroundSystem,
     health::{HealthSystem, Player},
     input::{Controller, InputSystem},
-    jump::JumpSystem,
     movement::MovementSystem,
     position::PositionSystem,
     shape::ShapeSystem,
-    stand::StandSystem,
-    stun::StunSystem,
     velocity::VelocitySystem,
-    walking::WalkingSystem,
 };
 
 pub struct FightScene<'a> {
@@ -29,13 +26,10 @@ pub struct FightScene<'a> {
     pub collision: CollisionSystem,
     pub input: InputSystem<'a>,
     pub movement: MovementSystem,
-    pub stand: StandSystem,
-    pub walking: WalkingSystem,
-    pub basic_attack: BasicAttackSystem,
     pub damage: DamageSystem,
     pub health: HealthSystem,
-    pub stun: StunSystem,
-    pub jump: JumpSystem,
+    pub aim: AimSystem,
+    pub ground: GroundSystem,
 }
 
 impl<'a> FightScene<'a> {
@@ -62,34 +56,21 @@ impl<'a> FightScene<'a> {
             }
 
             self.input.update(&mut self.movement);
-            self.stun.update(
-                &self.health,
-                &mut self.movement,
-                &mut self.shape,
-                &mut self.velocity,
-            );
-            self.movement
-                .update(&mut self.shape, &self.position, &self.collision);
-            self.basic_attack.update(
-                &mut self.movement,
-                &mut self.velocity,
-                &mut self.damage,
-                &mut self.shape,
-            );
-            self.stand
-                .update(&self.movement, &mut self.shape, &mut self.velocity);
-            self.jump.update(&mut self.movement, &mut self.velocity);
-            self.walking
-                .update(&mut self.shape, &mut self.velocity, &mut self.movement);
-            self.shape.update();
-            self.velocity.update(&mut self.position);
-            self.collision.update(&self.shape, &mut self.position);
+            self.aim.update(&self.position, &mut self.shape);
+            self.ground.update(&mut self.movement, &self.collision);
             self.damage.update(
                 &mut self.health,
                 &self.collision,
                 &self.position,
                 &self.shape,
+                &mut self.movement,
             );
+            self.movement
+                .update(&mut self.velocity, &mut self.shape, &mut self.damage);
+            self.shape.update();
+            self.velocity.update(&mut self.position);
+            self.collision
+                .update(&self.shape, &mut self.position, &mut self.velocity);
             self.health.update();
             self.position.update();
             self.drawing.update(&self.position, &self.shape)?;

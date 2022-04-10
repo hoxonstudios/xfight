@@ -6,10 +6,9 @@ mod systems;
 use scenes::fight::FightScene;
 use sdl2::image::InitFlag;
 use systems::{
-    basic_attack::BasicAttackSystem, collision::CollisionSystem, damage::DamageSystem,
-    drawing::DrawingSystem, health::HealthSystem, input::InputSystem, jump::JumpSystem,
-    movement::MovementSystem, position::PositionSystem, shape::ShapeSystem, stand::StandSystem,
-    stun::StunSystem, velocity::VelocitySystem, walking::WalkingSystem,
+    aim::AimSystem, collision::CollisionSystem, damage::DamageSystem, drawing::DrawingSystem,
+    ground::GroundSystem, health::HealthSystem, input::InputSystem, movement::MovementSystem,
+    position::PositionSystem, shape::ShapeSystem, velocity::VelocitySystem,
 };
 
 fn main() -> Result<(), String> {
@@ -38,13 +37,10 @@ fn main() -> Result<(), String> {
         collision: CollisionSystem::init(),
         input: InputSystem::init(&mut event_pump),
         movement: MovementSystem::init(),
-        stand: StandSystem::init(),
-        walking: WalkingSystem::init(),
-        basic_attack: BasicAttackSystem::init(),
         damage: DamageSystem::init(),
         health: HealthSystem::init(),
-        stun: StunSystem::init(),
-        jump: JumpSystem::init(),
+        aim: AimSystem::init(),
+        ground: GroundSystem::init(),
     };
     scene.init();
     scene.run()

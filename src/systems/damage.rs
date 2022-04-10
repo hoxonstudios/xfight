@@ -1,9 +1,10 @@
-use crate::systems::health::HealthAction;
+use crate::systems::{health::HealthAction, movement::MovementAction};
 
 use super::{
     collision::CollisionSystem,
     health::{HealthSystem, Player},
     helpers::ComponentStore,
+    movement::MovementSystem,
     position::PositionSystem,
     shape::ShapeSystem,
 };
@@ -41,6 +42,7 @@ impl DamageSystem {
         collision_system: &CollisionSystem,
         position_system: &PositionSystem,
         shape_system: &ShapeSystem,
+        movement_system: &mut MovementSystem,
     ) {
         for damage in self.store.data_mut() {
             match damage.action {
@@ -49,7 +51,6 @@ impl DamageSystem {
                     damage.damage = Some(point);
                 }
             }
-            damage.action = DamageAction::None;
             if let Some(damage_point) = damage.damage {
                 if let Some(damage_position) = position_system.store.get_component(damage.entity) {
                     if let Some(damage_shape) = shape_system.store.get_component(damage.entity) {
@@ -92,6 +93,12 @@ impl DamageSystem {
                                                     damage: damage_point.power,
                                                 };
                                                 damage.damage = None;
+                                                if let Some(movement) = movement_system
+                                                    .store
+                                                    .get_mut_component(health.entity)
+                                                {
+                                                    movement.action = Some(MovementAction::Hit)
+                                                };
                                                 println!("({}) = {}", health.entity, health.health);
                                             }
                                         }
@@ -102,6 +109,8 @@ impl DamageSystem {
                     }
                 }
             }
+            damage.action = DamageAction::None;
+            damage.damage = None;
         }
     }
 
