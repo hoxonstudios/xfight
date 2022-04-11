@@ -1,4 +1,4 @@
-use crate::systems::{damage::DamagePoint, shape::Sprite};
+use crate::systems::{damage::DamagePoint, health::Shield, shape::Sprite};
 
 pub const RYU_TEXTURE_PATH: &'static str = "assets/ryu.png";
 // STAND
@@ -312,3 +312,33 @@ pub const RYU_CROUCH_STRONG_KICK: [(Sprite, Option<DamagePoint>); 3] = [
         None,
     ),
 ];
+
+// BLOCK
+pub const RYU_BLOCK: (Sprite, Shield) = (
+    Sprite {
+        center: (1229, 44),
+        area: (1210, 12, 1249, 94),
+    },
+    Shield {
+        x0: -19,
+        y0: -32,
+        x1: 20,
+        y1: 0,
+        reduction: 0.75,
+    },
+);
+
+// CROUCH BLOCK
+pub const RYU_CROUCH_BLOCK: (Sprite, Shield) = (
+    Sprite {
+        center: (1278, 45),
+        area: (1259, 34, 1296, 95),
+    },
+    Shield {
+        x0: -19,
+        y0: -11,
+        x1: 18,
+        y1: 50,
+        reduction: 0.75,
+    },
+);

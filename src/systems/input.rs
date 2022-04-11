@@ -59,6 +59,11 @@ impl<'a> InputSystem<'a> {
                         strong_kick: true,
                         ..
                     } => Some(MovementAction::CrouchStrongKick),
+                    ControllerMap {
+                        down: true,
+                        block: true,
+                        ..
+                    } => Some(MovementAction::CrouchBlock),
                     ControllerMap { down: true, .. } => Some(MovementAction::Crouch),
                     ControllerMap {
                         strong_punch: true, ..
@@ -73,6 +78,7 @@ impl<'a> InputSystem<'a> {
                         light_kick: true, ..
                     } => Some(MovementAction::LightKick),
                     ControllerMap { up: true, .. } => Some(MovementAction::JumpStraight),
+                    ControllerMap { block: true, .. } => Some(MovementAction::Block),
                     ControllerMap { left: true, .. } => Some(MovementAction::WalkLeft),
                     ControllerMap { right: true, .. } => Some(MovementAction::WalkRight),
                     _ => None,
@@ -96,6 +102,7 @@ impl<'a> InputSystem<'a> {
                     down: keys.contains(&Keycode::S),
                     left: keys.contains(&Keycode::A),
                     right: keys.contains(&Keycode::D),
+                    block: keys.contains(&Keycode::Y),
                     strong_punch: keys.contains(&Keycode::T),
                     light_punch: keys.contains(&Keycode::G),
                     strong_kick: keys.contains(&Keycode::U),
@@ -106,6 +113,7 @@ impl<'a> InputSystem<'a> {
                     down: keys.contains(&Keycode::Down),
                     left: keys.contains(&Keycode::Left),
                     right: keys.contains(&Keycode::Right),
+                    block: keys.contains(&Keycode::Kp5),
                     strong_punch: keys.contains(&Keycode::Kp4),
                     light_punch: keys.contains(&Keycode::Kp1),
                     strong_kick: keys.contains(&Keycode::Kp6),
@@ -126,6 +134,7 @@ struct ControllerMap {
     right: bool,
     down: bool,
     up: bool,
+    block: bool,
     light_punch: bool,
     strong_punch: bool,
     light_kick: bool,

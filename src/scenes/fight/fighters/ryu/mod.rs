@@ -17,9 +17,9 @@ use crate::{
 };
 
 use self::sprites::{
-    RYU_CROUCH, RYU_CROUCH_LIGHT_KICK, RYU_CROUCH_LIGHT_PUNCH, RYU_CROUCH_STRONG_KICK,
-    RYU_CROUCH_STRONG_PUNCH, RYU_LIGHT_KICK, RYU_LIGHT_PUNCH, RYU_STAND, RYU_STRONG_KICK,
-    RYU_STRONG_PUNCH, RYU_STUNT, RYU_TEXTURE_PATH, RYU_WALKING,
+    RYU_BLOCK, RYU_CROUCH, RYU_CROUCH_BLOCK, RYU_CROUCH_LIGHT_KICK, RYU_CROUCH_LIGHT_PUNCH,
+    RYU_CROUCH_STRONG_KICK, RYU_CROUCH_STRONG_PUNCH, RYU_LIGHT_KICK, RYU_LIGHT_PUNCH, RYU_STAND,
+    RYU_STRONG_KICK, RYU_STRONG_PUNCH, RYU_STUNT, RYU_TEXTURE_PATH, RYU_WALKING,
 };
 
 impl<'a> FightScene<'a> {
@@ -91,6 +91,9 @@ impl<'a> FightScene<'a> {
                     walking: RYU_WALKING,
                     stunt: RYU_STUNT,
 
+                    block: RYU_BLOCK,
+                    crouch_block: RYU_CROUCH_BLOCK,
+
                     light_punch: RYU_LIGHT_PUNCH,
                     strong_punch: RYU_STRONG_PUNCH,
                     light_kick: RYU_LIGHT_KICK,
@@ -120,6 +123,7 @@ impl<'a> FightScene<'a> {
                 action: HealthAction::None,
                 player,
                 health: 100,
+                shield: None,
             },
         );
 

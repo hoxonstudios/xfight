@@ -6,7 +6,17 @@ pub struct HealthComponent {
     pub action: HealthAction,
     pub player: Player,
     pub health: u32,
+    pub shield: Option<Shield>,
 }
+#[derive(Copy, Clone)]
+pub struct Shield {
+    pub x0: i32,
+    pub x1: i32,
+    pub y0: i32,
+    pub y1: i32,
+    pub reduction: f32,
+}
+
 #[derive(Copy, Clone)]
 pub enum HealthAction {
     None,

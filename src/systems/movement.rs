@@ -1,5 +1,6 @@
 use super::{
     damage::{DamageAction, DamagePoint, DamageSystem},
+    health::{HealthSystem, Shield},
     helpers::ComponentStore,
     shape::{ShapeAction, ShapeSystem, Sprite},
     velocity::VelocitySystem,
@@ -33,6 +34,8 @@ pub struct MovementSprites {
     pub standing: [Sprite; STANDING_FRAMES.0],
     pub walking: [Sprite; WALKING_FRAMES.0],
     pub stunt: Sprite,
+    pub block: (Sprite, Shield),
+    pub crouch_block: (Sprite, Shield),
     pub light_punch: [(Sprite, Option<DamagePoint>); LIGHT_PUNCH_FRAMES.0],
     pub strong_punch: [(Sprite, Option<DamagePoint>); STRONG_PUNCH_FRAMES.0],
     pub light_kick: [(Sprite, Option<DamagePoint>); LIGHT_KICK_FRAMES.0],
@@ -49,6 +52,9 @@ pub enum MovementAction {
     WalkLeft,
     Crouch,
 
+    Block,
+    CrouchBlock,
+
     LightPunch,
     StrongPunch,
     LightKick,
@@ -62,6 +68,8 @@ pub enum MovementAction {
     JumpStraight,
 
     Land,
+
+    BlockedHit,
     Hit,
 }
 #[derive(Copy, Clone, PartialEq, Debug)]
@@ -72,6 +80,8 @@ pub enum MovementState {
     Stunt {
         frame: u8,
     },
+    Blocking,
+    CrouchBlocking,
 
     Walking {
         frame: (usize, u8),
@@ -129,10 +139,27 @@ impl MovementSystem {
         velocity_system: &mut VelocitySystem,
         shape_system: &mut ShapeSystem,
         damage_system: &mut DamageSystem,
+        health_system: &mut HealthSystem,
     ) {
         for movement in self.store.data_mut() {
             let entity = movement.entity;
             let transition = calculate_transition(movement.state, movement.action);
+
+            if movement.state != transition {
+                match movement.state {
+                    MovementState::Blocking => {
+                        if let Some(health) = health_system.store.get_mut_component(entity) {
+                            health.shield = None;
+                        }
+                    }
+                    MovementState::CrouchBlocking => {
+                        if let Some(health) = health_system.store.get_mut_component(entity) {
+                            health.shield = None;
+                        }
+                    }
+                    _ => {}
+                }
+            }
 
             movement.state = transition;
             movement.action = None;
@@ -178,6 +205,34 @@ impl MovementSystem {
                     }
                     if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
                         velocity.velocity.0 = 0.0;
+                    }
+                }
+                MovementState::Blocking => {
+                    if let Some(shape) = shape_system.store.get_mut_component(entity) {
+                        shape.action = ShapeAction::Update {
+                            sprite: movement.sprites.block.0,
+                            flipped: shape.flipped,
+                        };
+                    }
+                    if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
+                        velocity.velocity.0 = 0.0;
+                    }
+                    if let Some(health) = health_system.store.get_mut_component(entity) {
+                        health.shield = Some(movement.sprites.block.1);
+                    }
+                }
+                MovementState::CrouchBlocking => {
+                    if let Some(shape) = shape_system.store.get_mut_component(entity) {
+                        shape.action = ShapeAction::Update {
+                            sprite: movement.sprites.crouch_block.0,
+                            flipped: shape.flipped,
+                        };
+                    }
+                    if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
+                        velocity.velocity.0 = 0.0;
+                    }
+                    if let Some(health) = health_system.store.get_mut_component(entity) {
+                        health.shield = Some(movement.sprites.crouch_block.1);
                     }
                 }
                 MovementState::Walking {
@@ -426,10 +481,13 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
             },
             Some(action) => match action {
                 MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                MovementAction::BlockedHit => MovementState::Blocking,
                 MovementAction::Land => MovementState::Standing {
                     frame: next_infinite_frame(frame, STANDING_FRAMES),
                 },
                 MovementAction::Crouch => MovementState::Crouching,
+                MovementAction::Block => MovementState::Blocking,
+                MovementAction::CrouchBlock => MovementState::CrouchBlocking,
                 MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                 MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                 MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -465,8 +523,11 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                     None => MovementState::Standing { frame: (0, 0) },
                     Some(action) => match action {
                         MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                        MovementAction::BlockedHit => MovementState::Blocking,
                         MovementAction::Land => MovementState::Standing { frame: (0, 0) },
                         MovementAction::Crouch => MovementState::Crouching,
+                        MovementAction::Block => MovementState::Blocking,
+                        MovementAction::CrouchBlock => MovementState::CrouchBlocking,
                         MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                         MovementAction::LightPunch => {
                             MovementState::LightPunching { frame: (0, 0) }
@@ -508,8 +569,83 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
             None => MovementState::Standing { frame: (0, 0) },
             Some(action) => match action {
                 MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                MovementAction::BlockedHit => MovementState::CrouchBlocking,
                 MovementAction::Land => MovementState::Standing { frame: (0, 0) },
                 MovementAction::Crouch => MovementState::Crouching,
+                MovementAction::Block => MovementState::Blocking,
+                MovementAction::CrouchBlock => MovementState::CrouchBlocking,
+                MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
+                MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
+                MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
+                MovementAction::StrongPunch => MovementState::StrongPunching { frame: (0, 0) },
+                MovementAction::JumpStraight => MovementState::JumpingStraight { starting: true },
+                MovementAction::WalkLeft => MovementState::Walking {
+                    frame: (0, 0),
+                    direction: WalkingDirection::Left,
+                },
+                MovementAction::WalkRight => MovementState::Walking {
+                    frame: (0, 0),
+                    direction: WalkingDirection::Right,
+                },
+                MovementAction::CrouchLightPunch => {
+                    MovementState::CrouchLightPunching { frame: (0, 0) }
+                }
+                MovementAction::CrouchStrongPunch => {
+                    MovementState::CrouchStrongPunching { frame: (0, 0) }
+                }
+                MovementAction::CrouchLightKick => {
+                    MovementState::CrouchLightKicking { frame: (0, 0) }
+                }
+                MovementAction::CrouchStrongKick => {
+                    MovementState::CrouchStrongKicking { frame: (0, 0) }
+                }
+            },
+        },
+        MovementState::Blocking => match action {
+            None => MovementState::Standing { frame: (0, 0) },
+            Some(action) => match action {
+                MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                MovementAction::BlockedHit => MovementState::Blocking,
+                MovementAction::Land => MovementState::Standing { frame: (0, 0) },
+                MovementAction::Crouch => MovementState::Crouching,
+                MovementAction::Block => MovementState::Blocking,
+                MovementAction::CrouchBlock => MovementState::CrouchBlocking,
+                MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
+                MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
+                MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
+                MovementAction::StrongPunch => MovementState::StrongPunching { frame: (0, 0) },
+                MovementAction::JumpStraight => MovementState::JumpingStraight { starting: true },
+                MovementAction::WalkLeft => MovementState::Walking {
+                    frame: (0, 0),
+                    direction: WalkingDirection::Left,
+                },
+                MovementAction::WalkRight => MovementState::Walking {
+                    frame: (0, 0),
+                    direction: WalkingDirection::Right,
+                },
+                MovementAction::CrouchLightPunch => {
+                    MovementState::CrouchLightPunching { frame: (0, 0) }
+                }
+                MovementAction::CrouchStrongPunch => {
+                    MovementState::CrouchStrongPunching { frame: (0, 0) }
+                }
+                MovementAction::CrouchLightKick => {
+                    MovementState::CrouchLightKicking { frame: (0, 0) }
+                }
+                MovementAction::CrouchStrongKick => {
+                    MovementState::CrouchStrongKicking { frame: (0, 0) }
+                }
+            },
+        },
+        MovementState::CrouchBlocking => match action {
+            None => MovementState::Standing { frame: (0, 0) },
+            Some(action) => match action {
+                MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                MovementAction::BlockedHit => MovementState::CrouchBlocking,
+                MovementAction::Land => MovementState::Standing { frame: (0, 0) },
+                MovementAction::Crouch => MovementState::Crouching,
+                MovementAction::Block => MovementState::Blocking,
+                MovementAction::CrouchBlock => MovementState::CrouchBlocking,
                 MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                 MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                 MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -541,8 +677,11 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
             None => MovementState::Standing { frame: (0, 0) },
             Some(action) => match action {
                 MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                MovementAction::BlockedHit => MovementState::Blocking,
                 MovementAction::Land => MovementState::Standing { frame: (0, 0) },
                 MovementAction::Crouch => MovementState::Crouching,
+                MovementAction::Block => MovementState::Blocking,
+                MovementAction::CrouchBlock => MovementState::CrouchBlocking,
                 MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                 MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                 MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -586,8 +725,11 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
             None => MovementState::JumpingStraight { starting: false },
             Some(action) => match action {
                 MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                MovementAction::BlockedHit => MovementState::Blocking,
                 MovementAction::Land => MovementState::Standing { frame: (0, 0) },
                 MovementAction::Crouch => MovementState::JumpingStraight { starting: false },
+                MovementAction::Block => MovementState::JumpingStraight { starting: false },
+                MovementAction::CrouchBlock => MovementState::JumpingStraight { starting: false },
                 MovementAction::LightKick => MovementState::JumpingStraight { starting: false },
                 MovementAction::LightPunch => MovementState::JumpingStraight { starting: false },
                 MovementAction::StrongKick => MovementState::JumpingStraight { starting: false },
@@ -615,8 +757,11 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                 None => MovementState::Standing { frame: (0, 0) },
                 Some(action) => match action {
                     MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                    MovementAction::BlockedHit => MovementState::Blocking,
                     MovementAction::Land => MovementState::Standing { frame: (0, 0) },
                     MovementAction::Crouch => MovementState::Crouching,
+                    MovementAction::Block => MovementState::Blocking,
+                    MovementAction::CrouchBlock => MovementState::CrouchBlocking,
                     MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                     MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                     MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -653,8 +798,11 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                 None => MovementState::Standing { frame: (0, 0) },
                 Some(action) => match action {
                     MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                    MovementAction::BlockedHit => MovementState::Blocking,
                     MovementAction::Land => MovementState::Standing { frame: (0, 0) },
                     MovementAction::Crouch => MovementState::Crouching,
+                    MovementAction::Block => MovementState::Blocking,
+                    MovementAction::CrouchBlock => MovementState::CrouchBlocking,
                     MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                     MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                     MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -691,8 +839,11 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                 None => MovementState::Standing { frame: (0, 0) },
                 Some(action) => match action {
                     MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                    MovementAction::BlockedHit => MovementState::Blocking,
                     MovementAction::Land => MovementState::Standing { frame: (0, 0) },
                     MovementAction::Crouch => MovementState::Crouching,
+                    MovementAction::Block => MovementState::Blocking,
+                    MovementAction::CrouchBlock => MovementState::CrouchBlocking,
                     MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                     MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                     MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -729,8 +880,11 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                 None => MovementState::Standing { frame: (0, 0) },
                 Some(action) => match action {
                     MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                    MovementAction::BlockedHit => MovementState::Blocking,
                     MovementAction::Land => MovementState::Standing { frame: (0, 0) },
                     MovementAction::Crouch => MovementState::Crouching,
+                    MovementAction::Block => MovementState::Blocking,
+                    MovementAction::CrouchBlock => MovementState::CrouchBlocking,
                     MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                     MovementAction::LightPunch => MovementState::LightPunching { frame: (0, 0) },
                     MovementAction::StrongKick => MovementState::StrongKicking { frame: (0, 0) },
@@ -768,8 +922,11 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                     None => MovementState::Standing { frame: (0, 0) },
                     Some(action) => match action {
                         MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                        MovementAction::BlockedHit => MovementState::Blocking,
                         MovementAction::Land => MovementState::Standing { frame: (0, 0) },
                         MovementAction::Crouch => MovementState::Crouching,
+                        MovementAction::Block => MovementState::Blocking,
+                        MovementAction::CrouchBlock => MovementState::CrouchBlocking,
                         MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                         MovementAction::LightPunch => {
                             MovementState::LightPunching { frame: (0, 0) }
@@ -814,8 +971,11 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                     None => MovementState::Standing { frame: (0, 0) },
                     Some(action) => match action {
                         MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                        MovementAction::BlockedHit => MovementState::Blocking,
                         MovementAction::Land => MovementState::Standing { frame: (0, 0) },
                         MovementAction::Crouch => MovementState::Crouching,
+                        MovementAction::Block => MovementState::Blocking,
+                        MovementAction::CrouchBlock => MovementState::CrouchBlocking,
                         MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                         MovementAction::LightPunch => {
                             MovementState::LightPunching { frame: (0, 0) }
@@ -860,8 +1020,11 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                     None => MovementState::Standing { frame: (0, 0) },
                     Some(action) => match action {
                         MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                        MovementAction::BlockedHit => MovementState::Blocking,
                         MovementAction::Land => MovementState::Standing { frame: (0, 0) },
                         MovementAction::Crouch => MovementState::Crouching,
+                        MovementAction::Block => MovementState::Blocking,
+                        MovementAction::CrouchBlock => MovementState::CrouchBlocking,
                         MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                         MovementAction::LightPunch => {
                             MovementState::LightPunching { frame: (0, 0) }
@@ -906,8 +1069,11 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
                     None => MovementState::Standing { frame: (0, 0) },
                     Some(action) => match action {
                         MovementAction::Hit => MovementState::Stunt { frame: 0 },
+                        MovementAction::BlockedHit => MovementState::Blocking,
                         MovementAction::Land => MovementState::Standing { frame: (0, 0) },
                         MovementAction::Crouch => MovementState::Crouching,
+                        MovementAction::Block => MovementState::Blocking,
+                        MovementAction::CrouchBlock => MovementState::CrouchBlocking,
                         MovementAction::LightKick => MovementState::LightKicking { frame: (0, 0) },
                         MovementAction::LightPunch => {
                             MovementState::LightPunching { frame: (0, 0) }

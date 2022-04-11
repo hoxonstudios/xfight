@@ -65,8 +65,12 @@ impl<'a> FightScene<'a> {
                 &self.shape,
                 &mut self.movement,
             );
-            self.movement
-                .update(&mut self.velocity, &mut self.shape, &mut self.damage);
+            self.movement.update(
+                &mut self.velocity,
+                &mut self.shape,
+                &mut self.damage,
+                &mut self.health,
+            );
             self.shape.update();
             self.velocity.update(&mut self.position);
             self.collision
