@@ -10,15 +10,15 @@ const STANDING_FRAMES: (usize, u8) = (4, 3);
 const WALKING_FRAMES: (usize, u8) = (6, 2);
 const STUNT_FRAMES: (usize, u8) = (1, 10);
 
-const LIGHT_PUNCH_FRAMES: (usize, u8) = (3, 3);
+const LIGHT_PUNCH_FRAMES: (usize, u8) = (3, 5);
 const STRONG_PUNCH_FRAMES: (usize, u8) = (5, 3);
-const LIGHT_KICK_FRAMES: (usize, u8) = (3, 3);
-const STRONG_KICK_FRAMES: (usize, u8) = (3, 3);
+const LIGHT_KICK_FRAMES: (usize, u8) = (3, 5);
+const STRONG_KICK_FRAMES: (usize, u8) = (3, 5);
 
-const CROUCH_LIGHT_PUNCH_FRAMES: (usize, u8) = (3, 3);
-const CROUCH_STRONG_PUNCH_FRAMES: (usize, u8) = (5, 3);
-const CROUCH_LIGHT_KICK_FRAMES: (usize, u8) = (3, 3);
-const CROUCH_STRONG_KICK_FRAMES: (usize, u8) = (3, 3);
+const CROUCH_LIGHT_PUNCH_FRAMES: (usize, u8) = (3, 5);
+const CROUCH_STRONG_PUNCH_FRAMES: (usize, u8) = (5, 5);
+const CROUCH_LIGHT_KICK_FRAMES: (usize, u8) = (3, 5);
+const CROUCH_STRONG_KICK_FRAMES: (usize, u8) = (3, 5);
 
 const WALKING_VELOCITY: f32 = 2.0;
 
@@ -752,7 +752,10 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
             },
         },
         MovementState::LightKicking { frame } => match next_frame(frame, LIGHT_KICK_FRAMES) {
-            Some(frame) => MovementState::LightKicking { frame },
+            Some(frame) => match action {
+                Some(MovementAction::Hit) => MovementState::Stunt { frame: 0 },
+                _ => MovementState::LightKicking { frame },
+            },
             None => match action {
                 None => MovementState::Standing { frame: (0, 0) },
                 Some(action) => match action {
@@ -793,7 +796,10 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
             },
         },
         MovementState::LightPunching { frame } => match next_frame(frame, LIGHT_PUNCH_FRAMES) {
-            Some(frame) => MovementState::LightPunching { frame },
+            Some(frame) => match action {
+                Some(MovementAction::Hit) => MovementState::Stunt { frame: 0 },
+                _ => MovementState::LightPunching { frame },
+            },
             None => match action {
                 None => MovementState::Standing { frame: (0, 0) },
                 Some(action) => match action {
@@ -834,7 +840,10 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
             },
         },
         MovementState::StrongKicking { frame } => match next_frame(frame, STRONG_KICK_FRAMES) {
-            Some(frame) => MovementState::StrongKicking { frame },
+            Some(frame) => match action {
+                Some(MovementAction::Hit) => MovementState::Stunt { frame: 0 },
+                _ => MovementState::StrongKicking { frame },
+            },
             None => match action {
                 None => MovementState::Standing { frame: (0, 0) },
                 Some(action) => match action {
@@ -875,7 +884,10 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
             },
         },
         MovementState::StrongPunching { frame } => match next_frame(frame, STRONG_PUNCH_FRAMES) {
-            Some(frame) => MovementState::StrongPunching { frame },
+            Some(frame) => match action {
+                Some(MovementAction::Hit) => MovementState::Stunt { frame: 0 },
+                _ => MovementState::StrongPunching { frame },
+            },
             None => match action {
                 None => MovementState::Standing { frame: (0, 0) },
                 Some(action) => match action {
@@ -917,7 +929,10 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
         },
         MovementState::CrouchLightPunching { frame } => {
             match next_frame(frame, CROUCH_LIGHT_PUNCH_FRAMES) {
-                Some(frame) => MovementState::CrouchLightPunching { frame },
+                Some(frame) => match action {
+                    Some(MovementAction::Hit) => MovementState::Stunt { frame: 0 },
+                    _ => MovementState::CrouchLightPunching { frame },
+                },
                 None => match action {
                     None => MovementState::Standing { frame: (0, 0) },
                     Some(action) => match action {
@@ -966,7 +981,10 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
         }
         MovementState::CrouchStrongPunching { frame } => {
             match next_frame(frame, CROUCH_STRONG_PUNCH_FRAMES) {
-                Some(frame) => MovementState::CrouchStrongPunching { frame },
+                Some(frame) => match action {
+                    Some(MovementAction::Hit) => MovementState::Stunt { frame: 0 },
+                    _ => MovementState::CrouchStrongPunching { frame },
+                },
                 None => match action {
                     None => MovementState::Standing { frame: (0, 0) },
                     Some(action) => match action {
@@ -1015,7 +1033,10 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
         }
         MovementState::CrouchLightKicking { frame } => {
             match next_frame(frame, CROUCH_LIGHT_KICK_FRAMES) {
-                Some(frame) => MovementState::CrouchLightKicking { frame },
+                Some(frame) => match action {
+                    Some(MovementAction::Hit) => MovementState::Stunt { frame: 0 },
+                    _ => MovementState::CrouchLightKicking { frame },
+                },
                 None => match action {
                     None => MovementState::Standing { frame: (0, 0) },
                     Some(action) => match action {
@@ -1064,7 +1085,10 @@ fn calculate_transition(state: MovementState, action: Option<MovementAction>) ->
         }
         MovementState::CrouchStrongKicking { frame } => {
             match next_frame(frame, CROUCH_STRONG_KICK_FRAMES) {
-                Some(frame) => MovementState::CrouchStrongKicking { frame },
+                Some(frame) => match action {
+                    Some(MovementAction::Hit) => MovementState::Stunt { frame: 0 },
+                    _ => MovementState::CrouchStrongKicking { frame },
+                },
                 None => match action {
                     None => MovementState::Standing { frame: (0, 0) },
                     Some(action) => match action {
