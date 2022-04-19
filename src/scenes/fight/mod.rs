@@ -13,14 +13,12 @@ use crate::systems::{
     input::{Controller, InputSystem},
     movement::MovementSystem,
     position::PositionSystem,
-    shape::ShapeSystem,
     velocity::VelocitySystem,
 };
 
 pub struct FightScene<'a> {
     pub entity: usize,
     pub drawing: DrawingSystem<'a>,
-    pub shape: ShapeSystem,
     pub velocity: VelocitySystem,
     pub position: PositionSystem,
     pub collision: CollisionSystem,
@@ -56,28 +54,27 @@ impl<'a> FightScene<'a> {
             }
 
             self.input.update(&mut self.movement);
-            self.aim.update(&self.position, &mut self.shape);
+            self.aim.update(&self.position, &mut self.drawing);
             self.ground.update(&mut self.movement, &self.collision);
             self.damage.update(
                 &mut self.health,
                 &self.collision,
                 &self.position,
-                &self.shape,
+                &self.drawing,
                 &mut self.movement,
             );
             self.movement.update(
                 &mut self.velocity,
-                &mut self.shape,
+                &mut self.drawing,
                 &mut self.damage,
                 &mut self.health,
             );
-            self.shape.update();
             self.velocity.update(&mut self.position);
             self.collision
-                .update(&self.shape, &mut self.position, &mut self.velocity);
+                .update(&self.drawing, &mut self.position, &mut self.velocity);
             self.health.update();
             self.position.update();
-            self.drawing.update(&self.position, &self.shape)?;
+            self.drawing.update(&self.position)?;
         }
 
         Ok(())

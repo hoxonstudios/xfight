@@ -1,9 +1,9 @@
 use self::calculations::get_collision_time;
 
 use super::{
+    drawing::{DrawingSystem, ShapeComponent},
     helpers::ComponentStore,
     position::{PositionAction, PositionComponent, PositionSystem},
-    shape::{ShapeComponent, ShapeSystem},
     velocity::VelocitySystem,
 };
 
@@ -36,7 +36,7 @@ impl CollisionSystem {
     }
     pub fn update(
         &mut self,
-        shape_system: &ShapeSystem,
+        drawing_system: &DrawingSystem,
         position_system: &mut PositionSystem,
         velocity_system: &mut VelocitySystem,
     ) {
@@ -50,7 +50,7 @@ impl CollisionSystem {
             rigid_bodies.push(get_rigid_body(
                 entity,
                 collision,
-                shape_system.store.get_component(entity),
+                drawing_system.store.get_component(entity),
                 position_system.store.get_component(entity),
             ));
         }

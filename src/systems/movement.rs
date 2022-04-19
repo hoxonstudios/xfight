@@ -1,8 +1,8 @@
 use super::{
     damage::{DamageAction, DamagePoint, DamageSystem},
+    drawing::{DrawingSystem, Sprite},
     health::{HealthSystem, Shield},
     helpers::ComponentStore,
-    shape::{ShapeAction, ShapeSystem, Sprite},
     velocity::VelocitySystem,
 };
 
@@ -137,7 +137,7 @@ impl MovementSystem {
     pub fn update<'a>(
         &mut self,
         velocity_system: &mut VelocitySystem,
-        shape_system: &mut ShapeSystem,
+        drawing_system: &mut DrawingSystem,
         damage_system: &mut DamageSystem,
         health_system: &mut HealthSystem,
     ) {
@@ -175,21 +175,15 @@ impl MovementSystem {
                                 velocity.velocity.0 = 0.0;
                             }
                         }
-                        if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                            shape.action = ShapeAction::Update {
-                                sprite: movement.sprites.standing[sprite],
-                                flipped: shape.flipped,
-                            };
+                        if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                            shape.sprite = movement.sprites.standing[sprite];
                         }
                     }
                 }
                 MovementState::Stunt { frame } => {
                     if frame == 0 {
-                        if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                            shape.action = ShapeAction::Update {
-                                sprite: movement.sprites.stunt,
-                                flipped: shape.flipped,
-                            };
+                        if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                            shape.sprite = movement.sprites.stunt;
                         }
                         if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
                             velocity.velocity.0 = 0.0;
@@ -197,22 +191,16 @@ impl MovementSystem {
                     }
                 }
                 MovementState::Crouching => {
-                    if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                        shape.action = ShapeAction::Update {
-                            sprite: movement.sprites.crouching,
-                            flipped: shape.flipped,
-                        };
+                    if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                        shape.sprite = movement.sprites.crouching;
                     }
                     if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
                         velocity.velocity.0 = 0.0;
                     }
                 }
                 MovementState::Blocking => {
-                    if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                        shape.action = ShapeAction::Update {
-                            sprite: movement.sprites.block.0,
-                            flipped: shape.flipped,
-                        };
+                    if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                        shape.sprite = movement.sprites.block.0;
                     }
                     if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
                         velocity.velocity.0 = 0.0;
@@ -222,11 +210,8 @@ impl MovementSystem {
                     }
                 }
                 MovementState::CrouchBlocking => {
-                    if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                        shape.action = ShapeAction::Update {
-                            sprite: movement.sprites.crouch_block.0,
-                            flipped: shape.flipped,
-                        };
+                    if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                        shape.sprite = movement.sprites.crouch_block.0;
                     }
                     if let Some(velocity) = velocity_system.store.get_mut_component(entity) {
                         velocity.velocity.0 = 0.0;
@@ -253,11 +238,8 @@ impl MovementSystem {
                                 }
                             }
                         }
-                        if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                            shape.action = ShapeAction::Update {
-                                sprite: movement.sprites.walking[sprite],
-                                flipped: shape.flipped,
-                            };
+                        if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                            shape.sprite = movement.sprites.walking[sprite];
                         }
                     }
                 }
@@ -269,11 +251,8 @@ impl MovementSystem {
                             velocity.velocity.0 = 0.0;
                         }
                         let sprite = movement.sprites.light_kick[sprite];
-                        if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                            shape.action = ShapeAction::Update {
-                                sprite: sprite.0,
-                                flipped: shape.flipped,
-                            };
+                        if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                            shape.sprite = sprite.0;
                         }
                         if let Some(damage_point) = sprite.1 {
                             if let Some(damage) = damage_system.store.get_mut_component(entity) {
@@ -294,11 +273,8 @@ impl MovementSystem {
                             velocity.velocity.0 = 0.0;
                         }
                         let sprite = movement.sprites.light_punch[sprite];
-                        if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                            shape.action = ShapeAction::Update {
-                                sprite: sprite.0,
-                                flipped: shape.flipped,
-                            };
+                        if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                            shape.sprite = sprite.0;
                         }
                         if let Some(damage_point) = sprite.1 {
                             if let Some(damage) = damage_system.store.get_mut_component(entity) {
@@ -319,11 +295,8 @@ impl MovementSystem {
                             velocity.velocity.0 = 0.0;
                         }
                         let sprite = movement.sprites.strong_kick[sprite];
-                        if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                            shape.action = ShapeAction::Update {
-                                sprite: sprite.0,
-                                flipped: shape.flipped,
-                            };
+                        if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                            shape.sprite = sprite.0;
                         }
                         if let Some(damage_point) = sprite.1 {
                             if let Some(damage) = damage_system.store.get_mut_component(entity) {
@@ -344,11 +317,8 @@ impl MovementSystem {
                             velocity.velocity.0 = 0.0;
                         }
                         let sprite = movement.sprites.strong_punch[sprite];
-                        if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                            shape.action = ShapeAction::Update {
-                                sprite: sprite.0,
-                                flipped: shape.flipped,
-                            };
+                        if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                            shape.sprite = sprite.0;
                         }
                         if let Some(damage_point) = sprite.1 {
                             if let Some(damage) = damage_system.store.get_mut_component(entity) {
@@ -369,11 +339,8 @@ impl MovementSystem {
                             velocity.velocity.0 = 0.0;
                         }
                         let sprite = movement.sprites.crouch_light_punch[sprite];
-                        if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                            shape.action = ShapeAction::Update {
-                                sprite: sprite.0,
-                                flipped: shape.flipped,
-                            };
+                        if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                            shape.sprite = sprite.0;
                         }
                         if let Some(damage_point) = sprite.1 {
                             if let Some(damage) = damage_system.store.get_mut_component(entity) {
@@ -394,11 +361,8 @@ impl MovementSystem {
                             velocity.velocity.0 = 0.0;
                         }
                         let sprite = movement.sprites.crouch_strong_punch[sprite];
-                        if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                            shape.action = ShapeAction::Update {
-                                sprite: sprite.0,
-                                flipped: shape.flipped,
-                            };
+                        if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                            shape.sprite = sprite.0;
                         }
                         if let Some(damage_point) = sprite.1 {
                             if let Some(damage) = damage_system.store.get_mut_component(entity) {
@@ -419,11 +383,8 @@ impl MovementSystem {
                             velocity.velocity.0 = 0.0;
                         }
                         let sprite = movement.sprites.crouch_light_kick[sprite];
-                        if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                            shape.action = ShapeAction::Update {
-                                sprite: sprite.0,
-                                flipped: shape.flipped,
-                            };
+                        if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                            shape.sprite = sprite.0;
                         }
                         if let Some(damage_point) = sprite.1 {
                             if let Some(damage) = damage_system.store.get_mut_component(entity) {
@@ -444,11 +405,8 @@ impl MovementSystem {
                             velocity.velocity.0 = 0.0;
                         }
                         let sprite = movement.sprites.crouch_strong_kick[sprite];
-                        if let Some(shape) = shape_system.store.get_mut_component(entity) {
-                            shape.action = ShapeAction::Update {
-                                sprite: sprite.0,
-                                flipped: shape.flipped,
-                            };
+                        if let Some(shape) = drawing_system.store.get_mut_component(entity) {
+                            shape.sprite = sprite.0;
                         }
                         if let Some(damage_point) = sprite.1 {
                             if let Some(damage) = damage_system.store.get_mut_component(entity) {

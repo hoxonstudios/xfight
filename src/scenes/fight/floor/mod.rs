@@ -2,8 +2,8 @@ pub mod sprites;
 
 use crate::systems::{
     collision::CollisionComponent,
+    drawing::ShapeComponent,
     position::{PositionAction, PositionComponent},
-    shape::{ShapeAction, ShapeComponent},
 };
 
 use self::sprites::{FLOOR_SPRITE, FLOOR_TEXTURE_PATH};
@@ -29,11 +29,10 @@ impl<'a> FightScene<'a> {
                 y: 550.0,
             },
         );
-        self.shape.store.insert_component(
+        self.drawing.store.insert_component(
             entity,
             ShapeComponent {
                 entity,
-                action: ShapeAction::None,
                 texture,
                 sprite: FLOOR_SPRITE,
                 flipped: (false, false),

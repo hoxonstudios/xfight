@@ -8,7 +8,7 @@ use sdl2::image::InitFlag;
 use systems::{
     aim::AimSystem, collision::CollisionSystem, damage::DamageSystem, drawing::DrawingSystem,
     ground::GroundSystem, health::HealthSystem, input::InputSystem, movement::MovementSystem,
-    position::PositionSystem, shape::ShapeSystem, velocity::VelocitySystem,
+    position::PositionSystem, velocity::VelocitySystem,
 };
 
 fn main() -> Result<(), String> {
@@ -31,7 +31,6 @@ fn main() -> Result<(), String> {
     let mut scene = FightScene {
         entity: 0,
         drawing: DrawingSystem::init(&mut canvas, &texture_creator)?,
-        shape: ShapeSystem::init(),
         position: PositionSystem::init(),
         velocity: VelocitySystem::init(),
         collision: CollisionSystem::init(),

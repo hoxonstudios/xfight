@@ -2,11 +2,11 @@ use crate::systems::{health::HealthAction, movement::MovementAction};
 
 use super::{
     collision::CollisionSystem,
+    drawing::{DrawingSystem, Sprite},
     health::{HealthSystem, Player, Shield},
     helpers::ComponentStore,
     movement::MovementSystem,
     position::PositionSystem,
-    shape::{ShapeSystem, Sprite},
 };
 
 #[derive(Copy, Clone)]
@@ -41,7 +41,7 @@ impl DamageSystem {
         health_system: &mut HealthSystem,
         collision_system: &CollisionSystem,
         position_system: &PositionSystem,
-        shape_system: &ShapeSystem,
+        drawing_system: &DrawingSystem,
         movement_system: &mut MovementSystem,
     ) {
         for damage in self.store.data_mut() {
@@ -53,11 +53,11 @@ impl DamageSystem {
             }
             if let Some(damage_point) = damage.damage {
                 if let Some(damage_position) = position_system.store.get_component(damage.entity) {
-                    if let Some(damage_shape) = shape_system.store.get_component(damage.entity) {
+                    if let Some(damage_shape) = drawing_system.store.get_component(damage.entity) {
                         for health in health_system.store.data_mut() {
                             if health.player != damage.player {
                                 if let Some(health_shape) =
-                                    shape_system.store.get_component(health.entity)
+                                    drawing_system.store.get_component(health.entity)
                                 {
                                     if let Some(health_position) =
                                         position_system.store.get_component(health.entity)

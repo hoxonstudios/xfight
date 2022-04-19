@@ -1,8 +1,4 @@
-use super::{
-    helpers::ComponentStore,
-    position::PositionSystem,
-    shape::{ShapeAction, ShapeSystem},
-};
+use super::{drawing::DrawingSystem, helpers::ComponentStore, position::PositionSystem};
 
 #[derive(Copy, Clone)]
 pub struct AimComponent {
@@ -24,11 +20,11 @@ impl AimSystem {
             store: ComponentStore::<AimComponent>::init(),
         }
     }
-    pub fn update(&mut self, position_system: &PositionSystem, shape_system: &mut ShapeSystem) {
+    pub fn update(&mut self, position_system: &PositionSystem, drawing_system: &mut DrawingSystem) {
         let max_position = self.get_max_position(position_system);
         for aim in self.store.data_mut() {
             let entity = aim.entity;
-            if let Some(shape) = shape_system.store.get_mut_component(entity) {
+            if let Some(shape) = drawing_system.store.get_mut_component(entity) {
                 if let Some(position) = position_system.store.get_component(entity) {
                     let (flipped_x, direction) = if position.x < max_position {
                         (false, AimDirection::Right)
@@ -36,20 +32,7 @@ impl AimSystem {
                         (true, AimDirection::Left)
                     };
                     aim.direction = direction;
-                    match shape.action {
-                        ShapeAction::None => {
-                            shape.action = ShapeAction::Update {
-                                sprite: shape.sprite,
-                                flipped: (flipped_x, shape.flipped.1),
-                            };
-                        }
-                        ShapeAction::Update { sprite, flipped } => {
-                            shape.action = ShapeAction::Update {
-                                sprite,
-                                flipped: (flipped_x, flipped.1),
-                            };
-                        }
-                    }
+                    shape.flipped.0 = flipped_x;
                 }
             }
         }

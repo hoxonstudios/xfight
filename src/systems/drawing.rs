@@ -8,16 +8,27 @@ use sdl2::{
     video::{Window, WindowContext},
 };
 
-use super::{
-    position::PositionSystem,
-    shape::{ShapeComponent, ShapeSystem},
-};
+use super::{helpers::ComponentStore, position::PositionSystem};
 
 const DEBUG_POSITION: bool = false;
+
+#[derive(Copy, Clone)]
+pub struct ShapeComponent {
+    pub entity: usize,
+    pub texture: usize,
+    pub sprite: Sprite,
+    pub flipped: (bool, bool),
+}
+#[derive(Copy, Clone)]
+pub struct Sprite {
+    pub center: (i32, i32),
+    pub area: (i32, i32, i32, i32),
+}
 
 pub struct DrawingSystem<'a> {
     canvas: &'a mut Canvas<Window>,
     pub texture_store: TextureStore<'a>,
+    pub store: ComponentStore<ShapeComponent>,
 }
 impl<'a> DrawingSystem<'a> {
     pub fn init(
@@ -35,18 +46,15 @@ impl<'a> DrawingSystem<'a> {
                 textures: vec![],
                 creator,
             },
+            store: ComponentStore::<ShapeComponent>::init(),
         })
     }
 
-    pub fn update(
-        &mut self,
-        position_system: &PositionSystem,
-        shape_system: &ShapeSystem,
-    ) -> Result<(), String> {
+    pub fn update(&mut self, position_system: &PositionSystem) -> Result<(), String> {
         self.canvas.set_draw_color(Color::BLACK);
         self.canvas.clear();
 
-        for shape in shape_system.store.data() {
+        for shape in self.store.data() {
             let entity = shape.entity;
             if let Some(position) = position_system.store.get_component(entity) {
                 match shape {
@@ -106,5 +114,24 @@ impl<'a> TextureStore<'a> {
 
             return Ok(self.textures.len() - 1);
         }
+    }
+}
+
+impl Sprite {
+    pub fn rect(&self, flipped: (bool, bool)) -> (i32, i32, i32, i32) {
+        let x1 = self.area.0 - self.center.0;
+        let y1 = self.area.1 - self.center.1;
+        let x2 = self.area.2 - self.center.0;
+        let y2 = self.area.3 - self.center.1;
+
+        match flipped {
+            (false, false) => (x1, y1, x2, y2),
+            (true, false) => (-x2, y1, -x1, y2),
+            (false, true) => (x1, -y2, x2, -y1),
+            (true, true) => (-x2, -y2, -x1, -y1),
+        }
+    }
+    pub fn size(&self) -> (i32, i32) {
+        (self.area.2 - self.area.0, self.area.3 - self.area.1)
     }
 }

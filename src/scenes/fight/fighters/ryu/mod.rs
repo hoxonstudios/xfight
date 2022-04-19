@@ -6,12 +6,12 @@ use crate::{
         aim::{AimComponent, AimDirection},
         collision::CollisionComponent,
         damage::{DamageAction, DamageComponent},
+        drawing::ShapeComponent,
         ground::GroundComponent,
         health::{HealthAction, HealthComponent, Player},
         input::{Controller, InputComponent},
         movement::{MovementComponent, MovementSprites, MovementState},
         position::{PositionAction, PositionComponent},
-        shape::{ShapeAction, ShapeComponent},
         velocity::VelocityComponent,
     },
 };
@@ -40,11 +40,10 @@ impl<'a> FightScene<'a> {
                 y: position.1,
             },
         );
-        self.shape.store.insert_component(
+        self.drawing.store.insert_component(
             entity,
             ShapeComponent {
                 entity,
-                action: ShapeAction::None,
                 texture,
                 sprite: RYU_STAND[0],
                 flipped: (false, false),
