@@ -2,7 +2,7 @@ use self::calculations::get_collision_time;
 
 use super::{
     drawing::{DrawingSystem, ShapeComponent},
-    helpers::ComponentStore,
+    helpers::component_store::ComponentStore,
     position::{PositionAction, PositionComponent, PositionSystem},
     velocity::VelocitySystem,
 };

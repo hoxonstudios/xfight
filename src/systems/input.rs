@@ -1,7 +1,7 @@
 use sdl2::{keyboard::Keycode, EventPump};
 
 use super::{
-    helpers::ComponentStore,
+    helpers::component_store::ComponentStore,
     movement::{MovementAction, MovementSystem},
 };
 

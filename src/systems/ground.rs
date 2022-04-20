@@ -1,6 +1,6 @@
 use super::{
     collision::CollisionSystem,
-    helpers::ComponentStore,
+    helpers::component_store::ComponentStore,
     movement::{MovementAction, MovementState, MovementSystem},
 };
 

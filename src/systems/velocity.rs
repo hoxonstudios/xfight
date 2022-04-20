@@ -1,5 +1,5 @@
 use super::{
-    helpers::ComponentStore,
+    helpers::component_store::ComponentStore,
     position::{PositionAction, PositionSystem},
 };
 

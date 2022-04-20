@@ -1,4 +1,4 @@
-use super::helpers::ComponentStore;
+use super::helpers::component_store::ComponentStore;
 
 #[derive(Copy, Clone)]
 pub struct PositionComponent {

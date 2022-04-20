@@ -2,7 +2,7 @@ use super::{
     damage::{DamageAction, DamagePoint, DamageSystem},
     drawing::{DrawingSystem, Sprite},
     health::{HealthSystem, Shield},
-    helpers::ComponentStore,
+    helpers::component_store::ComponentStore,
     velocity::VelocitySystem,
 };
 

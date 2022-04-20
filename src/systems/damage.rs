@@ -4,7 +4,7 @@ use super::{
     collision::CollisionSystem,
     drawing::{DrawingSystem, Sprite},
     health::{HealthSystem, Player, Shield},
-    helpers::ComponentStore,
+    helpers::component_store::ComponentStore,
     movement::MovementSystem,
     position::PositionSystem,
 };

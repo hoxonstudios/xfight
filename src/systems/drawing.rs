@@ -8,7 +8,7 @@ use sdl2::{
     video::{Window, WindowContext},
 };
 
-use super::{helpers::ComponentStore, position::PositionSystem};
+use super::{helpers::component_store::ComponentStore, position::PositionSystem};
 
 const DEBUG_POSITION: bool = false;
 

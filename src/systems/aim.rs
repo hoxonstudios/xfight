@@ -1,4 +1,6 @@
-use super::{drawing::DrawingSystem, helpers::ComponentStore, position::PositionSystem};
+use super::{
+    drawing::DrawingSystem, helpers::component_store::ComponentStore, position::PositionSystem,
+};
 
 #[derive(Copy, Clone)]
 pub struct AimComponent {
