@@ -1,4 +1,4 @@
-use super::helpers::component_store::ComponentStore;
+use super::{helpers::component_store::ComponentStore, tag::TagSystem};
 
 #[derive(Copy, Clone)]
 pub struct HealthComponent {
@@ -20,7 +20,7 @@ pub struct Shield {
 #[derive(Copy, Clone)]
 pub enum HealthAction {
     None,
-    Consume { damage: u32 },
+    Consume { damage: u32, shield: Option<f32> },
 }
 #[derive(Copy, Clone, PartialEq)]
 pub enum Player {
@@ -39,10 +39,15 @@ impl HealthSystem {
     }
     pub fn update(&mut self) {
         for health in self.store.data_mut() {
+            let entity = health.entity;
             match health.action {
                 HealthAction::None => {}
-                HealthAction::Consume { damage } => {
-                    health.health -= damage;
+                HealthAction::Consume { damage, shield } => {
+                    if let Some(shield) = shield {
+                        health.health -= (damage as f32 * shield) as u32;
+                    } else {
+                        health.health -= damage;
+                    }
                 }
             }
             health.action = HealthAction::None;

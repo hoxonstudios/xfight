@@ -8,16 +8,19 @@ use crate::systems::{
     collision::CollisionSystem,
     damage::DamageSystem,
     drawing::DrawingSystem,
-    ground::GroundSystem,
     health::{HealthSystem, Player},
-    input::{Controller, InputSystem},
-    movement::MovementSystem,
+    input::InputSystem,
+    movement::system::MovementSystem,
     position::PositionSystem,
+    tag::TagSystem,
     velocity::VelocitySystem,
 };
 
+use self::fighters::{CONTROLLER_ONE, CONTROLLER_TWO};
+
 pub struct FightScene<'a> {
     pub entity: usize,
+    pub tag: TagSystem,
     pub drawing: DrawingSystem<'a>,
     pub velocity: VelocitySystem,
     pub position: PositionSystem,
@@ -27,7 +30,6 @@ pub struct FightScene<'a> {
     pub damage: DamageSystem,
     pub health: HealthSystem,
     pub aim: AimSystem,
-    pub ground: GroundSystem,
 }
 
 impl<'a> FightScene<'a> {
@@ -36,8 +38,8 @@ impl<'a> FightScene<'a> {
         self.init_floor();
 
         // INIT FIGHTERS
-        self.init_ryu((100.0, 0.0), Controller::One, Player::One);
-        self.init_ryu((600.0, 0.0), Controller::Two, Player::Two);
+        self.init_ryu((100.0, 0.0), CONTROLLER_ONE, Player::One);
+        self.init_ryu((600.0, 0.0), CONTROLLER_TWO, Player::Two);
     }
 
     pub fn run(&mut self) -> Result<(), String> {
@@ -53,25 +55,27 @@ impl<'a> FightScene<'a> {
                 }
             }
 
+            self.tag.update();
             self.input.update(&mut self.movement);
             self.aim.update(&self.position, &mut self.drawing);
-            self.ground.update(&mut self.movement, &self.collision);
-            self.damage.update(
-                &mut self.health,
-                &self.collision,
-                &self.position,
-                &self.drawing,
-                &mut self.movement,
-            );
             self.movement.update(
-                &mut self.velocity,
                 &mut self.drawing,
+                &mut self.velocity,
                 &mut self.damage,
                 &mut self.health,
+                &self.aim,
+                &self.tag,
             );
             self.velocity.update(&mut self.position);
             self.collision
                 .update(&self.drawing, &mut self.position, &mut self.velocity);
+            self.damage.update(
+                &mut self.health,
+                &mut self.tag,
+                &self.collision,
+                &self.position,
+                &self.drawing,
+            );
             self.health.update();
             self.position.update();
             self.drawing.update(&self.position)?;

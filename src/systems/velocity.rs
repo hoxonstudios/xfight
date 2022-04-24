@@ -3,13 +3,12 @@ use super::{
     position::{PositionAction, PositionSystem},
 };
 
-const GRAVITY_ACCELERATION: f32 = 0.5;
+const GRAVITY_ACCELERATION: f32 = 1.0;
 
 #[derive(Copy, Clone)]
 pub struct VelocityComponent {
     pub entity: usize,
     pub velocity: (f32, f32),
-    pub acceleration: (f32, f32),
     pub gravity: bool,
 }
 
@@ -35,13 +34,11 @@ impl VelocitySystem {
                 }
             }
 
-            velocity.velocity.0 += velocity.acceleration.0;
-            velocity.velocity.1 += velocity.acceleration.1
-                + if velocity.gravity {
-                    GRAVITY_ACCELERATION
-                } else {
-                    0.0
-                };
+            velocity.velocity.1 += if velocity.gravity {
+                GRAVITY_ACCELERATION
+            } else {
+                0.0
+            };
         }
     }
 }

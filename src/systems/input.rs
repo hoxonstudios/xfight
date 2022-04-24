@@ -2,7 +2,7 @@ use sdl2::{keyboard::Keycode, EventPump};
 
 use super::{
     helpers::component_store::ComponentStore,
-    movement::{MovementAction, MovementSystem},
+    movement::{system::MovementSystem, MovementAction},
 };
 
 #[derive(Copy, Clone)]
@@ -12,9 +12,13 @@ pub struct InputComponent {
 }
 
 #[derive(Copy, Clone)]
-pub enum Controller {
-    One,
-    Two,
+pub struct Controller {
+    pub keys: &'static [ControllerKey],
+}
+#[derive(Copy, Clone)]
+pub struct ControllerKey {
+    pub code: Keycode,
+    pub action: MovementAction,
 }
 
 pub struct InputSystem<'a> {
@@ -33,110 +37,34 @@ impl<'a> InputSystem<'a> {
 
         for input in self.store.data() {
             let entity = input.entity;
+
             if let Some(movement) = movement_system.store.get_mut_component(entity) {
-                let controller = match input.controller {
-                    Controller::One => pressed_keys.controllers[0],
-                    Controller::Two => pressed_keys.controllers[1],
+                let mut action = match movement.action {
+                    None => 0,
+                    Some(action) => action.0,
                 };
-                movement.action = match controller {
-                    ControllerMap {
-                        down: true,
-                        light_punch: true,
-                        ..
-                    } => Some(MovementAction::CrouchLightPunch),
-                    ControllerMap {
-                        down: true,
-                        strong_punch: true,
-                        ..
-                    } => Some(MovementAction::CrouchStrongPunch),
-                    ControllerMap {
-                        down: true,
-                        light_kick: true,
-                        ..
-                    } => Some(MovementAction::CrouchLightKick),
-                    ControllerMap {
-                        down: true,
-                        strong_kick: true,
-                        ..
-                    } => Some(MovementAction::CrouchStrongKick),
-                    ControllerMap {
-                        down: true,
-                        block: true,
-                        ..
-                    } => Some(MovementAction::CrouchBlock),
-                    ControllerMap { down: true, .. } => Some(MovementAction::Crouch),
-                    ControllerMap {
-                        strong_punch: true, ..
-                    } => Some(MovementAction::StrongPunch),
-                    ControllerMap {
-                        light_punch: true, ..
-                    } => Some(MovementAction::LightPunch),
-                    ControllerMap {
-                        strong_kick: true, ..
-                    } => Some(MovementAction::StrongKick),
-                    ControllerMap {
-                        light_kick: true, ..
-                    } => Some(MovementAction::LightKick),
-                    ControllerMap { up: true, .. } => Some(MovementAction::JumpStraight),
-                    ControllerMap { block: true, .. } => Some(MovementAction::Block),
-                    ControllerMap { left: true, .. } => Some(MovementAction::WalkLeft),
-                    ControllerMap { right: true, .. } => Some(MovementAction::WalkRight),
-                    _ => None,
+
+                for key in input.controller.keys {
+                    if pressed_keys.contains(&key.code) {
+                        action |= key.action.0;
+                    }
+                }
+
+                let none_action = action == 0;
+                movement.action = if none_action {
+                    None
+                } else {
+                    Some(MovementAction(action))
                 };
             }
         }
     }
 
-    fn get_pressed_keys(&self) -> PressedKeys {
-        let keys: Vec<Keycode> = self
-            .event_pump
+    fn get_pressed_keys(&self) -> Vec<Keycode> {
+        self.event_pump
             .keyboard_state()
             .pressed_scancodes()
             .filter_map(Keycode::from_scancode)
-            .collect();
-
-        PressedKeys {
-            controllers: [
-                ControllerMap {
-                    up: keys.contains(&Keycode::W),
-                    down: keys.contains(&Keycode::S),
-                    left: keys.contains(&Keycode::A),
-                    right: keys.contains(&Keycode::D),
-                    block: keys.contains(&Keycode::Y),
-                    strong_punch: keys.contains(&Keycode::T),
-                    light_punch: keys.contains(&Keycode::G),
-                    strong_kick: keys.contains(&Keycode::U),
-                    light_kick: keys.contains(&Keycode::J),
-                },
-                ControllerMap {
-                    up: keys.contains(&Keycode::Up),
-                    down: keys.contains(&Keycode::Down),
-                    left: keys.contains(&Keycode::Left),
-                    right: keys.contains(&Keycode::Right),
-                    block: keys.contains(&Keycode::Kp5),
-                    strong_punch: keys.contains(&Keycode::Kp4),
-                    light_punch: keys.contains(&Keycode::Kp1),
-                    strong_kick: keys.contains(&Keycode::Kp6),
-                    light_kick: keys.contains(&Keycode::Kp3),
-                },
-            ],
-        }
+            .collect()
     }
-}
-
-#[derive(Copy, Clone)]
-struct PressedKeys {
-    controllers: [ControllerMap; 2],
-}
-#[derive(Copy, Clone)]
-struct ControllerMap {
-    left: bool,
-    right: bool,
-    down: bool,
-    up: bool,
-    block: bool,
-    light_punch: bool,
-    strong_punch: bool,
-    light_kick: bool,
-    strong_kick: bool,
 }

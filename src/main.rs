@@ -7,8 +7,8 @@ use scenes::fight::FightScene;
 use sdl2::image::InitFlag;
 use systems::{
     aim::AimSystem, collision::CollisionSystem, damage::DamageSystem, drawing::DrawingSystem,
-    ground::GroundSystem, health::HealthSystem, input::InputSystem, movement::MovementSystem,
-    position::PositionSystem, velocity::VelocitySystem,
+    health::HealthSystem, input::InputSystem, movement::system::MovementSystem,
+    position::PositionSystem, tag::TagSystem, velocity::VelocitySystem,
 };
 
 fn main() -> Result<(), String> {
@@ -30,6 +30,7 @@ fn main() -> Result<(), String> {
     // SCENE
     let mut scene = FightScene {
         entity: 0,
+        tag: TagSystem::init(),
         drawing: DrawingSystem::init(&mut canvas, &texture_creator)?,
         position: PositionSystem::init(),
         velocity: VelocitySystem::init(),
@@ -39,7 +40,6 @@ fn main() -> Result<(), String> {
         damage: DamageSystem::init(),
         health: HealthSystem::init(),
         aim: AimSystem::init(),
-        ground: GroundSystem::init(),
     };
     scene.init();
     scene.run()

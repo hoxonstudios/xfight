@@ -1,30 +1,25 @@
-use crate::systems::{health::HealthAction, movement::MovementAction};
+use crate::systems::health::HealthAction;
 
 use super::{
     collision::CollisionSystem,
     drawing::{DrawingSystem, Sprite},
     health::{HealthSystem, Player, Shield},
     helpers::component_store::ComponentStore,
-    movement::MovementSystem,
     position::PositionSystem,
+    tag::{StateTag, TagSystem},
 };
 
 #[derive(Copy, Clone)]
 pub struct DamageComponent {
     pub entity: usize,
-    pub action: DamageAction,
     pub player: Player,
     pub damage: Option<DamagePoint>,
-}
-#[derive(Copy, Clone)]
-pub enum DamageAction {
-    None,
-    Inflict { point: DamagePoint },
 }
 #[derive(Copy, Clone)]
 pub struct DamagePoint {
     pub point: (i32, i32),
     pub power: u32,
+    pub tag: StateTag,
 }
 
 pub struct DamageSystem {
@@ -39,18 +34,12 @@ impl DamageSystem {
     pub fn update(
         &mut self,
         health_system: &mut HealthSystem,
+        tag_system: &mut TagSystem,
         collision_system: &CollisionSystem,
         position_system: &PositionSystem,
         drawing_system: &DrawingSystem,
-        movement_system: &mut MovementSystem,
     ) {
         for damage in self.store.data_mut() {
-            match damage.action {
-                DamageAction::None => {}
-                DamageAction::Inflict { point } => {
-                    damage.damage = Some(point);
-                }
-            }
             if let Some(damage_point) = damage.damage {
                 if let Some(damage_position) = position_system.store.get_component(damage.entity) {
                     if let Some(damage_shape) = drawing_system.store.get_component(damage.entity) {
@@ -98,35 +87,19 @@ impl DamageSystem {
                                                     }
                                                 };
 
-                                                let damage_power = match shield {
-                                                    None => damage_point.power,
-                                                    Some(shield) => {
-                                                        (damage_point.power as f32 * shield) as u32
-                                                    }
-                                                };
-
                                                 health.action = HealthAction::Consume {
-                                                    damage: damage_power,
+                                                    damage: damage_point.power,
+                                                    shield,
                                                 };
-                                                damage.damage = None;
-                                                println!("({}) = {}", health.entity, health.health);
 
-                                                if let Some(movement) = movement_system
+                                                if let Some(tag) = tag_system
                                                     .store
                                                     .get_mut_component(health.entity)
                                                 {
-                                                    movement.action = if shield.is_some() {
-                                                        Some(MovementAction::BlockedHit)
-                                                    } else {
-                                                        Some(MovementAction::Hit)
-                                                    };
-                                                    println!(
-                                                        "({}) = {} | {:?}",
-                                                        health.entity,
-                                                        health.health,
-                                                        movement.action
-                                                    );
-                                                };
+                                                    tag.next_state.0 |= damage_point.tag.0;
+                                                }
+                                                damage.damage = None;
+                                                println!("({}) = {}", health.entity, health.health);
                                             }
                                         }
                                     }
@@ -136,7 +109,6 @@ impl DamageSystem {
                     }
                 }
             }
-            damage.action = DamageAction::None;
             damage.damage = None;
         }
     }

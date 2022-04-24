@@ -1,26 +1,22 @@
-pub mod sprites;
+pub mod movements;
 
 use crate::{
     scenes::fight::FightScene,
     systems::{
         aim::{AimComponent, AimDirection},
         collision::CollisionComponent,
-        damage::{DamageAction, DamageComponent},
+        damage::DamageComponent,
         drawing::ShapeComponent,
-        ground::GroundComponent,
         health::{HealthAction, HealthComponent, Player},
         input::{Controller, InputComponent},
-        movement::{MovementComponent, MovementSprites, MovementState},
+        movement::MovementComponent,
         position::{PositionAction, PositionComponent},
+        tag::{StateTag, TagComponent},
         velocity::VelocityComponent,
     },
 };
 
-use self::sprites::{
-    RYU_BLOCK, RYU_CROUCH, RYU_CROUCH_BLOCK, RYU_CROUCH_LIGHT_KICK, RYU_CROUCH_LIGHT_PUNCH,
-    RYU_CROUCH_STRONG_KICK, RYU_CROUCH_STRONG_PUNCH, RYU_LIGHT_KICK, RYU_LIGHT_PUNCH, RYU_STAND,
-    RYU_STRONG_KICK, RYU_STRONG_PUNCH, RYU_STUNT, RYU_TEXTURE_PATH, RYU_WALKING,
-};
+use self::movements::{RYU_MOVEMENTS, RYU_STAND_INDEX, RYU_TEXTURE_PATH};
 
 impl<'a> FightScene<'a> {
     pub fn init_ryu(&mut self, position: (f32, f32), controller: Controller, player: Player) {
@@ -31,6 +27,14 @@ impl<'a> FightScene<'a> {
             .load_texture(RYU_TEXTURE_PATH)
             .expect("Failed to load Ryu texture");
 
+        self.tag.store.insert_component(
+            entity,
+            TagComponent {
+                entity,
+                next_state: StateTag(0),
+                actual_state: StateTag(0),
+            },
+        );
         self.position.store.insert_component(
             entity,
             PositionComponent {
@@ -45,7 +49,7 @@ impl<'a> FightScene<'a> {
             ShapeComponent {
                 entity,
                 texture,
-                sprite: RYU_STAND[0],
+                sprite: RYU_MOVEMENTS[RYU_STAND_INDEX].sprites[0].sprite,
                 flipped: (false, false),
             },
         );
@@ -54,7 +58,6 @@ impl<'a> FightScene<'a> {
             VelocityComponent {
                 entity,
                 velocity: (0.0, 0.0),
-                acceleration: (0.0, 0.0),
                 gravity: true,
             },
         );
@@ -76,41 +79,20 @@ impl<'a> FightScene<'a> {
                 direction: AimDirection::Right,
             },
         );
-        self.ground
-            .store
-            .insert_component(entity, GroundComponent { entity });
         self.movement.store.insert_component(
             entity,
             MovementComponent {
                 entity,
                 action: None,
-                state: MovementState::Standing { frame: (0, 0) },
-                sprites: MovementSprites {
-                    standing: RYU_STAND,
-                    walking: RYU_WALKING,
-                    stunt: RYU_STUNT,
-
-                    block: RYU_BLOCK,
-                    crouch_block: RYU_CROUCH_BLOCK,
-
-                    light_punch: RYU_LIGHT_PUNCH,
-                    strong_punch: RYU_STRONG_PUNCH,
-                    light_kick: RYU_LIGHT_KICK,
-                    strong_kick: RYU_STRONG_KICK,
-
-                    crouching: RYU_CROUCH,
-                    crouch_light_punch: RYU_CROUCH_LIGHT_PUNCH,
-                    crouch_strong_punch: RYU_CROUCH_STRONG_PUNCH,
-                    crouch_light_kick: RYU_CROUCH_LIGHT_KICK,
-                    crouch_strong_kick: RYU_CROUCH_STRONG_KICK,
-                },
+                movements: RYU_MOVEMENTS,
+                movement: RYU_STAND_INDEX,
+                frame: Some((0, 0)),
             },
         );
         self.damage.store.insert_component(
             entity,
             DamageComponent {
                 entity,
-                action: DamageAction::None,
                 player,
                 damage: None,
             },
