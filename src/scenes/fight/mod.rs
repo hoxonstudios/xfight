@@ -1,6 +1,8 @@
 mod fighters;
 mod floor;
+pub mod jobs;
 mod kinds;
+mod states;
 
 use sdl2::{event::Event, keyboard::Keycode};
 
@@ -11,16 +13,21 @@ use crate::systems::{
     drawing::DrawingSystem,
     health::{HealthSystem, Player},
     input::InputSystem,
+    job::{FightJob, FightJobParameters},
     movement::system::MovementSystem,
     position::PositionSystem,
     tag::TagSystem,
     velocity::VelocitySystem,
 };
 
-use self::fighters::{CONTROLLER_ONE, CONTROLLER_TWO};
+use self::{
+    fighters::{CONTROLLER_ONE, CONTROLLER_TWO},
+    jobs::{FIGHT_JOBS, JOB_SPAWN_FLOOR_INDEX, JOB_SPAWN_RYU_INDEX},
+};
 
 pub struct FightScene<'a> {
     pub entity: usize,
+    pub jobs: Vec<FightJob>,
     pub tag: TagSystem,
     pub drawing: DrawingSystem<'a>,
     pub velocity: VelocitySystem,
@@ -36,11 +43,28 @@ pub struct FightScene<'a> {
 impl<'a> FightScene<'a> {
     pub fn init(&mut self) {
         // INIT SHAPES
-        self.init_floor();
+        self.jobs.push(FightJob {
+            script: JOB_SPAWN_FLOOR_INDEX,
+            parameters: FightJobParameters::None,
+        });
 
         // INIT FIGHTERS
-        self.init_ryu((100.0, 0.0), CONTROLLER_ONE, Player::One);
-        self.init_ryu((600.0, 0.0), CONTROLLER_TWO, Player::Two);
+        self.jobs.push(FightJob {
+            script: JOB_SPAWN_RYU_INDEX,
+            parameters: FightJobParameters::SpawnFighter {
+                position: (100.0, 0.0),
+                controller: CONTROLLER_ONE,
+                player: Player::One,
+            },
+        });
+        self.jobs.push(FightJob {
+            script: JOB_SPAWN_RYU_INDEX,
+            parameters: FightJobParameters::SpawnFighter {
+                position: (600.0, 0.0),
+                controller: CONTROLLER_TWO,
+                player: Player::Two,
+            },
+        });
     }
 
     pub fn run(&mut self) -> Result<(), String> {
@@ -56,6 +80,7 @@ impl<'a> FightScene<'a> {
                 }
             }
 
+            self.run_jobs();
             self.tag.update();
             self.input.update(&mut self.movement);
             self.aim.update(&self.position, &mut self.drawing);
@@ -66,6 +91,8 @@ impl<'a> FightScene<'a> {
                 &mut self.health,
                 &self.aim,
                 &self.tag,
+                &self.position,
+                &mut self.jobs,
             );
             self.velocity.update(&mut self.position);
             self.collision.update(
@@ -87,5 +114,13 @@ impl<'a> FightScene<'a> {
         }
 
         Ok(())
+    }
+
+    fn run_jobs(&mut self) {
+        for job in &self.jobs.clone() {
+            let script = FIGHT_JOBS[job.script];
+            script(self, job.parameters);
+        }
+        self.jobs.clear();
     }
 }

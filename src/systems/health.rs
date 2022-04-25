@@ -1,4 +1,4 @@
-use super::{helpers::component_store::ComponentStore, tag::TagSystem};
+use super::helpers::component_store::ComponentStore;
 
 #[derive(Copy, Clone)]
 pub struct HealthComponent {
@@ -39,7 +39,6 @@ impl HealthSystem {
     }
     pub fn update(&mut self) {
         for health in self.store.data_mut() {
-            let entity = health.entity;
             match health.action {
                 HealthAction::None => {}
                 HealthAction::Consume { damage, shield } => {

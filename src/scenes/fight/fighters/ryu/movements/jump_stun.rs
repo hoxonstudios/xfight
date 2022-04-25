@@ -1,5 +1,5 @@
 use crate::{
-    scenes::fight::fighters::STATE_GROUNDED,
+    scenes::fight::states::STATE_GROUNDED,
     systems::{
         drawing::Sprite,
         movement::{
@@ -20,8 +20,10 @@ pub const RYU_JUMP_STUN: Movement = Movement {
         velocity_change: Some(MovementVelocityChange::HorizontalToAim(-6.0)),
         damage_point: None,
         shield: None,
+        spell: None,
         frames: 15,
     }],
+    destroy_script: None,
     transitions: &[MovementTransition {
         conditions: &[MovementTransitionCondition::StateActive(STATE_GROUNDED)],
         movement: RYU_STAND_INDEX,

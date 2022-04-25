@@ -1,37 +1,39 @@
-pub mod movements;
-pub mod spells;
+mod movements;
 
 use crate::{
     scenes::fight::{
-        kinds::{KIND_FIGHTER, KIND_FLOOR},
-        states::STATE_GROUNDED,
+        fighters::ryu::movements::RYU_TEXTURE_PATH,
+        kinds::{KIND_FIGHTER, KIND_SPELL},
+        states::STATE_EXPLODE,
         FightScene,
     },
     systems::{
-        aim::{AimComponent, AimDirection},
+        aim::AimDirection,
         collision::{CollisionComponent, CollisionKind},
         damage::DamageComponent,
         drawing::ShapeComponent,
-        health::{HealthAction, HealthComponent},
-        input::InputComponent,
         job::FightJobParameters,
         movement::MovementComponent,
         position::{PositionAction, PositionComponent},
-        tag::{StateTag, TagComponent},
+        tag::{KindTag, StateTag, TagComponent},
         velocity::VelocityComponent,
     },
 };
 
-use self::movements::{RYU_MOVEMENTS, RYU_STAND_INDEX, RYU_TEXTURE_PATH};
+use self::movements::{RYU_ADOKEN_FLYING_INDEX, RYU_ADOKEN_MOVEMENTS};
 
-pub fn job_spawn_ryu(scene: &mut FightScene, params: FightJobParameters) {
-    if let FightJobParameters::SpawnFighter {
+pub fn job_spawn_ryu_adoken(scene: &mut FightScene, params: FightJobParameters) {
+    if let FightJobParameters::SpawnSpell {
         position,
-        controller,
+        direction,
         player,
     } = params
     {
         let entity = scene.entity;
+        let (flipped_x, velocity_x) = match direction {
+            AimDirection::Right => (false, 5.0),
+            AimDirection::Left => (true, -5.0),
+        };
         let texture = scene
             .drawing
             .texture_store
@@ -42,7 +44,7 @@ pub fn job_spawn_ryu(scene: &mut FightScene, params: FightJobParameters) {
             entity,
             TagComponent {
                 entity,
-                kind: KIND_FIGHTER,
+                kind: KIND_SPELL,
                 next_state: StateTag(0),
                 actual_state: StateTag(0),
             },
@@ -61,16 +63,16 @@ pub fn job_spawn_ryu(scene: &mut FightScene, params: FightJobParameters) {
             ShapeComponent {
                 entity,
                 texture,
-                sprite: RYU_MOVEMENTS[RYU_STAND_INDEX].sprites[0].sprite,
-                flipped: (false, false),
+                sprite: RYU_ADOKEN_MOVEMENTS[RYU_ADOKEN_FLYING_INDEX].sprites[0].sprite,
+                flipped: (flipped_x, false),
             },
         );
         scene.velocity.store.insert_component(
             entity,
             VelocityComponent {
                 entity,
-                velocity: (0.0, 0.0),
-                gravity: true,
+                velocity: (velocity_x, 0.0),
+                gravity: false,
             },
         );
         scene.collision.store.insert_component(
@@ -78,22 +80,18 @@ pub fn job_spawn_ryu(scene: &mut FightScene, params: FightJobParameters) {
             CollisionComponent {
                 entity,
                 padding: 0,
-                kinds: &[CollisionKind {
-                    kind: KIND_FLOOR,
-                    state: STATE_GROUNDED,
-                    solid: true,
-                }],
-            },
-        );
-        scene
-            .input
-            .store
-            .insert_component(entity, InputComponent { entity, controller });
-        scene.aim.store.insert_component(
-            entity,
-            AimComponent {
-                entity,
-                direction: AimDirection::Right,
+                kinds: &[
+                    CollisionKind {
+                        kind: KIND_FIGHTER,
+                        state: STATE_EXPLODE,
+                        solid: false,
+                    },
+                    CollisionKind {
+                        kind: KIND_SPELL,
+                        state: STATE_EXPLODE,
+                        solid: false,
+                    },
+                ],
             },
         );
         scene.movement.store.insert_component(
@@ -101,8 +99,8 @@ pub fn job_spawn_ryu(scene: &mut FightScene, params: FightJobParameters) {
             MovementComponent {
                 entity,
                 action: None,
-                movements: RYU_MOVEMENTS,
-                movement: RYU_STAND_INDEX,
+                movements: RYU_ADOKEN_MOVEMENTS,
+                movement: RYU_ADOKEN_FLYING_INDEX,
                 frame: Some((0, 0)),
             },
         );
@@ -114,17 +112,19 @@ pub fn job_spawn_ryu(scene: &mut FightScene, params: FightJobParameters) {
                 damage: None,
             },
         );
-        scene.health.store.insert_component(
-            entity,
-            HealthComponent {
-                entity,
-                action: HealthAction::None,
-                player,
-                health: 100,
-                shield: None,
-            },
-        );
 
         scene.entity += 1;
+    }
+}
+
+pub fn job_destroy_ryu_adoken(scene: &mut FightScene, params: FightJobParameters) {
+    if let FightJobParameters::DestroyEntity { entity } = params {
+        scene.tag.store.delete_component(entity, |e| e.entity);
+        scene.position.store.delete_component(entity, |e| e.entity);
+        scene.drawing.store.delete_component(entity, |e| e.entity);
+        scene.velocity.store.delete_component(entity, |e| e.entity);
+        scene.collision.store.delete_component(entity, |e| e.entity);
+        scene.movement.store.delete_component(entity, |e| e.entity);
+        scene.damage.store.delete_component(entity, |e| e.entity);
     }
 }

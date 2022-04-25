@@ -1,10 +1,9 @@
 use crate::{
-    scenes::fight::fighters::{STATE_GROUNDED, STATE_STUN},
+    scenes::fight::states::{STATE_GROUNDED, STATE_STUN},
     systems::{
         damage::DamagePoint,
         drawing::Sprite,
         movement::{Movement, MovementSprite, MovementTransition, MovementTransitionCondition},
-        tag::StateTag,
     },
 };
 
@@ -20,6 +19,7 @@ pub const RYU_JUMP_LIGHT_KICK: Movement = Movement {
             damage_point: None,
             velocity_change: None,
             shield: None,
+            spell: None,
             frames: 3,
         },
         MovementSprite {
@@ -34,9 +34,11 @@ pub const RYU_JUMP_LIGHT_KICK: Movement = Movement {
             }),
             velocity_change: None,
             shield: None,
+            spell: None,
             frames: 10,
         },
     ],
+    destroy_script: None,
     transitions: &[
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],

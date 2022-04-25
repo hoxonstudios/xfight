@@ -30,6 +30,7 @@ fn main() -> Result<(), String> {
     // SCENE
     let mut scene = FightScene {
         entity: 0,
+        jobs: vec![],
         tag: TagSystem::init(),
         drawing: DrawingSystem::init(&mut canvas, &texture_creator)?,
         position: PositionSystem::init(),

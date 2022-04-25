@@ -27,8 +27,10 @@ pub const RYU_BLOCK: Movement = Movement {
         }),
         velocity_change: Some(MovementVelocityChange::Horizontal(0.0)),
         damage_point: None,
+        spell: None,
         frames: 0,
     }],
+    destroy_script: None,
     transitions: &[MovementTransition {
         conditions: &[MovementTransitionCondition::ActionNotActivated(
             ACTION_BLOCK,

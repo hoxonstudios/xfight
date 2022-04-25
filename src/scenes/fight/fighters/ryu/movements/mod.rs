@@ -23,6 +23,8 @@ mod jump_strong_kick;
 mod jump_strong_punch;
 mod jump_stun;
 
+mod special_adoken;
+
 use crate::systems::movement::Movement;
 
 use self::{
@@ -42,6 +44,7 @@ use self::{
     jump_stun::RYU_JUMP_STUN,
     light_kick::RYU_LIGHT_KICK,
     light_punch::RYU_LIGHT_PUNCH,
+    special_adoken::RYU_SPECIAL_ADOKEN,
     stand::RYU_STAND,
     strong_kick::RYU_STRONG_KICK,
     strong_punch::RYU_STRONG_PUNCH,
@@ -77,6 +80,7 @@ pub const RYU_JUMP_STRONG_KICK_INDEX: usize = 20;
 pub const RYU_JUMP_LIGHT_KICK_INDEX: usize = 21;
 pub const RYU_JUMP_STUN_INDEX: usize = 22;
 pub const RYU_CROUCH_STUN_INDEX: usize = 23;
+pub const RYU_SPECIAL_ADOKEN_INDEX: usize = 24;
 // STAND
 pub const RYU_MOVEMENTS: &'static [Movement] = &[
     RYU_STAND,
@@ -103,4 +107,5 @@ pub const RYU_MOVEMENTS: &'static [Movement] = &[
     RYU_JUMP_LIGHT_KICK,
     RYU_JUMP_STUN,
     RYU_CROUCH_STUN,
+    RYU_SPECIAL_ADOKEN,
 ];

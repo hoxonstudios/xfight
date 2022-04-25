@@ -1,7 +1,11 @@
 use crate::{
-    scenes::fight::fighters::{
-        ACTION_BLOCK, ACTION_CROUCH, ACTION_JUMP, ACTION_LEFT, ACTION_LIGHT_KICK,
-        ACTION_LIGHT_PUNCH, ACTION_RIGHT, ACTION_STRONG_KICK, ACTION_STRONG_PUNCH, STATE_STUN,
+    scenes::fight::{
+        fighters::{
+            ACTION_BLOCK, ACTION_CROUCH, ACTION_JUMP, ACTION_LEFT, ACTION_LIGHT_KICK,
+            ACTION_LIGHT_PUNCH, ACTION_RIGHT, ACTION_SPECIAL, ACTION_STRONG_KICK,
+            ACTION_STRONG_PUNCH,
+        },
+        states::STATE_STUN,
     },
     systems::{
         drawing::Sprite,
@@ -14,8 +18,8 @@ use crate::{
 
 use super::{
     RYU_BLOCK_INDEX, RYU_CROUCH_INDEX, RYU_JUMP_INDEX, RYU_LIGHT_KICK_INDEX, RYU_LIGHT_PUNCH_INDEX,
-    RYU_STAND_INDEX, RYU_STRONG_KICK_INDEX, RYU_STRONG_PUNCH_INDEX, RYU_STUN_INDEX,
-    RYU_WALK_LEFT_INDEX, RYU_WALK_RIGHT_INDEX,
+    RYU_SPECIAL_ADOKEN_INDEX, RYU_STAND_INDEX, RYU_STRONG_KICK_INDEX, RYU_STRONG_PUNCH_INDEX,
+    RYU_STUN_INDEX, RYU_WALK_LEFT_INDEX, RYU_WALK_RIGHT_INDEX,
 };
 
 pub const RYU_STAND: Movement = Movement {
@@ -28,6 +32,7 @@ pub const RYU_STAND: Movement = Movement {
             velocity_change: Some(MovementVelocityChange::Horizontal(0.0)),
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 3,
         },
         MovementSprite {
@@ -38,6 +43,7 @@ pub const RYU_STAND: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 3,
         },
         MovementSprite {
@@ -48,6 +54,7 @@ pub const RYU_STAND: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 3,
         },
         MovementSprite {
@@ -58,9 +65,11 @@ pub const RYU_STAND: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 3,
         },
     ],
+    destroy_script: None,
     transitions: &[
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
@@ -108,6 +117,11 @@ pub const RYU_STAND: Movement = Movement {
                 ACTION_STRONG_KICK,
             )],
             movement: RYU_STRONG_KICK_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionActivated(ACTION_SPECIAL)],
+            movement: RYU_SPECIAL_ADOKEN_INDEX,
             wait: false,
         },
         MovementTransition {

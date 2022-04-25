@@ -1,5 +1,5 @@
 use crate::{
-    scenes::fight::fighters::STATE_STUN,
+    scenes::fight::states::STATE_STUN,
     systems::{
         damage::DamagePoint,
         drawing::Sprite,
@@ -22,6 +22,7 @@ pub const RYU_LIGHT_PUNCH: Movement = Movement {
             velocity_change: Some(MovementVelocityChange::Horizontal(0.0)),
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 4,
         },
         MovementSprite {
@@ -36,6 +37,7 @@ pub const RYU_LIGHT_PUNCH: Movement = Movement {
             }),
             velocity_change: None,
             shield: None,
+            spell: None,
             frames: 4,
         },
         MovementSprite {
@@ -46,9 +48,11 @@ pub const RYU_LIGHT_PUNCH: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 4,
         },
     ],
+    destroy_script: None,
     transitions: &[
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],

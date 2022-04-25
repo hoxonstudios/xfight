@@ -61,15 +61,15 @@ impl<T: Copy> ComponentStore<T> {
         }
         self.components.push(component);
     }
-    pub fn delete_component(&mut self, entity: usize) {
-        if let Some(index) = self.entities[entity] {
-            self.components[index] = self.components[self.components.len() - 1];
-            self.components.pop();
-        }
-        if entity < self.entities.len() - 1 {
-            self.entities[entity] = None;
-        } else if entity == self.entities.len() - 1 {
-            self.entities.pop();
+    pub fn delete_component(&mut self, entity: usize, get_entity: fn(&T) -> usize) {
+        if entity < self.entities.len() {
+            if let Some(index) = self.entities[entity] {
+                self.components[index] = self.components[self.components.len() - 1];
+                let move_entity = get_entity(&self.components[index]);
+                self.entities[move_entity] = Some(index);
+                self.entities[entity] = None;
+                self.components.pop();
+            }
         }
     }
 }
@@ -139,7 +139,7 @@ mod tests {
             ],
         };
         // ACT
-        store.delete_component(entity);
+        store.delete_component(entity, |e| e.entity);
         // ASSERT
         assert_eq!(store.entities.len(), 4);
         assert_eq!(store.entities[entity], None);
@@ -160,7 +160,7 @@ mod tests {
             ],
         };
         // ACT
-        store.delete_component(entity);
+        store.delete_component(entity, |e| e.entity);
         // ASSERT
         assert_eq!(store.entities.len(), 3);
         assert_eq!(store.components.len(), 2);

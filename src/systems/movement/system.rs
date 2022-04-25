@@ -4,6 +4,8 @@ use crate::systems::{
     drawing::DrawingSystem,
     health::HealthSystem,
     helpers::component_store::ComponentStore,
+    job::{FightJob, FightJobParameters},
+    position::PositionSystem,
     tag::TagSystem,
     velocity::VelocitySystem,
 };
@@ -27,6 +29,8 @@ impl MovementSystem {
         health_system: &mut HealthSystem,
         aim_system: &AimSystem,
         tag_system: &TagSystem,
+        position_system: &PositionSystem,
+        jobs: &mut Vec<FightJob>,
     ) {
         for component in self.store.data_mut() {
             let entity = component.entity;
@@ -68,7 +72,15 @@ impl MovementSystem {
             if let Some(transition) = transition {
                 component.frame = Some((0, 0));
                 component.movement = transition.movement;
+            } else if let Some(destroy_script) =
+                component.movements[component.movement].destroy_script
+            {
+                jobs.push(FightJob {
+                    script: destroy_script,
+                    parameters: FightJobParameters::DestroyEntity { entity },
+                });
             }
+
             let movement = &component.movements[component.movement];
 
             if let Some(frame) = component.frame {
@@ -103,6 +115,24 @@ impl MovementSystem {
 
                     if let Some(damage) = damage_system.store.get_mut_component(entity) {
                         damage.damage = movement_sprite.damage_point;
+                        if let Some(spell) = movement_sprite.spell {
+                            if let Some(position) = position_system.store.get_component(entity) {
+                                if let Some(aim) = aim_system.store.get_component(entity) {
+                                    let position_x = match aim.direction {
+                                        AimDirection::Left => position.x - spell.position.0,
+                                        AimDirection::Right => position.x + spell.position.0,
+                                    };
+                                    jobs.push(FightJob {
+                                        script: spell.script,
+                                        parameters: FightJobParameters::SpawnSpell {
+                                            position: (position_x, position.y + spell.position.1),
+                                            direction: aim.direction,
+                                            player: damage.player,
+                                        },
+                                    });
+                                }
+                            }
+                        }
                     }
 
                     if let Some(health) = health_system.store.get_mut_component(entity) {

@@ -1,7 +1,10 @@
 use crate::{
-    scenes::fight::fighters::{
-        ACTION_CROUCH, ACTION_CROUCH_BLOCK, ACTION_CROUCH_LIGHT_KICK, ACTION_CROUCH_LIGHT_PUNCH,
-        ACTION_CROUCH_STRONG_KICK, ACTION_CROUCH_STRONG_PUNCH, STATE_STUN,
+    scenes::fight::{
+        fighters::{
+            ACTION_CROUCH, ACTION_CROUCH_BLOCK, ACTION_CROUCH_LIGHT_KICK,
+            ACTION_CROUCH_LIGHT_PUNCH, ACTION_CROUCH_STRONG_KICK, ACTION_CROUCH_STRONG_PUNCH,
+        },
+        states::STATE_STUN,
     },
     systems::{
         drawing::Sprite,
@@ -13,9 +16,9 @@ use crate::{
 };
 
 use super::{
-    crouch_stun::RYU_CROUCH_STUN, RYU_CROUCH_BLOCK_INDEX, RYU_CROUCH_LIGHT_KICK_INDEX,
-    RYU_CROUCH_LIGHT_PUNCH_INDEX, RYU_CROUCH_STRONG_KICK_INDEX, RYU_CROUCH_STRONG_PUNCH_INDEX,
-    RYU_CROUCH_STUN_INDEX, RYU_STAND_INDEX,
+    RYU_CROUCH_BLOCK_INDEX, RYU_CROUCH_LIGHT_KICK_INDEX, RYU_CROUCH_LIGHT_PUNCH_INDEX,
+    RYU_CROUCH_STRONG_KICK_INDEX, RYU_CROUCH_STRONG_PUNCH_INDEX, RYU_CROUCH_STUN_INDEX,
+    RYU_STAND_INDEX,
 };
 
 pub const RYU_CROUCH: Movement = Movement {
@@ -27,8 +30,10 @@ pub const RYU_CROUCH: Movement = Movement {
         velocity_change: Some(MovementVelocityChange::Horizontal(0.0)),
         damage_point: None,
         shield: None,
+        spell: None,
         frames: 0,
     }],
+    destroy_script: None,
     transitions: &[
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],

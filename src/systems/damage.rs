@@ -72,15 +72,6 @@ impl DamageSystem {
                                                 (health_position.x, health_position.y),
                                                 health_shape.flipped,
                                             );
-                                            println!(
-                                                "Damage [{};{}] => ({}, {}, {}, {})",
-                                                point.0,
-                                                point.1,
-                                                health_rect.0,
-                                                health_rect.1,
-                                                health_rect.2,
-                                                health_rect.3
-                                            );
 
                                             if check_collision(point, health_rect) {
                                                 let shield = match health.shield {

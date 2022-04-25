@@ -3,6 +3,7 @@ pub mod helpers;
 pub mod collision;
 pub mod drawing;
 pub mod input;
+pub mod job;
 pub mod position;
 pub mod tag;
 pub mod velocity;

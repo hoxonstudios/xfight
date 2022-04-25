@@ -3,6 +3,7 @@ pub mod sprites;
 use crate::systems::{
     collision::CollisionComponent,
     drawing::ShapeComponent,
+    job::FightJobParameters,
     position::{PositionAction, PositionComponent},
     tag::{StateTag, TagComponent},
 };
@@ -11,17 +12,17 @@ use self::sprites::{FLOOR_SPRITE, FLOOR_TEXTURE_PATH};
 
 use super::{kinds::KIND_FLOOR, FightScene};
 
-impl<'a> FightScene<'a> {
-    pub fn init_floor(&mut self) {
-        let entity = self.entity;
+pub fn job_spawn_floor(scene: &mut FightScene, params: FightJobParameters) {
+    if let FightJobParameters::None = params {
+        let entity = scene.entity;
 
-        let texture = self
+        let texture = scene
             .drawing
             .texture_store
             .load_texture(FLOOR_TEXTURE_PATH)
             .expect("Failed to load floor texture");
 
-        self.tag.store.insert_component(
+        scene.tag.store.insert_component(
             entity,
             TagComponent {
                 entity,
@@ -30,7 +31,7 @@ impl<'a> FightScene<'a> {
                 actual_state: StateTag(0),
             },
         );
-        self.position.store.insert_component(
+        scene.position.store.insert_component(
             entity,
             PositionComponent {
                 entity,
@@ -39,7 +40,7 @@ impl<'a> FightScene<'a> {
                 y: 550.0,
             },
         );
-        self.drawing.store.insert_component(
+        scene.drawing.store.insert_component(
             entity,
             ShapeComponent {
                 entity,
@@ -48,7 +49,7 @@ impl<'a> FightScene<'a> {
                 flipped: (false, false),
             },
         );
-        self.collision.store.insert_component(
+        scene.collision.store.insert_component(
             entity,
             CollisionComponent {
                 entity,
@@ -57,6 +58,6 @@ impl<'a> FightScene<'a> {
             },
         );
 
-        self.entity += 1;
+        scene.entity += 1;
     }
 }

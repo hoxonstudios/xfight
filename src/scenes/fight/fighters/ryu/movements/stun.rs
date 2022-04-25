@@ -15,6 +15,7 @@ pub const RYU_STUN: Movement = Movement {
             velocity_change: Some(MovementVelocityChange::HorizontalToAim(-1.5)),
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 3,
         },
         MovementSprite {
@@ -25,6 +26,7 @@ pub const RYU_STUN: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 3,
         },
         MovementSprite {
@@ -35,6 +37,7 @@ pub const RYU_STUN: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 3,
         },
         MovementSprite {
@@ -45,6 +48,7 @@ pub const RYU_STUN: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 3,
         },
         MovementSprite {
@@ -55,9 +59,11 @@ pub const RYU_STUN: Movement = Movement {
             velocity_change: Some(MovementVelocityChange::Horizontal(0.0)),
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 3,
         },
     ],
+    destroy_script: None,
     transitions: &[MovementTransition {
         conditions: &[],
         movement: RYU_STAND_INDEX,

@@ -20,8 +20,10 @@ pub const RYU_CROUCH_STUN: Movement = Movement {
         velocity_change: Some(MovementVelocityChange::HorizontalToAim(-4.0)),
         damage_point: None,
         shield: None,
+        spell: None,
         frames: 10,
     }],
+    destroy_script: None,
     transitions: &[
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(ACTION_CROUCH)],

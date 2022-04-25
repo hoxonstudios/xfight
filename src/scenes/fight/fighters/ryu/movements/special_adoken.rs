@@ -1,89 +1,92 @@
 use crate::{
-    scenes::fight::states::STATE_STUN,
+    scenes::fight::{jobs::JOB_SPAWN_RYU_ADOKEN, states::STATE_STUN},
     systems::{
         damage::DamagePoint,
         drawing::Sprite,
         movement::{
-            Movement, MovementSprite, MovementTransition, MovementTransitionCondition,
-            MovementVelocityChange,
+            Movement, MovementSpellScript, MovementSprite, MovementTransition,
+            MovementTransitionCondition, MovementVelocityChange,
         },
     },
 };
 
-use super::{RYU_CROUCH_INDEX, RYU_CROUCH_STUN_INDEX};
+use super::{RYU_STAND_INDEX, RYU_STUN_INDEX};
 
-pub const RYU_CROUCH_STRONG_PUNCH: Movement = Movement {
+pub const RYU_SPECIAL_ADOKEN: Movement = Movement {
     sprites: &[
         MovementSprite {
             sprite: Sprite {
-                center: (148, 419),
-                area: (129, 415, 171, 469),
+                center: (30, 663),
+                area: (7, 632, 52, 713),
             },
             velocity_change: Some(MovementVelocityChange::Horizontal(0.0)),
             damage_point: None,
             shield: None,
             spell: None,
-            frames: 3,
+            frames: 7,
         },
         MovementSprite {
             sprite: Sprite {
-                center: (202, 419),
-                area: (183, 415, 223, 469),
+                center: (84, 662),
+                area: (62, 638, 114, 712),
             },
             velocity_change: None,
             damage_point: None,
             shield: None,
             spell: None,
-            frames: 3,
+            frames: 7,
         },
         MovementSprite {
             sprite: Sprite {
-                center: (254, 419),
-                area: (235, 414, 290, 469),
+                center: (162, 662),
+                area: (134, 639, 187, 712),
+            },
+            velocity_change: None,
+            damage_point: None,
+            shield: None,
+            spell: None,
+            frames: 7,
+        },
+        MovementSprite {
+            sprite: Sprite {
+                center: (233, 662),
+                area: (205, 644, 290, 712),
             },
             damage_point: Some(DamagePoint {
-                point: (33, 9),
-                power: 5,
+                point: (54, 2),
+                power: 10,
                 tag: STATE_STUN,
             }),
             velocity_change: None,
             shield: None,
             spell: None,
-            frames: 3,
+            frames: 7,
         },
         MovementSprite {
             sprite: Sprite {
-                center: (202, 419),
-                area: (183, 415, 223, 469),
+                center: (330, 662),
+                area: (302, 644, 366, 712),
             },
             damage_point: None,
             velocity_change: None,
             shield: None,
-            spell: None,
-            frames: 3,
-        },
-        MovementSprite {
-            sprite: Sprite {
-                center: (148, 419),
-                area: (129, 415, 171, 469),
-            },
-            damage_point: None,
-            velocity_change: None,
-            shield: None,
-            spell: None,
-            frames: 3,
+            spell: Some(MovementSpellScript {
+                script: JOB_SPAWN_RYU_ADOKEN,
+                position: (62.0, 0.0),
+            }),
+            frames: 7,
         },
     ],
     destroy_script: None,
     transitions: &[
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
-            movement: RYU_CROUCH_STUN_INDEX,
+            movement: RYU_STUN_INDEX,
             wait: false,
         },
         MovementTransition {
             conditions: &[],
-            movement: RYU_CROUCH_INDEX,
+            movement: RYU_STAND_INDEX,
             wait: true,
         },
     ],

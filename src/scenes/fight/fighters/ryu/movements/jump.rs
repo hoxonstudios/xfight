@@ -1,7 +1,9 @@
 use crate::{
-    scenes::fight::fighters::{
-        ACTION_LIGHT_KICK, ACTION_LIGHT_PUNCH, ACTION_STRONG_KICK, ACTION_STRONG_PUNCH,
-        STATE_GROUNDED, STATE_STUN,
+    scenes::fight::{
+        fighters::{
+            ACTION_LIGHT_KICK, ACTION_LIGHT_PUNCH, ACTION_STRONG_KICK, ACTION_STRONG_PUNCH,
+        },
+        states::{STATE_GROUNDED, STATE_STUN},
     },
     systems::{
         drawing::Sprite,
@@ -13,8 +15,8 @@ use crate::{
 };
 
 use super::{
-    stand::RYU_STAND, RYU_JUMP_LIGHT_KICK_INDEX, RYU_JUMP_LIGHT_PUNCH_INDEX,
-    RYU_JUMP_STRONG_KICK_INDEX, RYU_JUMP_STRONG_PUNCH_INDEX, RYU_JUMP_STUN_INDEX, RYU_STAND_INDEX,
+    RYU_JUMP_LIGHT_KICK_INDEX, RYU_JUMP_LIGHT_PUNCH_INDEX, RYU_JUMP_STRONG_KICK_INDEX,
+    RYU_JUMP_STRONG_PUNCH_INDEX, RYU_JUMP_STUN_INDEX, RYU_STAND_INDEX,
 };
 
 pub const RYU_JUMP: Movement = Movement {
@@ -27,6 +29,7 @@ pub const RYU_JUMP: Movement = Movement {
             velocity_change: Some(MovementVelocityChange::Both(0.0, -20.0)),
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 10,
         },
         MovementSprite {
@@ -37,6 +40,7 @@ pub const RYU_JUMP: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 10,
         },
         MovementSprite {
@@ -47,6 +51,7 @@ pub const RYU_JUMP: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 10,
         },
         MovementSprite {
@@ -57,9 +62,11 @@ pub const RYU_JUMP: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 10,
         },
     ],
+    destroy_script: None,
     transitions: &[
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
@@ -112,6 +119,7 @@ pub const RYU_JUMP_LEFT: Movement = Movement {
             velocity_change: Some(MovementVelocityChange::Both(-4.0, -20.0)),
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 10,
         },
         MovementSprite {
@@ -122,6 +130,7 @@ pub const RYU_JUMP_LEFT: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 10,
         },
         MovementSprite {
@@ -132,6 +141,7 @@ pub const RYU_JUMP_LEFT: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 10,
         },
         MovementSprite {
@@ -142,9 +152,11 @@ pub const RYU_JUMP_LEFT: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 10,
         },
     ],
+    destroy_script: None,
     transitions: &[
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
@@ -197,6 +209,7 @@ pub const RYU_JUMP_RIGHT: Movement = Movement {
             velocity_change: Some(MovementVelocityChange::Both(4.0, -20.0)),
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 10,
         },
         MovementSprite {
@@ -207,6 +220,7 @@ pub const RYU_JUMP_RIGHT: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 10,
         },
         MovementSprite {
@@ -217,6 +231,7 @@ pub const RYU_JUMP_RIGHT: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 10,
         },
         MovementSprite {
@@ -227,9 +242,11 @@ pub const RYU_JUMP_RIGHT: Movement = Movement {
             velocity_change: None,
             damage_point: None,
             shield: None,
+            spell: None,
             frames: 10,
         },
     ],
+    destroy_script: None,
     transitions: &[
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],

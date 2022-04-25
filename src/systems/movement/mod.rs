@@ -1,6 +1,6 @@
 pub mod system;
 
-use super::{damage::DamagePoint, drawing::Sprite, health::Shield, tag::StateTag};
+use super::{damage::DamagePoint, drawing::Sprite, health::Shield, job::FightJob, tag::StateTag};
 
 #[derive(Copy, Clone)]
 pub struct MovementComponent {
@@ -14,6 +14,7 @@ pub struct MovementComponent {
 pub struct Movement {
     pub sprites: &'static [MovementSprite],
     pub transitions: &'static [MovementTransition],
+    pub destroy_script: Option<usize>,
 }
 #[derive(Copy, Clone)]
 pub struct MovementSprite {
@@ -21,7 +22,13 @@ pub struct MovementSprite {
     pub velocity_change: Option<MovementVelocityChange>,
     pub damage_point: Option<DamagePoint>,
     pub shield: Option<Shield>,
+    pub spell: Option<MovementSpellScript>,
     pub frames: u8,
+}
+#[derive(Copy, Clone)]
+pub struct MovementSpellScript {
+    pub position: (f32, f32),
+    pub script: usize,
 }
 #[derive(Copy, Clone)]
 pub enum MovementVelocityChange {
