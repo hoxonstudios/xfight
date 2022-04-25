@@ -83,57 +83,85 @@ pub const RYU_WALK_LEFT: Movement = Movement {
             frames: 2,
         },
     ],
-    next: None,
     transitions: &[
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
             movement: RYU_STUN_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(ACTION_CROUCH)],
             movement: RYU_CROUCH_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(ACTION_BLOCK)],
             movement: RYU_BLOCK_INDEX,
-        },
-        MovementTransition {
-            conditions: &[MovementTransitionCondition::ActionActivated(
-                ACTION_JUMP_LEFT,
-            )],
-            movement: RYU_JUMP_LEFT_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(
                 ACTION_LIGHT_PUNCH,
             )],
             movement: RYU_LIGHT_PUNCH_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(
                 ACTION_LIGHT_KICK,
             )],
             movement: RYU_LIGHT_KICK_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(
                 ACTION_STRONG_PUNCH,
             )],
             movement: RYU_STRONG_PUNCH_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(
                 ACTION_STRONG_KICK,
             )],
             movement: RYU_STRONG_KICK_INDEX,
+            wait: false,
         },
         MovementTransition {
-            conditions: &[MovementTransitionCondition::ActionActivated(ACTION_RIGHT)],
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_JUMP_LEFT,
+            )],
+            movement: RYU_JUMP_LEFT_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[
+                MovementTransitionCondition::ActionActivated(ACTION_RIGHT),
+                MovementTransitionCondition::ActionNotActivated(ACTION_LEFT),
+            ],
             movement: RYU_WALK_RIGHT_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[
+                MovementTransitionCondition::ActionActivated(ACTION_LEFT),
+                MovementTransitionCondition::ActionNotActivated(ACTION_RIGHT),
+            ],
+            movement: RYU_WALK_LEFT_INDEX,
+            wait: true,
+        },
+        MovementTransition {
+            conditions: &[
+                MovementTransitionCondition::ActionActivated(ACTION_LEFT),
+                MovementTransitionCondition::ActionActivated(ACTION_RIGHT),
+            ],
+            movement: RYU_STAND_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::NoneAction],
             movement: RYU_STAND_INDEX,
+            wait: false,
         },
     ],
 };
@@ -201,57 +229,85 @@ pub const RYU_WALK_RIGHT: Movement = Movement {
             frames: 2,
         },
     ],
-    next: None,
     transitions: &[
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
             movement: RYU_STUN_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(ACTION_CROUCH)],
             movement: RYU_CROUCH_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(ACTION_BLOCK)],
             movement: RYU_BLOCK_INDEX,
-        },
-        MovementTransition {
-            conditions: &[MovementTransitionCondition::ActionActivated(
-                ACTION_JUMP_RIGHT,
-            )],
-            movement: RYU_JUMP_RIGHT_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(
                 ACTION_LIGHT_PUNCH,
             )],
             movement: RYU_LIGHT_PUNCH_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(
                 ACTION_LIGHT_KICK,
             )],
             movement: RYU_LIGHT_KICK_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(
                 ACTION_STRONG_PUNCH,
             )],
             movement: RYU_STRONG_PUNCH_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(
                 ACTION_STRONG_KICK,
             )],
             movement: RYU_STRONG_KICK_INDEX,
+            wait: false,
         },
         MovementTransition {
-            conditions: &[MovementTransitionCondition::ActionActivated(ACTION_LEFT)],
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_JUMP_RIGHT,
+            )],
+            movement: RYU_JUMP_RIGHT_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[
+                MovementTransitionCondition::ActionActivated(ACTION_LEFT),
+                MovementTransitionCondition::ActionNotActivated(ACTION_RIGHT),
+            ],
             movement: RYU_WALK_LEFT_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[
+                MovementTransitionCondition::ActionActivated(ACTION_RIGHT),
+                MovementTransitionCondition::ActionNotActivated(ACTION_LEFT),
+            ],
+            movement: RYU_WALK_RIGHT_INDEX,
+            wait: true,
+        },
+        MovementTransition {
+            conditions: &[
+                MovementTransitionCondition::ActionActivated(ACTION_LEFT),
+                MovementTransitionCondition::ActionActivated(ACTION_RIGHT),
+            ],
+            movement: RYU_STAND_INDEX,
+            wait: false,
         },
         MovementTransition {
             conditions: &[MovementTransitionCondition::NoneAction],
             movement: RYU_STAND_INDEX,
+            wait: false,
         },
     ],
 };

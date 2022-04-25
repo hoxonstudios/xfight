@@ -13,7 +13,6 @@ pub struct MovementComponent {
 #[derive(Copy, Clone)]
 pub struct Movement {
     pub sprites: &'static [MovementSprite],
-    pub next: Option<usize>,
     pub transitions: &'static [MovementTransition],
 }
 #[derive(Copy, Clone)]
@@ -34,6 +33,7 @@ pub enum MovementVelocityChange {
 pub struct MovementTransition {
     pub conditions: &'static [MovementTransitionCondition],
     pub movement: usize,
+    pub wait: bool,
 }
 
 #[derive(Copy, Clone)]

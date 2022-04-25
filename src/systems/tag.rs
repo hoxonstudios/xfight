@@ -3,11 +3,14 @@ use super::helpers::component_store::ComponentStore;
 #[derive(Copy, Clone)]
 pub struct TagComponent {
     pub entity: usize,
+    pub kind: KindTag,
     pub next_state: StateTag,
     pub actual_state: StateTag,
 }
 #[derive(Copy, Clone)]
 pub struct StateTag(pub u128);
+#[derive(Copy, Clone)]
+pub struct KindTag(pub u128);
 
 pub struct TagSystem {
     pub store: ComponentStore<TagComponent>,

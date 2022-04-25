@@ -49,9 +49,16 @@ pub const RYU_LIGHT_PUNCH: Movement = Movement {
             frames: 4,
         },
     ],
-    next: Some(RYU_STAND_INDEX),
-    transitions: &[MovementTransition {
-        conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
-        movement: RYU_STUN_INDEX,
-    }],
+    transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
+            movement: RYU_STUN_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[],
+            movement: RYU_STAND_INDEX,
+            wait: true,
+        },
+    ],
 };

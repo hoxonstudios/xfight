@@ -27,7 +27,7 @@ impl AimSystem {
         for aim in self.store.data_mut() {
             let entity = aim.entity;
             if let Some(shape) = drawing_system.store.get_mut_component(entity) {
-                if let Some(position) = position_system.store.get_component(entity) {
+                if let Some(position) = position_system.store.get_component_ref(entity) {
                     let (flipped_x, direction) = if position.x < max_position {
                         (false, AimDirection::Right)
                     } else {
@@ -44,7 +44,7 @@ impl AimSystem {
             .data()
             .iter()
             .map(|m| {
-                if let Some(position) = position_system.store.get_component(m.entity) {
+                if let Some(position) = position_system.store.get_component_ref(m.entity) {
                     position.x
                 } else {
                     0.0

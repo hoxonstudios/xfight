@@ -1,5 +1,6 @@
 mod fighters;
 mod floor;
+mod kinds;
 
 use sdl2::{event::Event, keyboard::Keycode};
 
@@ -67,8 +68,12 @@ impl<'a> FightScene<'a> {
                 &self.tag,
             );
             self.velocity.update(&mut self.position);
-            self.collision
-                .update(&self.drawing, &mut self.position, &mut self.velocity);
+            self.collision.update(
+                &self.drawing,
+                &mut self.position,
+                &mut self.velocity,
+                &mut self.tag,
+            );
             self.damage.update(
                 &mut self.health,
                 &mut self.tag,

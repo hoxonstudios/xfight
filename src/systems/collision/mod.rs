@@ -4,6 +4,7 @@ use super::{
     drawing::{DrawingSystem, ShapeComponent},
     helpers::component_store::ComponentStore,
     position::{PositionAction, PositionComponent, PositionSystem},
+    tag::{KindTag, StateTag, TagSystem},
     velocity::VelocitySystem,
 };
 
@@ -13,24 +14,21 @@ mod calculations;
 pub struct CollisionComponent {
     pub entity: usize,
     pub padding: i32,
-    pub solid: bool,
+    pub kinds: &'static [CollisionKind],
 }
-
 #[derive(Copy, Clone)]
-pub struct Collision {
-    pub entity: usize,
-    pub sides: [bool; 4],
+pub struct CollisionKind {
+    pub kind: KindTag,
+    pub state: StateTag,
     pub solid: bool,
 }
 
 pub struct CollisionSystem {
-    pub collisions: Vec<(Collision, Collision)>,
     pub store: ComponentStore<CollisionComponent>,
 }
 impl CollisionSystem {
     pub fn init() -> CollisionSystem {
         CollisionSystem {
-            collisions: vec![],
             store: ComponentStore::<CollisionComponent>::init(),
         }
     }
@@ -39,8 +37,8 @@ impl CollisionSystem {
         drawing_system: &DrawingSystem,
         position_system: &mut PositionSystem,
         velocity_system: &mut VelocitySystem,
+        tag_system: &mut TagSystem,
     ) {
-        self.collisions.clear();
         let mut rigid_bodies: Vec<Option<(usize, Rectangle, Point)>> = vec![];
         let collisions = self.store.data();
         let length = collisions.len();
@@ -50,8 +48,8 @@ impl CollisionSystem {
             rigid_bodies.push(get_rigid_body(
                 entity,
                 collision,
-                drawing_system.store.get_component(entity),
-                position_system.store.get_component(entity),
+                drawing_system.store.get_component_ref(entity),
+                position_system.store.get_component_ref(entity),
             ));
         }
 
@@ -68,53 +66,63 @@ impl CollisionSystem {
                             let collision = get_collision_time(source, velocity, &target);
                             if let Some(collision) = collision {
                                 let (left, top, right, bottom) = collision;
-                                if actual.solid && compare.solid {
-                                    let actual_update = &mut updates[j];
 
-                                    let entity = compare.entity;
-                                    let stop_velocity_x = (velocity.x > 0.0 && right.is_some())
-                                        || (velocity.x < 0.0 && left.is_some());
-                                    let stop_velocity_y = (velocity.y > 0.0 && bottom.is_some())
-                                        || (velocity.y < 0.0 && top.is_some());
-                                    let delta_time =
-                                        left.or(top.or(right.or(bottom))).or(Some(0.0)).unwrap();
+                                if compare.kinds.len() > 0 {
+                                    let actual_tag = tag_system.store.get_component(actual.entity);
+                                    let compare_tag =
+                                        tag_system.store.get_mut_component(compare.entity);
 
-                                    if let Some(actual_update) = actual_update {
-                                        actual_update.stop_velocity.0 |= stop_velocity_x;
-                                        actual_update.stop_velocity.1 |= stop_velocity_y;
-                                        actual_update.delta_time =
-                                            actual_update.delta_time.min(delta_time);
-                                    } else {
-                                        *actual_update = Some(CollisionUpdate {
-                                            entity,
-                                            stop_velocity: (stop_velocity_x, stop_velocity_y),
-                                            delta_time,
-                                        });
+                                    match (actual_tag, compare_tag) {
+                                        (Some(actual_tag), Some(compare_tag)) => {
+                                            let mut solid = false;
+                                            for compare_kind in compare.kinds {
+                                                if (compare_kind.kind.0 & actual_tag.kind.0)
+                                                    == compare_kind.kind.0
+                                                {
+                                                    if compare_kind.solid {
+                                                        solid = true;
+                                                    }
+                                                    compare_tag.next_state.0 |=
+                                                        compare_kind.state.0;
+                                                }
+                                            }
+                                            if solid {
+                                                let actual_update = &mut updates[j];
+
+                                                let entity = compare.entity;
+                                                let stop_velocity_x = (velocity.x > 0.0
+                                                    && right.is_some())
+                                                    || (velocity.x < 0.0 && left.is_some());
+                                                let stop_velocity_y = (velocity.y > 0.0
+                                                    && bottom.is_some())
+                                                    || (velocity.y < 0.0 && top.is_some());
+                                                let delta_time = left
+                                                    .or(top.or(right.or(bottom)))
+                                                    .or(Some(0.0))
+                                                    .unwrap();
+
+                                                if let Some(actual_update) = actual_update {
+                                                    actual_update.stop_velocity.0 |=
+                                                        stop_velocity_x;
+                                                    actual_update.stop_velocity.1 |=
+                                                        stop_velocity_y;
+                                                    actual_update.delta_time =
+                                                        actual_update.delta_time.min(delta_time);
+                                                } else {
+                                                    *actual_update = Some(CollisionUpdate {
+                                                        entity,
+                                                        stop_velocity: (
+                                                            stop_velocity_x,
+                                                            stop_velocity_y,
+                                                        ),
+                                                        delta_time,
+                                                    });
+                                                }
+                                            }
+                                        }
+                                        _ => {}
                                     }
                                 }
-
-                                self.collisions.push((
-                                    Collision {
-                                        entity: compare.entity,
-                                        solid: compare.solid,
-                                        sides: [
-                                            left.is_some(),
-                                            top.is_some(),
-                                            right.is_some(),
-                                            bottom.is_some(),
-                                        ],
-                                    },
-                                    Collision {
-                                        entity: actual.entity,
-                                        solid: actual.solid,
-                                        sides: [
-                                            right.is_some(),
-                                            bottom.is_some(),
-                                            left.is_some(),
-                                            top.is_some(),
-                                        ],
-                                    },
-                                ))
                             }
                         }
                     }

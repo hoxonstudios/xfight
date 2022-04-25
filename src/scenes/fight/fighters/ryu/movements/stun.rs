@@ -1,6 +1,6 @@
 use crate::systems::{
     drawing::Sprite,
-    movement::{Movement, MovementSprite, MovementVelocityChange},
+    movement::{Movement, MovementSprite, MovementTransition, MovementVelocityChange},
 };
 
 use super::RYU_STAND_INDEX;
@@ -55,9 +55,12 @@ pub const RYU_STUN: Movement = Movement {
             velocity_change: Some(MovementVelocityChange::Horizontal(0.0)),
             damage_point: None,
             shield: None,
-            frames: 5,
+            frames: 3,
         },
     ],
-    next: Some(RYU_STAND_INDEX),
-    transitions: &[],
+    transitions: &[MovementTransition {
+        conditions: &[],
+        movement: RYU_STAND_INDEX,
+        wait: true,
+    }],
 };

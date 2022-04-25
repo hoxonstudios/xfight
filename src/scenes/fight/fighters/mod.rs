@@ -32,6 +32,7 @@ pub const ACTION_JUMP_LEFT: MovementAction = MovementAction(ACTION_JUMP.0 | ACTI
 pub const ACTION_JUMP_RIGHT: MovementAction = MovementAction(ACTION_JUMP.0 | ACTION_RIGHT.0);
 // STATES
 pub const STATE_STUN: StateTag = StateTag(0b1);
+pub const STATE_GROUNDED: StateTag = StateTag(0b10);
 // CONTROLLERS
 pub const CONTROLLER_ONE: Controller = Controller {
     keys: &[

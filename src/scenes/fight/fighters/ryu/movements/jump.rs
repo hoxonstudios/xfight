@@ -1,9 +1,21 @@
-use crate::systems::{
-    drawing::Sprite,
-    movement::{Movement, MovementSprite, MovementVelocityChange},
+use crate::{
+    scenes::fight::fighters::{
+        ACTION_LIGHT_KICK, ACTION_LIGHT_PUNCH, ACTION_STRONG_KICK, ACTION_STRONG_PUNCH,
+        STATE_GROUNDED, STATE_STUN,
+    },
+    systems::{
+        drawing::Sprite,
+        movement::{
+            Movement, MovementSprite, MovementTransition, MovementTransitionCondition,
+            MovementVelocityChange,
+        },
+    },
 };
 
-use super::RYU_STAND_INDEX;
+use super::{
+    stand::RYU_STAND, RYU_JUMP_LIGHT_KICK_INDEX, RYU_JUMP_LIGHT_PUNCH_INDEX,
+    RYU_JUMP_STRONG_KICK_INDEX, RYU_JUMP_STRONG_PUNCH_INDEX, RYU_JUMP_STUN_INDEX, RYU_STAND_INDEX,
+};
 
 pub const RYU_JUMP: Movement = Movement {
     sprites: &[
@@ -48,8 +60,46 @@ pub const RYU_JUMP: Movement = Movement {
             frames: 10,
         },
     ],
-    next: Some(RYU_STAND_INDEX),
-    transitions: &[],
+    transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
+            movement: RYU_JUMP_STUN_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_GROUNDED)],
+            movement: RYU_STAND_INDEX,
+            wait: true,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_LIGHT_PUNCH,
+            )],
+            movement: RYU_JUMP_LIGHT_PUNCH_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_LIGHT_KICK,
+            )],
+            movement: RYU_JUMP_LIGHT_KICK_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_STRONG_PUNCH,
+            )],
+            movement: RYU_JUMP_STRONG_PUNCH_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_STRONG_KICK,
+            )],
+            movement: RYU_JUMP_STRONG_KICK_INDEX,
+            wait: false,
+        },
+    ],
 };
 
 pub const RYU_JUMP_LEFT: Movement = Movement {
@@ -95,8 +145,46 @@ pub const RYU_JUMP_LEFT: Movement = Movement {
             frames: 10,
         },
     ],
-    next: Some(RYU_STAND_INDEX),
-    transitions: &[],
+    transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
+            movement: RYU_JUMP_STUN_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_GROUNDED)],
+            movement: RYU_STAND_INDEX,
+            wait: true,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_LIGHT_PUNCH,
+            )],
+            movement: RYU_JUMP_LIGHT_PUNCH_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_LIGHT_KICK,
+            )],
+            movement: RYU_JUMP_LIGHT_KICK_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_STRONG_PUNCH,
+            )],
+            movement: RYU_JUMP_STRONG_PUNCH_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_STRONG_KICK,
+            )],
+            movement: RYU_JUMP_STRONG_KICK_INDEX,
+            wait: false,
+        },
+    ],
 };
 
 pub const RYU_JUMP_RIGHT: Movement = Movement {
@@ -142,6 +230,44 @@ pub const RYU_JUMP_RIGHT: Movement = Movement {
             frames: 10,
         },
     ],
-    next: Some(RYU_STAND_INDEX),
-    transitions: &[],
+    transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
+            movement: RYU_JUMP_STUN_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_GROUNDED)],
+            movement: RYU_STAND_INDEX,
+            wait: true,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_LIGHT_PUNCH,
+            )],
+            movement: RYU_JUMP_LIGHT_PUNCH_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_LIGHT_KICK,
+            )],
+            movement: RYU_JUMP_LIGHT_KICK_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_STRONG_PUNCH,
+            )],
+            movement: RYU_JUMP_STRONG_PUNCH_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionActivated(
+                ACTION_STRONG_KICK,
+            )],
+            movement: RYU_JUMP_STRONG_KICK_INDEX,
+            wait: false,
+        },
+    ],
 };

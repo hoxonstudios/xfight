@@ -1,22 +1,24 @@
 pub mod movements;
 
 use crate::{
-    scenes::fight::FightScene,
+    scenes::fight::{kinds::KIND_FLOOR, FightScene},
     systems::{
         aim::{AimComponent, AimDirection},
-        collision::CollisionComponent,
+        collision::{CollisionComponent, CollisionKind},
         damage::DamageComponent,
         drawing::ShapeComponent,
         health::{HealthAction, HealthComponent, Player},
         input::{Controller, InputComponent},
         movement::MovementComponent,
         position::{PositionAction, PositionComponent},
-        tag::{StateTag, TagComponent},
+        tag::{KindTag, StateTag, TagComponent},
         velocity::VelocityComponent,
     },
 };
 
 use self::movements::{RYU_MOVEMENTS, RYU_STAND_INDEX, RYU_TEXTURE_PATH};
+
+use super::STATE_GROUNDED;
 
 impl<'a> FightScene<'a> {
     pub fn init_ryu(&mut self, position: (f32, f32), controller: Controller, player: Player) {
@@ -31,6 +33,7 @@ impl<'a> FightScene<'a> {
             entity,
             TagComponent {
                 entity,
+                kind: KindTag(0),
                 next_state: StateTag(0),
                 actual_state: StateTag(0),
             },
@@ -66,7 +69,11 @@ impl<'a> FightScene<'a> {
             CollisionComponent {
                 entity,
                 padding: 0,
-                solid: true,
+                kinds: &[CollisionKind {
+                    kind: KIND_FLOOR,
+                    state: STATE_GROUNDED,
+                    solid: true,
+                }],
             },
         );
         self.input

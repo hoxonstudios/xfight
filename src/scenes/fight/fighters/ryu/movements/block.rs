@@ -29,11 +29,11 @@ pub const RYU_BLOCK: Movement = Movement {
         damage_point: None,
         frames: 0,
     }],
-    next: None,
     transitions: &[MovementTransition {
         conditions: &[MovementTransitionCondition::ActionNotActivated(
             ACTION_BLOCK,
         )],
         movement: RYU_STAND_INDEX,
+        wait: true,
     }],
 };

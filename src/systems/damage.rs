@@ -41,18 +41,22 @@ impl DamageSystem {
     ) {
         for damage in self.store.data_mut() {
             if let Some(damage_point) = damage.damage {
-                if let Some(damage_position) = position_system.store.get_component(damage.entity) {
-                    if let Some(damage_shape) = drawing_system.store.get_component(damage.entity) {
+                if let Some(damage_position) =
+                    position_system.store.get_component_ref(damage.entity)
+                {
+                    if let Some(damage_shape) =
+                        drawing_system.store.get_component_ref(damage.entity)
+                    {
                         for health in health_system.store.data_mut() {
                             if health.player != damage.player {
                                 if let Some(health_shape) =
-                                    drawing_system.store.get_component(health.entity)
+                                    drawing_system.store.get_component_ref(health.entity)
                                 {
                                     if let Some(health_position) =
-                                        position_system.store.get_component(health.entity)
+                                        position_system.store.get_component_ref(health.entity)
                                     {
                                         if let Some(health_collision) =
-                                            collision_system.store.get_component(health.entity)
+                                            collision_system.store.get_component_ref(health.entity)
                                         {
                                             let point = absolute_damage_point(
                                                 (
@@ -67,6 +71,15 @@ impl DamageSystem {
                                                 health_collision.padding,
                                                 (health_position.x, health_position.y),
                                                 health_shape.flipped,
+                                            );
+                                            println!(
+                                                "Damage [{};{}] => ({}, {}, {}, {})",
+                                                point.0,
+                                                point.1,
+                                                health_rect.0,
+                                                health_rect.1,
+                                                health_rect.2,
+                                                health_rect.3
                                             );
 
                                             if check_collision(point, health_rect) {
@@ -109,7 +122,6 @@ impl DamageSystem {
                     }
                 }
             }
-            damage.damage = None;
         }
     }
 }

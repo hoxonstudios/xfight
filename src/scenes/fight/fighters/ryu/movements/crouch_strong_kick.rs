@@ -3,11 +3,14 @@ use crate::{
     systems::{
         damage::DamagePoint,
         drawing::Sprite,
-        movement::{Movement, MovementSprite, MovementVelocityChange},
+        movement::{
+            Movement, MovementSprite, MovementTransition, MovementTransitionCondition,
+            MovementVelocityChange,
+        },
     },
 };
 
-use super::RYU_CROUCH_INDEX;
+use super::{RYU_CROUCH_INDEX, RYU_CROUCH_STUN_INDEX};
 
 pub const RYU_CROUCH_STRONG_KICK: Movement = Movement {
     sprites: &[
@@ -46,6 +49,16 @@ pub const RYU_CROUCH_STRONG_KICK: Movement = Movement {
             frames: 4,
         },
     ],
-    next: Some(RYU_CROUCH_INDEX),
-    transitions: &[],
+    transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
+            movement: RYU_CROUCH_STUN_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[],
+            movement: RYU_CROUCH_INDEX,
+            wait: true,
+        },
+    ],
 };

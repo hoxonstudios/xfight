@@ -14,8 +14,14 @@ mod crouch_light_kick;
 mod crouch_light_punch;
 mod crouch_strong_kick;
 mod crouch_strong_punch;
+mod crouch_stun;
 
 mod jump;
+mod jump_light_kick;
+mod jump_light_punch;
+mod jump_strong_kick;
+mod jump_strong_punch;
+mod jump_stun;
 
 use crate::systems::movement::Movement;
 
@@ -27,7 +33,13 @@ use self::{
     crouch_light_punch::RYU_CROUCH_LIGHT_PUNCH,
     crouch_strong_kick::RYU_CROUCH_STRONG_KICK,
     crouch_strong_punch::RYU_CROUCH_STRONG_PUNCH,
+    crouch_stun::RYU_CROUCH_STUN,
     jump::{RYU_JUMP, RYU_JUMP_LEFT, RYU_JUMP_RIGHT},
+    jump_light_kick::RYU_JUMP_LIGHT_KICK,
+    jump_light_punch::RYU_JUMP_LIGHT_PUNCH,
+    jump_strong_kick::RYU_JUMP_STRONG_KICK,
+    jump_strong_punch::RYU_JUMP_STRONG_PUNCH,
+    jump_stun::RYU_JUMP_STUN,
     light_kick::RYU_LIGHT_KICK,
     light_punch::RYU_LIGHT_PUNCH,
     stand::RYU_STAND,
@@ -59,6 +71,12 @@ pub const RYU_JUMP_INDEX: usize = 14;
 pub const RYU_JUMP_LEFT_INDEX: usize = 15;
 pub const RYU_JUMP_RIGHT_INDEX: usize = 16;
 pub const RYU_STUN_INDEX: usize = 17;
+pub const RYU_JUMP_STRONG_PUNCH_INDEX: usize = 18;
+pub const RYU_JUMP_LIGHT_PUNCH_INDEX: usize = 19;
+pub const RYU_JUMP_STRONG_KICK_INDEX: usize = 20;
+pub const RYU_JUMP_LIGHT_KICK_INDEX: usize = 21;
+pub const RYU_JUMP_STUN_INDEX: usize = 22;
+pub const RYU_CROUCH_STUN_INDEX: usize = 23;
 // STAND
 pub const RYU_MOVEMENTS: &'static [Movement] = &[
     RYU_STAND,
@@ -79,4 +97,10 @@ pub const RYU_MOVEMENTS: &'static [Movement] = &[
     RYU_JUMP_LEFT,
     RYU_JUMP_RIGHT,
     RYU_STUN,
+    RYU_JUMP_STRONG_PUNCH,
+    RYU_JUMP_LIGHT_PUNCH,
+    RYU_JUMP_STRONG_KICK,
+    RYU_JUMP_LIGHT_KICK,
+    RYU_JUMP_STUN,
+    RYU_CROUCH_STUN,
 ];

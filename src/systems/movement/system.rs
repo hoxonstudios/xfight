@@ -8,9 +8,7 @@ use crate::systems::{
     velocity::VelocitySystem,
 };
 
-use super::{
-    MovementComponent, MovementTransition, MovementTransitionCondition, MovementVelocityChange,
-};
+use super::{MovementComponent, MovementTransitionCondition, MovementVelocityChange};
 
 pub struct MovementSystem {
     pub store: ComponentStore<MovementComponent>,
@@ -33,51 +31,43 @@ impl MovementSystem {
         for component in self.store.data_mut() {
             let entity = component.entity;
 
-            let transition = if let None = component.frame {
-                component.movements[component.movement].next
-            } else {
-                let tag = tag_system.store.get_component(entity);
-                let transition = component.movements[component.movement]
-                    .transitions
-                    .iter()
-                    .find(|t| {
-                        t.conditions.iter().all(|c| match c {
-                            MovementTransitionCondition::NoneAction => match component.action {
+            let tag = tag_system.store.get_component(entity);
+            let transition = component.movements[component.movement]
+                .transitions
+                .iter()
+                .find(|t| match (component.frame, t.wait) {
+                    (Some(_), true) => false,
+                    _ => t.conditions.iter().all(|c| match c {
+                        MovementTransitionCondition::NoneAction => match component.action {
+                            None => true,
+                            Some(_) => false,
+                        },
+                        MovementTransitionCondition::ActionNotActivated(action) => {
+                            match component.action {
                                 None => true,
-                                Some(_) => false,
-                            },
-                            MovementTransitionCondition::ActionNotActivated(action) => {
-                                match component.action {
-                                    None => true,
-                                    Some(movement_action) => (action.0 & movement_action.0) == 0,
-                                }
+                                Some(movement_action) => (action.0 & movement_action.0) == 0,
                             }
-                            MovementTransitionCondition::ActionActivated(action) => match component
-                                .action
-                            {
+                        }
+                        MovementTransitionCondition::ActionActivated(action) => {
+                            match component.action {
                                 None => false,
                                 Some(movement_action) => (action.0 & movement_action.0) == action.0,
-                            },
-                            MovementTransitionCondition::StateActive(state) => match tag {
-                                None => false,
-                                Some(tag) => (state.0 & tag.actual_state.0) == state.0,
-                            },
-                            MovementTransitionCondition::StateInactive(state) => match tag {
-                                None => true,
-                                Some(tag) => (state.0 & tag.actual_state.0) == 0,
-                            },
-                        })
-                    });
-                if let Some(transition) = transition {
-                    Some(transition.movement)
-                } else {
-                    None
-                }
-            };
+                            }
+                        }
+                        MovementTransitionCondition::StateActive(state) => match tag {
+                            None => false,
+                            Some(tag) => (state.0 & tag.actual_state.0) == state.0,
+                        },
+                        MovementTransitionCondition::StateInactive(state) => match tag {
+                            None => true,
+                            Some(tag) => (state.0 & tag.actual_state.0) == 0,
+                        },
+                    }),
+                });
 
             if let Some(transition) = transition {
                 component.frame = Some((0, 0));
-                component.movement = transition;
+                component.movement = transition.movement;
             }
             let movement = &component.movements[component.movement];
 
@@ -120,14 +110,7 @@ impl MovementSystem {
                     }
                 }
 
-                if let None = movement.next {
-                    component.frame = Some(next_infinite_frame(
-                        frame,
-                        (sprites, movement_sprite.frames),
-                    ));
-                } else {
-                    component.frame = next_frame(frame, (sprites, movement_sprite.frames));
-                }
+                component.frame = next_frame(frame, (sprites, movement_sprite.frames));
             }
             component.action = None;
         }
@@ -144,20 +127,6 @@ fn next_frame(frame: (usize, u8), frames: (usize, u8)) -> Option<(usize, u8)> {
             Some((next_sprite, 0))
         } else {
             None
-        }
-    }
-}
-
-fn next_infinite_frame(frame: (usize, u8), frames: (usize, u8)) -> (usize, u8) {
-    let next_frame = frame.1 + 1;
-    if next_frame < frames.1 {
-        (frame.0, next_frame)
-    } else {
-        let next_sprite = frame.0 + 1;
-        if next_sprite < frames.0 {
-            (next_sprite, 0)
-        } else {
-            (0, 0)
         }
     }
 }

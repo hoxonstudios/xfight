@@ -16,7 +16,18 @@ impl<T: Copy> ComponentStore<T> {
     pub fn data_mut(&mut self) -> &mut Vec<T> {
         &mut self.components
     }
-    pub fn get_component(&self, entity: usize) -> Option<&T> {
+    pub fn get_component(&self, entity: usize) -> Option<T> {
+        if entity < self.entities.len() {
+            if let Some(index) = self.entities[entity] {
+                Some(self.components[index])
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+    pub fn get_component_ref(&self, entity: usize) -> Option<&T> {
         if entity < self.entities.len() {
             if let Some(index) = self.entities[entity] {
                 Some(&self.components[index])
@@ -168,7 +179,7 @@ mod tests {
             ],
         };
         // ACT
-        let component = store.get_component(entity);
+        let component = store.get_component_ref(entity);
         // ASSERT
         assert!(matches!(component, Some(TestComponent { entity: 3 })));
     }
@@ -185,7 +196,7 @@ mod tests {
             ],
         };
         // ACT
-        let component = store.get_component(entity);
+        let component = store.get_component_ref(entity);
         // ASSERT
         assert!(matches!(component, None));
     }

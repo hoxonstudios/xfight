@@ -56,7 +56,7 @@ impl<'a> DrawingSystem<'a> {
 
         for shape in self.store.data() {
             let entity = shape.entity;
-            if let Some(position) = position_system.store.get_component(entity) {
+            if let Some(position) = position_system.store.get_component_ref(entity) {
                 match shape {
                     ShapeComponent {
                         sprite, flipped, ..
