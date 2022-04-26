@@ -1,5 +1,5 @@
 use crate::{
-    scenes::fight::fighters::ACTION_CROUCH,
+    scenes::fight::{fighters::ACTION_CROUCH, states::STATE_DEAD},
     systems::{
         drawing::Sprite,
         movement::{
@@ -9,7 +9,7 @@ use crate::{
     },
 };
 
-use super::{RYU_CROUCH_INDEX, RYU_STAND_INDEX};
+use super::{RYU_CROUCH_INDEX, RYU_DEFEATED_INDEX, RYU_STAND_INDEX};
 
 pub const RYU_CROUCH_STUN: Movement = Movement {
     sprites: &[MovementSprite {
@@ -25,6 +25,11 @@ pub const RYU_CROUCH_STUN: Movement = Movement {
     }],
     destroy_script: None,
     transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_DEAD)],
+            movement: RYU_DEFEATED_INDEX,
+            wait: false,
+        },
         MovementTransition {
             conditions: &[MovementTransitionCondition::ActionActivated(ACTION_CROUCH)],
             movement: RYU_CROUCH_INDEX,

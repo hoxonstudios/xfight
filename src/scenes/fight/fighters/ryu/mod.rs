@@ -4,7 +4,7 @@ pub mod spells;
 use crate::{
     scenes::fight::{
         kinds::{KIND_FIGHTER, KIND_FLOOR},
-        states::STATE_GROUNDED,
+        states::{STATE_DEAD, STATE_GROUNDED},
         FightScene,
     },
     systems::{
@@ -122,6 +122,7 @@ pub fn job_spawn_ryu(scene: &mut FightScene, params: FightJobParameters) {
                 player,
                 health: 100,
                 shield: None,
+                dead_tag: STATE_DEAD,
             },
         );
 

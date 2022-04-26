@@ -5,7 +5,7 @@ use crate::{
             ACTION_LIGHT_KICK, ACTION_LIGHT_PUNCH, ACTION_RIGHT, ACTION_SPECIAL,
             ACTION_STRONG_KICK, ACTION_STRONG_PUNCH,
         },
-        states::STATE_STUN,
+        states::{STATE_DEAD, STATE_STUN},
     },
     systems::{
         drawing::Sprite,
@@ -17,10 +17,10 @@ use crate::{
 };
 
 use super::{
-    RYU_BLOCK_INDEX, RYU_CROUCH_INDEX, RYU_JUMP_LEFT_INDEX, RYU_JUMP_RIGHT_INDEX,
-    RYU_LIGHT_KICK_INDEX, RYU_LIGHT_PUNCH_INDEX, RYU_SPECIAL_ADOKEN_INDEX, RYU_STAND_INDEX,
-    RYU_STRONG_KICK_INDEX, RYU_STRONG_PUNCH_INDEX, RYU_STUN_INDEX, RYU_WALK_LEFT_INDEX,
-    RYU_WALK_RIGHT_INDEX, RYU_WALK_VELOCITY,
+    RYU_BLOCK_INDEX, RYU_CROUCH_INDEX, RYU_DEFEATED_INDEX, RYU_JUMP_LEFT_INDEX,
+    RYU_JUMP_RIGHT_INDEX, RYU_LIGHT_KICK_INDEX, RYU_LIGHT_PUNCH_INDEX, RYU_SPECIAL_ADOKEN_INDEX,
+    RYU_STAND_INDEX, RYU_STRONG_KICK_INDEX, RYU_STRONG_PUNCH_INDEX, RYU_STUN_INDEX,
+    RYU_WALK_LEFT_INDEX, RYU_WALK_RIGHT_INDEX, RYU_WALK_VELOCITY,
 };
 
 pub const RYU_WALK_LEFT: Movement = Movement {
@@ -94,6 +94,11 @@ pub const RYU_WALK_LEFT: Movement = Movement {
     ],
     destroy_script: None,
     transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_DEAD)],
+            movement: RYU_DEFEATED_INDEX,
+            wait: false,
+        },
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
             movement: RYU_STUN_INDEX,
@@ -252,6 +257,11 @@ pub const RYU_WALK_RIGHT: Movement = Movement {
     ],
     destroy_script: None,
     transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_DEAD)],
+            movement: RYU_DEFEATED_INDEX,
+            wait: false,
+        },
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
             movement: RYU_STUN_INDEX,

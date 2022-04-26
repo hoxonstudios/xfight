@@ -1,12 +1,16 @@
-use super::helpers::component_store::ComponentStore;
+use super::{
+    helpers::component_store::ComponentStore,
+    tag::{StateTag, TagSystem},
+};
 
 #[derive(Copy, Clone)]
 pub struct HealthComponent {
     pub entity: usize,
     pub action: HealthAction,
     pub player: Player,
-    pub health: u32,
+    pub health: i32,
     pub shield: Option<Shield>,
+    pub dead_tag: StateTag,
 }
 #[derive(Copy, Clone)]
 pub struct Shield {
@@ -37,17 +41,25 @@ impl HealthSystem {
             store: ComponentStore::<HealthComponent>::init(),
         }
     }
-    pub fn update(&mut self) {
+    pub fn update(&mut self, tag_system: &mut TagSystem) {
         for health in self.store.data_mut() {
+            let entity = health.entity;
             match health.action {
                 HealthAction::None => {}
                 HealthAction::Consume { damage, shield } => {
-                    if let Some(shield) = shield {
-                        health.health -= (damage as f32 * shield) as u32;
-                    } else {
-                        health.health -= damage;
+                    if health.health > 0 {
+                        if let Some(shield) = shield {
+                            health.health -= (damage as f32 * shield) as i32;
+                        } else {
+                            health.health -= damage as i32;
+                        }
+                        if health.health <= 0 {
+                            if let Some(tag) = tag_system.store.get_mut_component(entity) {
+                                tag.next_state.0 |= health.dead_tag.0;
+                            }
+                        }
+                        println!("Player {} => {}", entity, health.health);
                     }
-                    println!("Player {} => {}", health.entity, health.health);
                 }
             }
             health.action = HealthAction::None;

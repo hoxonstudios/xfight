@@ -108,7 +108,7 @@ impl<'a> FightScene<'a> {
                 &self.position,
                 &self.drawing,
             );
-            self.health.update();
+            self.health.update(&mut self.tag);
             self.position.update();
             self.drawing.update(&self.position)?;
         }

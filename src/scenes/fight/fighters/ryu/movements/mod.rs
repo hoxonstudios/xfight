@@ -1,4 +1,5 @@
 mod block;
+mod defeated;
 mod stand;
 mod stun;
 mod walk;
@@ -36,6 +37,7 @@ use self::{
     crouch_strong_kick::RYU_CROUCH_STRONG_KICK,
     crouch_strong_punch::RYU_CROUCH_STRONG_PUNCH,
     crouch_stun::RYU_CROUCH_STUN,
+    defeated::RYU_DEFEATED,
     jump::{RYU_JUMP, RYU_JUMP_LEFT, RYU_JUMP_RIGHT},
     jump_light_kick::RYU_JUMP_LIGHT_KICK,
     jump_light_punch::RYU_JUMP_LIGHT_PUNCH,
@@ -81,6 +83,7 @@ pub const RYU_JUMP_LIGHT_KICK_INDEX: usize = 21;
 pub const RYU_JUMP_STUN_INDEX: usize = 22;
 pub const RYU_CROUCH_STUN_INDEX: usize = 23;
 pub const RYU_SPECIAL_ADOKEN_INDEX: usize = 24;
+pub const RYU_DEFEATED_INDEX: usize = 25;
 // STAND
 pub const RYU_MOVEMENTS: &'static [Movement] = &[
     RYU_STAND,
@@ -108,4 +111,5 @@ pub const RYU_MOVEMENTS: &'static [Movement] = &[
     RYU_JUMP_STUN,
     RYU_CROUCH_STUN,
     RYU_SPECIAL_ADOKEN,
+    RYU_DEFEATED,
 ];

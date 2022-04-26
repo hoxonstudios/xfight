@@ -1,5 +1,5 @@
 use crate::{
-    scenes::fight::states::STATE_GROUNDED,
+    scenes::fight::states::{STATE_DEAD, STATE_GROUNDED},
     systems::{
         drawing::Sprite,
         movement::{
@@ -9,7 +9,7 @@ use crate::{
     },
 };
 
-use super::RYU_STAND_INDEX;
+use super::{RYU_DEFEATED_INDEX, RYU_STAND_INDEX};
 
 pub const RYU_JUMP_STUN: Movement = Movement {
     sprites: &[MovementSprite {
@@ -24,9 +24,16 @@ pub const RYU_JUMP_STUN: Movement = Movement {
         frames: 15,
     }],
     destroy_script: None,
-    transitions: &[MovementTransition {
-        conditions: &[MovementTransitionCondition::StateActive(STATE_GROUNDED)],
-        movement: RYU_STAND_INDEX,
-        wait: false,
-    }],
+    transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_DEAD)],
+            movement: RYU_DEFEATED_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_GROUNDED)],
+            movement: RYU_STAND_INDEX,
+            wait: false,
+        },
+    ],
 };

@@ -1,5 +1,5 @@
 use crate::{
-    scenes::fight::states::STATE_STUN,
+    scenes::fight::states::{STATE_DEAD, STATE_STUN},
     systems::{
         damage::{Damage, DamageArea},
         drawing::Sprite,
@@ -10,7 +10,7 @@ use crate::{
     },
 };
 
-use super::{RYU_STAND_INDEX, RYU_STUN_INDEX};
+use super::{RYU_DEFEATED_INDEX, RYU_STAND_INDEX, RYU_STUN_INDEX};
 
 pub const RYU_LIGHT_PUNCH: Movement = Movement {
     sprites: &[
@@ -54,6 +54,11 @@ pub const RYU_LIGHT_PUNCH: Movement = Movement {
     ],
     destroy_script: None,
     transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_DEAD)],
+            movement: RYU_DEFEATED_INDEX,
+            wait: false,
+        },
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
             movement: RYU_STUN_INDEX,

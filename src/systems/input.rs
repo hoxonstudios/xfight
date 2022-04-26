@@ -39,6 +39,8 @@ pub enum JoystickButton {
     Cross,
     L1,
     R1,
+    L2,
+    R2,
 }
 #[derive(Copy, Clone)]
 pub struct KeyboardAction {
@@ -149,4 +151,6 @@ const JOYSTICK_MAPPING: &'static [JoystickButton] = &[
     JoystickButton::Square,
     JoystickButton::L1,
     JoystickButton::R1,
+    JoystickButton::L2,
+    JoystickButton::R2,
 ];

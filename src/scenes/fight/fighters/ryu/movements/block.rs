@@ -1,5 +1,5 @@
 use crate::{
-    scenes::fight::fighters::ACTION_BLOCK,
+    scenes::fight::{fighters::ACTION_BLOCK, states::STATE_DEAD},
     systems::{
         drawing::Sprite,
         health::Shield,
@@ -10,7 +10,7 @@ use crate::{
     },
 };
 
-use super::RYU_STAND_INDEX;
+use super::{RYU_DEFEATED_INDEX, RYU_STAND_INDEX};
 
 pub const RYU_BLOCK: Movement = Movement {
     sprites: &[MovementSprite {
@@ -31,11 +31,18 @@ pub const RYU_BLOCK: Movement = Movement {
         frames: 0,
     }],
     destroy_script: None,
-    transitions: &[MovementTransition {
-        conditions: &[MovementTransitionCondition::ActionNotActivated(
-            ACTION_BLOCK,
-        )],
-        movement: RYU_STAND_INDEX,
-        wait: true,
-    }],
+    transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_DEAD)],
+            movement: RYU_DEFEATED_INDEX,
+            wait: false,
+        },
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::ActionNotActivated(
+                ACTION_BLOCK,
+            )],
+            movement: RYU_STAND_INDEX,
+            wait: true,
+        },
+    ],
 };

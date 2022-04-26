@@ -155,11 +155,11 @@ pub fn get_joystick(id: u32) -> Controller {
                 action: ACTION_STRONG_KICK,
             },
             JoystickAction {
-                button: JoystickButton::R1,
+                button: JoystickButton::R2,
                 action: ACTION_BLOCK,
             },
             JoystickAction {
-                button: JoystickButton::L1,
+                button: JoystickButton::L2,
                 action: ACTION_SPECIAL,
             },
         ],

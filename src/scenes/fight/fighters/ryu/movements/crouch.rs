@@ -4,7 +4,7 @@ use crate::{
             ACTION_CROUCH, ACTION_CROUCH_BLOCK, ACTION_CROUCH_LIGHT_KICK,
             ACTION_CROUCH_LIGHT_PUNCH, ACTION_CROUCH_STRONG_KICK, ACTION_CROUCH_STRONG_PUNCH,
         },
-        states::STATE_STUN,
+        states::{STATE_DEAD, STATE_STUN},
     },
     systems::{
         drawing::Sprite,
@@ -18,7 +18,7 @@ use crate::{
 use super::{
     RYU_CROUCH_BLOCK_INDEX, RYU_CROUCH_LIGHT_KICK_INDEX, RYU_CROUCH_LIGHT_PUNCH_INDEX,
     RYU_CROUCH_STRONG_KICK_INDEX, RYU_CROUCH_STRONG_PUNCH_INDEX, RYU_CROUCH_STUN_INDEX,
-    RYU_STAND_INDEX,
+    RYU_DEFEATED_INDEX, RYU_STAND_INDEX,
 };
 
 pub const RYU_CROUCH: Movement = Movement {
@@ -35,6 +35,11 @@ pub const RYU_CROUCH: Movement = Movement {
     }],
     destroy_script: None,
     transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_DEAD)],
+            movement: RYU_DEFEATED_INDEX,
+            wait: false,
+        },
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
             movement: RYU_CROUCH_STUN_INDEX,

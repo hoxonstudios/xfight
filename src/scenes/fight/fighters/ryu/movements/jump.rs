@@ -3,7 +3,7 @@ use crate::{
         fighters::{
             ACTION_LIGHT_KICK, ACTION_LIGHT_PUNCH, ACTION_STRONG_KICK, ACTION_STRONG_PUNCH,
         },
-        states::{STATE_GROUNDED, STATE_STUN},
+        states::{STATE_DEAD, STATE_GROUNDED, STATE_STUN},
     },
     systems::{
         drawing::Sprite,
@@ -15,8 +15,8 @@ use crate::{
 };
 
 use super::{
-    RYU_JUMP_LIGHT_KICK_INDEX, RYU_JUMP_LIGHT_PUNCH_INDEX, RYU_JUMP_STRONG_KICK_INDEX,
-    RYU_JUMP_STRONG_PUNCH_INDEX, RYU_JUMP_STUN_INDEX, RYU_STAND_INDEX,
+    RYU_DEFEATED_INDEX, RYU_JUMP_LIGHT_KICK_INDEX, RYU_JUMP_LIGHT_PUNCH_INDEX,
+    RYU_JUMP_STRONG_KICK_INDEX, RYU_JUMP_STRONG_PUNCH_INDEX, RYU_JUMP_STUN_INDEX, RYU_STAND_INDEX,
 };
 
 pub const RYU_JUMP: Movement = Movement {
@@ -68,6 +68,11 @@ pub const RYU_JUMP: Movement = Movement {
     ],
     destroy_script: None,
     transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_DEAD)],
+            movement: RYU_DEFEATED_INDEX,
+            wait: false,
+        },
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
             movement: RYU_JUMP_STUN_INDEX,
@@ -159,6 +164,11 @@ pub const RYU_JUMP_LEFT: Movement = Movement {
     destroy_script: None,
     transitions: &[
         MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_DEAD)],
+            movement: RYU_DEFEATED_INDEX,
+            wait: false,
+        },
+        MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
             movement: RYU_JUMP_STUN_INDEX,
             wait: false,
@@ -248,6 +258,11 @@ pub const RYU_JUMP_RIGHT: Movement = Movement {
     ],
     destroy_script: None,
     transitions: &[
+        MovementTransition {
+            conditions: &[MovementTransitionCondition::StateActive(STATE_DEAD)],
+            movement: RYU_DEFEATED_INDEX,
+            wait: false,
+        },
         MovementTransition {
             conditions: &[MovementTransitionCondition::StateActive(STATE_STUN)],
             movement: RYU_JUMP_STUN_INDEX,
