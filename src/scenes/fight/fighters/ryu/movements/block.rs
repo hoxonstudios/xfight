@@ -23,7 +23,7 @@ pub const RYU_BLOCK: Movement = Movement {
             y0: -32,
             x1: 20,
             y1: 0,
-            reduction: 0.75,
+            reduction: 0.25,
         }),
         velocity_change: Some(MovementVelocityChange::Horizontal(0.0)),
         damage_point: None,

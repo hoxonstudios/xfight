@@ -47,6 +47,7 @@ impl HealthSystem {
                     } else {
                         health.health -= damage;
                     }
+                    println!("Player {} => {}", health.entity, health.health);
                 }
             }
             health.action = HealthAction::None;

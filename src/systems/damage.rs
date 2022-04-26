@@ -156,7 +156,6 @@ impl DamageSystem {
                                                     tag.next_state.0 |= damage_point.tag.0;
                                                 }
                                                 damage.damage = None;
-                                                println!("({}) = {}", health.entity, health.health);
                                             }
                                         }
                                     }

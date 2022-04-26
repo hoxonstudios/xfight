@@ -23,7 +23,7 @@ pub const RYU_CROUCH_BLOCK: Movement = Movement {
             y0: -11,
             x1: 18,
             y1: 50,
-            reduction: 0.75,
+            reduction: 0.25,
         }),
         velocity_change: Some(MovementVelocityChange::Horizontal(0.0)),
         damage_point: None,

@@ -3,7 +3,7 @@ pub mod ryu;
 use sdl2::keyboard::Keycode;
 
 use crate::systems::{
-    input::{Controller, ControllerKey},
+    input::{Controller, JoystickAction, JoystickButton, KeyboardAction},
     movement::MovementAction,
 };
 
@@ -32,92 +32,136 @@ pub const ACTION_JUMP_LEFT: MovementAction = MovementAction(ACTION_JUMP.0 | ACTI
 pub const ACTION_JUMP_RIGHT: MovementAction = MovementAction(ACTION_JUMP.0 | ACTION_RIGHT.0);
 // STATES
 // CONTROLLERS
-pub const CONTROLLER_ONE: Controller = Controller {
-    keys: &[
-        ControllerKey {
-            code: Keycode::S,
-            action: ACTION_CROUCH,
-        },
-        ControllerKey {
-            code: Keycode::W,
-            action: ACTION_JUMP,
-        },
-        ControllerKey {
-            code: Keycode::A,
-            action: ACTION_LEFT,
-        },
-        ControllerKey {
-            code: Keycode::D,
-            action: ACTION_RIGHT,
-        },
-        ControllerKey {
-            code: Keycode::H,
-            action: ACTION_LIGHT_PUNCH,
-        },
-        ControllerKey {
-            code: Keycode::Y,
-            action: ACTION_STRONG_PUNCH,
-        },
-        ControllerKey {
-            code: Keycode::K,
-            action: ACTION_LIGHT_KICK,
-        },
-        ControllerKey {
-            code: Keycode::I,
-            action: ACTION_STRONG_KICK,
-        },
-        ControllerKey {
-            code: Keycode::U,
-            action: ACTION_BLOCK,
-        },
-        ControllerKey {
-            code: Keycode::J,
-            action: ACTION_SPECIAL,
-        },
-    ],
-};
+pub const KEYBOARD_ONE: Controller = Controller::Keyboard(&[
+    KeyboardAction {
+        code: Keycode::S,
+        action: ACTION_CROUCH,
+    },
+    KeyboardAction {
+        code: Keycode::W,
+        action: ACTION_JUMP,
+    },
+    KeyboardAction {
+        code: Keycode::A,
+        action: ACTION_LEFT,
+    },
+    KeyboardAction {
+        code: Keycode::D,
+        action: ACTION_RIGHT,
+    },
+    KeyboardAction {
+        code: Keycode::H,
+        action: ACTION_LIGHT_PUNCH,
+    },
+    KeyboardAction {
+        code: Keycode::Y,
+        action: ACTION_STRONG_PUNCH,
+    },
+    KeyboardAction {
+        code: Keycode::K,
+        action: ACTION_LIGHT_KICK,
+    },
+    KeyboardAction {
+        code: Keycode::I,
+        action: ACTION_STRONG_KICK,
+    },
+    KeyboardAction {
+        code: Keycode::U,
+        action: ACTION_BLOCK,
+    },
+    KeyboardAction {
+        code: Keycode::J,
+        action: ACTION_SPECIAL,
+    },
+]);
 
-pub const CONTROLLER_TWO: Controller = Controller {
-    keys: &[
-        ControllerKey {
-            code: Keycode::Down,
-            action: ACTION_CROUCH,
-        },
-        ControllerKey {
-            code: Keycode::Up,
-            action: ACTION_JUMP,
-        },
-        ControllerKey {
-            code: Keycode::Left,
-            action: ACTION_LEFT,
-        },
-        ControllerKey {
-            code: Keycode::Right,
-            action: ACTION_RIGHT,
-        },
-        ControllerKey {
-            code: Keycode::Kp1,
-            action: ACTION_LIGHT_PUNCH,
-        },
-        ControllerKey {
-            code: Keycode::Kp4,
-            action: ACTION_STRONG_PUNCH,
-        },
-        ControllerKey {
-            code: Keycode::Kp3,
-            action: ACTION_LIGHT_KICK,
-        },
-        ControllerKey {
-            code: Keycode::Kp6,
-            action: ACTION_STRONG_KICK,
-        },
-        ControllerKey {
-            code: Keycode::Kp5,
-            action: ACTION_BLOCK,
-        },
-        ControllerKey {
-            code: Keycode::Kp2,
-            action: ACTION_SPECIAL,
-        },
-    ],
-};
+pub const KEYBOARD_TWO: Controller = Controller::Keyboard(&[
+    KeyboardAction {
+        code: Keycode::Down,
+        action: ACTION_CROUCH,
+    },
+    KeyboardAction {
+        code: Keycode::Up,
+        action: ACTION_JUMP,
+    },
+    KeyboardAction {
+        code: Keycode::Left,
+        action: ACTION_LEFT,
+    },
+    KeyboardAction {
+        code: Keycode::Right,
+        action: ACTION_RIGHT,
+    },
+    KeyboardAction {
+        code: Keycode::Kp1,
+        action: ACTION_LIGHT_PUNCH,
+    },
+    KeyboardAction {
+        code: Keycode::Kp4,
+        action: ACTION_STRONG_PUNCH,
+    },
+    KeyboardAction {
+        code: Keycode::Kp3,
+        action: ACTION_LIGHT_KICK,
+    },
+    KeyboardAction {
+        code: Keycode::Kp6,
+        action: ACTION_STRONG_KICK,
+    },
+    KeyboardAction {
+        code: Keycode::Kp5,
+        action: ACTION_BLOCK,
+    },
+    KeyboardAction {
+        code: Keycode::Kp2,
+        action: ACTION_SPECIAL,
+    },
+]);
+
+pub fn get_joystick(id: u32) -> Controller {
+    Controller::Joystick(
+        id,
+        &[
+            JoystickAction {
+                button: JoystickButton::Up,
+                action: ACTION_JUMP,
+            },
+            JoystickAction {
+                button: JoystickButton::Down,
+                action: ACTION_CROUCH,
+            },
+            JoystickAction {
+                button: JoystickButton::Left,
+                action: ACTION_LEFT,
+            },
+            JoystickAction {
+                button: JoystickButton::Right,
+                action: ACTION_RIGHT,
+            },
+            JoystickAction {
+                button: JoystickButton::Cross,
+                action: ACTION_LIGHT_PUNCH,
+            },
+            JoystickAction {
+                button: JoystickButton::Square,
+                action: ACTION_STRONG_PUNCH,
+            },
+            JoystickAction {
+                button: JoystickButton::Circle,
+                action: ACTION_LIGHT_KICK,
+            },
+            JoystickAction {
+                button: JoystickButton::Triangle,
+                action: ACTION_STRONG_KICK,
+            },
+            JoystickAction {
+                button: JoystickButton::R1,
+                action: ACTION_BLOCK,
+            },
+            JoystickAction {
+                button: JoystickButton::L1,
+                action: ACTION_SPECIAL,
+            },
+        ],
+    )
+}

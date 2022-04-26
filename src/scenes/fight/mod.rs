@@ -4,7 +4,7 @@ pub mod jobs;
 mod kinds;
 mod states;
 
-use sdl2::{event::Event, keyboard::Keycode};
+use sdl2::{event::Event, joystick::Joystick, keyboard::Keycode};
 
 use crate::systems::{
     aim::AimSystem,
@@ -21,7 +21,7 @@ use crate::systems::{
 };
 
 use self::{
-    fighters::{CONTROLLER_ONE, CONTROLLER_TWO},
+    fighters::{get_joystick, KEYBOARD_ONE, KEYBOARD_TWO},
     jobs::{FIGHT_JOBS, JOB_SPAWN_FLOOR_INDEX, JOB_SPAWN_RYU_INDEX},
 };
 
@@ -53,7 +53,7 @@ impl<'a> FightScene<'a> {
             script: JOB_SPAWN_RYU_INDEX,
             parameters: FightJobParameters::SpawnFighter {
                 position: (100.0, 0.0),
-                controller: CONTROLLER_ONE,
+                controller: get_joystick(0),
                 player: Player::One,
             },
         });
@@ -61,7 +61,7 @@ impl<'a> FightScene<'a> {
             script: JOB_SPAWN_RYU_INDEX,
             parameters: FightJobParameters::SpawnFighter {
                 position: (600.0, 0.0),
-                controller: CONTROLLER_TWO,
+                controller: get_joystick(1),
                 player: Player::Two,
             },
         });

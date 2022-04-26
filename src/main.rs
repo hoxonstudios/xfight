@@ -25,6 +25,18 @@ fn main() -> Result<(), String> {
         .build()
         .expect("Failed to create canvas");
     let texture_creator = canvas.texture_creator();
+    // JOYSTICKS
+    let joystick_subsystem = sdl_context.joystick()?;
+    let num_joysticks = joystick_subsystem
+        .num_joysticks()
+        .expect("No joysticks available");
+    println!("> {} Joysticks", num_joysticks);
+    let joy1 = joystick_subsystem
+        .open(0)
+        .expect("Failed to open controller");
+    let joy2 = joystick_subsystem
+        .open(1)
+        .expect("Failed to open controller");
     let mut event_pump = sdl_context.event_pump()?;
 
     // SCENE
@@ -36,7 +48,7 @@ fn main() -> Result<(), String> {
         position: PositionSystem::init(),
         velocity: VelocitySystem::init(),
         collision: CollisionSystem::init(),
-        input: InputSystem::init(&mut event_pump),
+        input: InputSystem::init(&mut event_pump, Some((&joy1, &joy2))),
         movement: MovementSystem::init(),
         damage: DamageSystem::init(),
         health: HealthSystem::init(),
