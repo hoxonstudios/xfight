@@ -26,11 +26,11 @@ pub const RYU_JUMP: Movement = Movement {
                 center: (512, 47),
                 area: (498, 5, 533, 97),
             },
-            velocity_change: Some(MovementVelocityChange::Both(0.0, -20.0)),
+            velocity_change: Some(MovementVelocityChange::Both(0.0, -17.0)),
             damage_point: None,
             shield: None,
             spell: None,
-            frames: 10,
+            frames: 9,
         },
         MovementSprite {
             sprite: Sprite {
@@ -41,7 +41,7 @@ pub const RYU_JUMP: Movement = Movement {
             damage_point: None,
             shield: None,
             spell: None,
-            frames: 10,
+            frames: 9,
         },
         MovementSprite {
             sprite: Sprite {
@@ -52,7 +52,7 @@ pub const RYU_JUMP: Movement = Movement {
             damage_point: None,
             shield: None,
             spell: None,
-            frames: 10,
+            frames: 9,
         },
         MovementSprite {
             sprite: Sprite {
@@ -63,7 +63,7 @@ pub const RYU_JUMP: Movement = Movement {
             damage_point: None,
             shield: None,
             spell: None,
-            frames: 10,
+            frames: 7,
         },
     ],
     destroy_script: None,
@@ -116,7 +116,7 @@ pub const RYU_JUMP_LEFT: Movement = Movement {
                 center: (512, 47),
                 area: (498, 5, 533, 97),
             },
-            velocity_change: Some(MovementVelocityChange::Both(-4.0, -20.0)),
+            velocity_change: Some(MovementVelocityChange::Both(-4.0, -17.0)),
             damage_point: None,
             shield: None,
             spell: None,
@@ -206,7 +206,7 @@ pub const RYU_JUMP_RIGHT: Movement = Movement {
                 center: (512, 47),
                 area: (498, 5, 533, 97),
             },
-            velocity_change: Some(MovementVelocityChange::Both(4.0, -20.0)),
+            velocity_change: Some(MovementVelocityChange::Both(4.0, -17.0)),
             damage_point: None,
             shield: None,
             spell: None,

@@ -32,7 +32,7 @@ pub const RYU_CROUCH_LIGHT_PUNCH: Movement = Movement {
             },
             damage_point: Some(Damage {
                 area: DamageArea::RelativePoint(34, 11),
-                power: 5,
+                power: 3,
                 tag: STATE_STUN,
             }),
             velocity_change: None,

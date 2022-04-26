@@ -32,7 +32,7 @@ pub const RYU_LIGHT_KICK: Movement = Movement {
             },
             damage_point: Some(Damage {
                 area: DamageArea::RelativePoint(27, 23),
-                power: 5,
+                power: 3,
                 tag: STATE_STUN,
             }),
             velocity_change: None,

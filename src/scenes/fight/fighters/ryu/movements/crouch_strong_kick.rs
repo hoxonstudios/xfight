@@ -23,7 +23,7 @@ pub const RYU_CROUCH_STRONG_KICK: Movement = Movement {
             damage_point: None,
             shield: None,
             spell: None,
-            frames: 4,
+            frames: 5,
         },
         MovementSprite {
             sprite: Sprite {
@@ -38,7 +38,7 @@ pub const RYU_CROUCH_STRONG_KICK: Movement = Movement {
                 tag: STATE_STUN,
             }),
             spell: None,
-            frames: 4,
+            frames: 5,
         },
         MovementSprite {
             sprite: Sprite {
@@ -49,7 +49,7 @@ pub const RYU_CROUCH_STRONG_KICK: Movement = Movement {
             damage_point: None,
             shield: None,
             spell: None,
-            frames: 4,
+            frames: 5,
         },
     ],
     destroy_script: None,

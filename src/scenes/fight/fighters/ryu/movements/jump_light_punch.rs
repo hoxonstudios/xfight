@@ -10,21 +10,45 @@ use crate::{
 use super::{RYU_JUMP_STUN_INDEX, RYU_STAND_INDEX};
 
 pub const RYU_JUMP_LIGHT_PUNCH: Movement = Movement {
-    sprites: &[MovementSprite {
-        sprite: Sprite {
-            center: (434, 555),
-            area: (416, 550, 457, 605),
+    sprites: &[
+        MovementSprite {
+            sprite: Sprite {
+                center: (393, 562),
+                area: (380, 543, 413, 612),
+            },
+            damage_point: None,
+            velocity_change: None,
+            shield: None,
+            spell: None,
+            frames: 3,
         },
-        damage_point: Some(Damage {
-            area: DamageArea::RelativePoint(21, 41),
-            power: 5,
-            tag: STATE_STUN,
-        }),
-        velocity_change: None,
-        shield: None,
-        spell: None,
-        frames: 10,
-    }],
+        MovementSprite {
+            sprite: Sprite {
+                center: (434, 555),
+                area: (416, 550, 457, 605),
+            },
+            damage_point: Some(Damage {
+                area: DamageArea::RelativePoint(21, 41),
+                power: 3,
+                tag: STATE_STUN,
+            }),
+            velocity_change: None,
+            shield: None,
+            spell: None,
+            frames: 10,
+        },
+        MovementSprite {
+            sprite: Sprite {
+                center: (393, 562),
+                area: (380, 543, 413, 612),
+            },
+            damage_point: None,
+            velocity_change: None,
+            shield: None,
+            spell: None,
+            frames: 3,
+        },
+    ],
     destroy_script: None,
     transitions: &[
         MovementTransition {

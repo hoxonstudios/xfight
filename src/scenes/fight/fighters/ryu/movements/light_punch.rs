@@ -23,7 +23,7 @@ pub const RYU_LIGHT_PUNCH: Movement = Movement {
             damage_point: None,
             shield: None,
             spell: None,
-            frames: 4,
+            frames: 3,
         },
         MovementSprite {
             sprite: Sprite {
@@ -32,13 +32,13 @@ pub const RYU_LIGHT_PUNCH: Movement = Movement {
             },
             damage_point: Some(Damage {
                 area: DamageArea::RelativePoint(35, -11),
-                power: 5,
+                power: 3,
                 tag: STATE_STUN,
             }),
             velocity_change: None,
             shield: None,
             spell: None,
-            frames: 4,
+            frames: 3,
         },
         MovementSprite {
             sprite: Sprite {
@@ -49,7 +49,7 @@ pub const RYU_LIGHT_PUNCH: Movement = Movement {
             damage_point: None,
             shield: None,
             spell: None,
-            frames: 4,
+            frames: 3,
         },
     ],
     destroy_script: None,

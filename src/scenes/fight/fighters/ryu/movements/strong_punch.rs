@@ -43,7 +43,7 @@ pub const RYU_STRONG_PUNCH: Movement = Movement {
             },
             damage_point: Some(Damage {
                 area: DamageArea::RelativePoint(39, -13),
-                power: 5,
+                power: 6,
                 tag: STATE_STUN,
             }),
             velocity_change: None,

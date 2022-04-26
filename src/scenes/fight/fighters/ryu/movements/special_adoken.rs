@@ -54,7 +54,7 @@ pub const RYU_SPECIAL_ADOKEN: Movement = Movement {
             },
             damage_point: Some(Damage {
                 area: DamageArea::RelativePoint(54, 2),
-                power: 10,
+                power: 8,
                 tag: STATE_STUN,
             }),
             velocity_change: None,
@@ -74,7 +74,7 @@ pub const RYU_SPECIAL_ADOKEN: Movement = Movement {
                 script: JOB_SPAWN_RYU_ADOKEN,
                 position: (76.0, 0.0),
             }),
-            frames: 7,
+            frames: 35,
         },
     ],
     destroy_script: None,
