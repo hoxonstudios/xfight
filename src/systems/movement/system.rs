@@ -109,6 +109,15 @@ impl MovementSystem {
                                         };
                                     }
                                 }
+                                MovementVelocityChange::BothToAim(velocity_x, velocity_y) => {
+                                    if let Some(aim) = aim_system.store.get_component(entity) {
+                                        velocity.velocity.0 = match aim.direction {
+                                            AimDirection::Left => -velocity_x,
+                                            AimDirection::Right => velocity_x,
+                                        };
+                                    }
+                                    velocity.velocity.1 = velocity_y;
+                                }
                             }
                         }
                     }

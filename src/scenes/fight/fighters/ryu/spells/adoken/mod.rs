@@ -4,7 +4,7 @@ use crate::{
     scenes::fight::{
         fighters::ryu::movements::RYU_TEXTURE_PATH,
         kinds::{KIND_FIGHTER, KIND_SPELL},
-        states::STATE_EXPLODE,
+        states::STATE_IMPACTED,
         FightScene,
     },
     systems::{
@@ -15,12 +15,12 @@ use crate::{
         job::FightJobParameters,
         movement::MovementComponent,
         position::{PositionAction, PositionComponent},
-        tag::{KindTag, StateTag, TagComponent},
+        tag::{StateTag, TagComponent},
         velocity::VelocityComponent,
     },
 };
 
-use self::movements::{RYU_ADOKEN_FLYING_INDEX, RYU_ADOKEN_MOVEMENTS};
+use self::movements::{RYU_ADOKEN_MOVEMENTS, RYU_ADOKEN_START_INDEX};
 
 pub fn job_spawn_ryu_adoken(scene: &mut FightScene, params: FightJobParameters) {
     if let FightJobParameters::SpawnSpell {
@@ -63,7 +63,7 @@ pub fn job_spawn_ryu_adoken(scene: &mut FightScene, params: FightJobParameters) 
             ShapeComponent {
                 entity,
                 texture,
-                sprite: RYU_ADOKEN_MOVEMENTS[RYU_ADOKEN_FLYING_INDEX].sprites[0].sprite,
+                sprite: RYU_ADOKEN_MOVEMENTS[RYU_ADOKEN_START_INDEX].sprites[0].sprite,
                 flipped: (flipped_x, false),
             },
         );
@@ -83,12 +83,12 @@ pub fn job_spawn_ryu_adoken(scene: &mut FightScene, params: FightJobParameters) 
                 kinds: &[
                     CollisionKind {
                         kind: KIND_FIGHTER,
-                        state: STATE_EXPLODE,
+                        state: STATE_IMPACTED,
                         solid: false,
                     },
                     CollisionKind {
                         kind: KIND_SPELL,
-                        state: STATE_EXPLODE,
+                        state: STATE_IMPACTED,
                         solid: false,
                     },
                 ],
@@ -100,7 +100,7 @@ pub fn job_spawn_ryu_adoken(scene: &mut FightScene, params: FightJobParameters) 
                 entity,
                 action: None,
                 movements: RYU_ADOKEN_MOVEMENTS,
-                movement: RYU_ADOKEN_FLYING_INDEX,
+                movement: RYU_ADOKEN_START_INDEX,
                 frame: Some((0, 0)),
             },
         );

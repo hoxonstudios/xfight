@@ -13,13 +13,18 @@ use super::{
 pub struct DamageComponent {
     pub entity: usize,
     pub player: Player,
-    pub damage: Option<DamagePoint>,
+    pub damage: Option<Damage>,
 }
 #[derive(Copy, Clone)]
-pub struct DamagePoint {
-    pub point: (i32, i32),
+pub struct Damage {
+    pub area: DamageArea,
     pub power: u32,
     pub tag: StateTag,
+}
+#[derive(Copy, Clone)]
+pub enum DamageArea {
+    RelativePoint(i32, i32),
+    EntireShape,
 }
 
 pub struct DamageSystem {
@@ -58,22 +63,37 @@ impl DamageSystem {
                                         if let Some(health_collision) =
                                             collision_system.store.get_component_ref(health.entity)
                                         {
-                                            let point = absolute_damage_point(
-                                                (
-                                                    damage_position.x as i32,
-                                                    damage_position.y as i32,
-                                                ),
-                                                damage_shape.flipped,
-                                                &damage_point,
-                                            );
-                                            let health_rect = absolute_health_rect(
+                                            let health_rect = absolute_rect(
                                                 &health_shape.sprite,
                                                 health_collision.padding,
                                                 (health_position.x, health_position.y),
                                                 health_shape.flipped,
                                             );
 
-                                            if check_collision(point, health_rect) {
+                                            let collide = match damage_point.area {
+                                                DamageArea::RelativePoint(damage_x, damage_y) => {
+                                                    let point = absolute_damage_point(
+                                                        (
+                                                            damage_position.x as i32,
+                                                            damage_position.y as i32,
+                                                        ),
+                                                        damage_shape.flipped,
+                                                        (damage_x, damage_y),
+                                                    );
+                                                    check_collision(point, health_rect)
+                                                }
+                                                DamageArea::EntireShape => {
+                                                    let damage_rect = absolute_rect(
+                                                        &damage_shape.sprite,
+                                                        0,
+                                                        (damage_position.x, damage_position.y),
+                                                        damage_shape.flipped,
+                                                    );
+                                                    check_rect_collision(damage_rect, health_rect)
+                                                }
+                                            };
+
+                                            if collide {
                                                 let shield = match health.shield {
                                                     None => None,
                                                     Some(shield) => {
@@ -83,7 +103,40 @@ impl DamageSystem {
                                                             health_shape.flipped,
                                                         );
 
-                                                        if check_collision(point, shield_rect) {
+                                                        let shield_collide = match damage_point.area
+                                                        {
+                                                            DamageArea::RelativePoint(
+                                                                damage_x,
+                                                                damage_y,
+                                                            ) => {
+                                                                let point = absolute_damage_point(
+                                                                    (
+                                                                        damage_position.x as i32,
+                                                                        damage_position.y as i32,
+                                                                    ),
+                                                                    damage_shape.flipped,
+                                                                    (damage_x, damage_y),
+                                                                );
+                                                                check_collision(point, shield_rect)
+                                                            }
+                                                            DamageArea::EntireShape => {
+                                                                let damage_rect = absolute_rect(
+                                                                    &damage_shape.sprite,
+                                                                    0,
+                                                                    (
+                                                                        damage_position.x,
+                                                                        damage_position.y,
+                                                                    ),
+                                                                    damage_shape.flipped,
+                                                                );
+                                                                check_rect_collision(
+                                                                    damage_rect,
+                                                                    shield_rect,
+                                                                )
+                                                            }
+                                                        };
+
+                                                        if shield_collide {
                                                             Some(shield.reduction)
                                                         } else {
                                                             None
@@ -120,18 +173,18 @@ impl DamageSystem {
 fn absolute_damage_point(
     position: (i32, i32),
     flipped: (bool, bool),
-    damage_point: &DamagePoint,
+    damage_point: (i32, i32),
 ) -> (i32, i32) {
     let (x, y) = position;
 
     match flipped {
-        (false, false) => (x + damage_point.point.0, y + damage_point.point.1),
-        (true, false) => (x - damage_point.point.0, y + damage_point.point.1),
-        (false, true) => (x + damage_point.point.0, y - damage_point.point.1),
-        (true, true) => (x - damage_point.point.0, y - damage_point.point.1),
+        (false, false) => (x + damage_point.0, y + damage_point.1),
+        (true, false) => (x - damage_point.0, y + damage_point.1),
+        (false, true) => (x + damage_point.0, y - damage_point.1),
+        (true, true) => (x - damage_point.0, y - damage_point.1),
     }
 }
-fn absolute_health_rect(
+fn absolute_rect(
     sprite: &Sprite,
     padding: i32,
     position: (f32, f32),
@@ -167,4 +220,13 @@ fn check_collision(damage_point: (i32, i32), rigid_body: (i32, i32, i32, i32)) -
         && damage_point.0 <= rigid_body.2
         && damage_point.1 >= rigid_body.1
         && damage_point.1 <= rigid_body.3
+}
+fn check_rect_collision(
+    damage_rect: (i32, i32, i32, i32),
+    rigid_body: (i32, i32, i32, i32),
+) -> bool {
+    damage_rect.0 <= rigid_body.2
+        && damage_rect.2 >= rigid_body.0
+        && damage_rect.1 <= rigid_body.3
+        && damage_rect.3 >= rigid_body.1
 }

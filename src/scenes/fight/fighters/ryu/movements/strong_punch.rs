@@ -1,7 +1,7 @@
 use crate::{
     scenes::fight::states::STATE_STUN,
     systems::{
-        damage::DamagePoint,
+        damage::{Damage, DamageArea},
         drawing::Sprite,
         movement::{
             Movement, MovementSprite, MovementTransition, MovementTransitionCondition,
@@ -41,8 +41,8 @@ pub const RYU_STRONG_PUNCH: Movement = Movement {
                 center: (300, 158),
                 area: (279, 126, 343, 208),
             },
-            damage_point: Some(DamagePoint {
-                point: (39, -13),
+            damage_point: Some(Damage {
+                area: DamageArea::RelativePoint(39, -13),
                 power: 5,
                 tag: STATE_STUN,
             }),

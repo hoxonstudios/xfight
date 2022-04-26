@@ -1,7 +1,7 @@
 use crate::{
     scenes::fight::states::STATE_STUN,
     systems::{
-        damage::DamagePoint,
+        damage::{Damage, DamageArea},
         drawing::Sprite,
         movement::{
             Movement, MovementSprite, MovementTransition, MovementTransitionCondition,
@@ -30,8 +30,8 @@ pub const RYU_CROUCH_LIGHT_PUNCH: Movement = Movement {
                 center: (82, 420),
                 area: (63, 415, 120, 470),
             },
-            damage_point: Some(DamagePoint {
-                point: (34, 11),
+            damage_point: Some(Damage {
+                area: DamageArea::RelativePoint(34, 11),
                 power: 5,
                 tag: STATE_STUN,
             }),

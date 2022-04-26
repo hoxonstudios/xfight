@@ -17,7 +17,7 @@ pub const RYU_JUMP_STUN: Movement = Movement {
             center: (533, 779),
             area: (506, 763, 555, 829),
         },
-        velocity_change: Some(MovementVelocityChange::HorizontalToAim(-6.0)),
+        velocity_change: Some(MovementVelocityChange::BothToAim(-6.0, -10.0)),
         damage_point: None,
         shield: None,
         spell: None,

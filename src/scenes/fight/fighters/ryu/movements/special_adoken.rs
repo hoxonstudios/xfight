@@ -1,7 +1,7 @@
 use crate::{
     scenes::fight::{jobs::JOB_SPAWN_RYU_ADOKEN, states::STATE_STUN},
     systems::{
-        damage::DamagePoint,
+        damage::{Damage, DamageArea},
         drawing::Sprite,
         movement::{
             Movement, MovementSpellScript, MovementSprite, MovementTransition,
@@ -52,8 +52,8 @@ pub const RYU_SPECIAL_ADOKEN: Movement = Movement {
                 center: (233, 662),
                 area: (205, 644, 290, 712),
             },
-            damage_point: Some(DamagePoint {
-                point: (54, 2),
+            damage_point: Some(Damage {
+                area: DamageArea::RelativePoint(54, 2),
                 power: 10,
                 tag: STATE_STUN,
             }),
@@ -72,7 +72,7 @@ pub const RYU_SPECIAL_ADOKEN: Movement = Movement {
             shield: None,
             spell: Some(MovementSpellScript {
                 script: JOB_SPAWN_RYU_ADOKEN,
-                position: (62.0, 0.0),
+                position: (76.0, 0.0),
             }),
             frames: 7,
         },
