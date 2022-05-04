@@ -50,7 +50,7 @@ impl<'a> FightScene<'a> {
         self.jobs.push(FightJob {
             script: JOB_SPAWN_RYU_INDEX,
             parameters: FightJobParameters::SpawnFighter {
-                position: (100.0, 0.0),
+                position: (200.0, 0.0),
                 controller: get_joystick(0),
                 player: Player::One,
             },
