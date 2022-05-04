@@ -1,6 +1,6 @@
 pub mod system;
 
-use super::{damage::Damage, drawing::Sprite, health::Shield, job::FightJob, tag::StateTag};
+use super::{damage::Damage, drawing::Sprite, health::Shield, tag::StateTag};
 
 #[derive(Copy, Clone)]
 pub struct MovementComponent {

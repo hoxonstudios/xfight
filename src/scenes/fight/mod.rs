@@ -3,9 +3,6 @@ mod floor;
 pub mod jobs;
 mod kinds;
 mod states;
-
-use sdl2::{event::Event, joystick::Joystick, keyboard::Keycode};
-
 use crate::systems::{
     aim::AimSystem,
     collision::CollisionSystem,
@@ -19,6 +16,7 @@ use crate::systems::{
     tag::TagSystem,
     velocity::VelocitySystem,
 };
+use sdl2::{event::Event, keyboard::Keycode};
 
 use self::{
     fighters::{get_joystick, KEYBOARD_ONE, KEYBOARD_TWO},

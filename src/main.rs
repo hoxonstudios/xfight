@@ -17,7 +17,6 @@ fn main() -> Result<(), String> {
     sdl2::image::init(InitFlag::PNG)?;
     let window = video_subsystem
         .window("X-Fight", 800, 600)
-        .fullscreen()
         .position_centered()
         .build()
         .expect("Failed to create window");

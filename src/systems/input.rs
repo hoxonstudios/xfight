@@ -1,10 +1,4 @@
-use sdl2::{
-    controller::{Axis, Button},
-    event::Event,
-    joystick::Joystick,
-    keyboard::Keycode,
-    EventPump,
-};
+use sdl2::{joystick::Joystick, keyboard::Keycode, EventPump};
 
 use super::{
     helpers::component_store::ComponentStore,
