@@ -77,7 +77,7 @@ pub fn job_spawn_ryu(scene: &mut FightScene, params: FightJobParameters) {
             entity,
             CollisionComponent {
                 entity,
-                padding: 0,
+                padding: (0, 0, 0, 0),
                 kinds: &[CollisionKind {
                     kind: KIND_FLOOR,
                     state: STATE_GROUNDED,

@@ -1,8 +1,8 @@
 use crate::systems::drawing::Sprite;
 
-pub const FLOOR_TEXTURE_PATH: &'static str = "assets/floor.png";
+pub const FLOOR_TEXTURE_PATH: &'static str = "assets/background.png";
 
 pub const FLOOR_SPRITE: Sprite = Sprite {
-    center: (400, 100),
-    area: (0, 0, 800, 200),
+    center: (600, 500),
+    area: (0, 0, 1187, 600),
 };

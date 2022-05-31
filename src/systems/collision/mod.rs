@@ -13,7 +13,7 @@ mod calculations;
 #[derive(Copy, Clone)]
 pub struct CollisionComponent {
     pub entity: usize,
-    pub padding: i32,
+    pub padding: (i32, i32, i32, i32),
     pub kinds: &'static [CollisionKind],
 }
 #[derive(Copy, Clone)]
@@ -182,10 +182,10 @@ fn get_rigid_body(
                 PositionAction::None => Point { x: 0.0, y: 0.0 },
             };
             let rectangle = Rectangle {
-                x0: position.x + (rect.0 + collision.padding) as f32,
-                y0: position.y + (rect.1 + collision.padding) as f32,
-                x1: position.x + (rect.2 - collision.padding) as f32,
-                y1: position.y + (rect.3 - collision.padding) as f32,
+                x0: position.x + (rect.0 + collision.padding.0) as f32,
+                y0: position.y + (rect.1 + collision.padding.1) as f32,
+                x1: position.x + (rect.2 - collision.padding.2) as f32,
+                y1: position.y + (rect.3 - collision.padding.3) as f32,
             };
 
             Some((entity, rectangle, velocity))

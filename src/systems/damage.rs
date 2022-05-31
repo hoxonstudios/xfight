@@ -85,7 +85,7 @@ impl DamageSystem {
                                                 DamageArea::EntireShape => {
                                                     let damage_rect = absolute_rect(
                                                         &damage_shape.sprite,
-                                                        0,
+                                                        (0,0,0,0),
                                                         (damage_position.x, damage_position.y),
                                                         damage_shape.flipped,
                                                     );
@@ -122,7 +122,7 @@ impl DamageSystem {
                                                             DamageArea::EntireShape => {
                                                                 let damage_rect = absolute_rect(
                                                                     &damage_shape.sprite,
-                                                                    0,
+                                                                    (0, 0, 0, 0),
                                                                     (
                                                                         damage_position.x,
                                                                         damage_position.y,
@@ -185,15 +185,15 @@ fn absolute_damage_point(
 }
 fn absolute_rect(
     sprite: &Sprite,
-    padding: i32,
+    padding: (i32, i32, i32, i32),
     position: (f32, f32),
     flipped: (bool, bool),
 ) -> (i32, i32, i32, i32) {
     let rect = sprite.rect(flipped);
-    let x1 = rect.0 + position.0 as i32 + padding;
-    let y1 = rect.1 + position.1 as i32 + padding;
-    let x2 = rect.2 + position.0 as i32 - padding;
-    let y2 = rect.3 + position.1 as i32 - padding;
+    let x1 = rect.0 + position.0 as i32 + padding.0;
+    let y1 = rect.1 + position.1 as i32 + padding.1;
+    let x2 = rect.2 + position.0 as i32 - padding.2;
+    let y2 = rect.3 + position.1 as i32 - padding.3;
 
     (x1, y1, x2, y2)
 }

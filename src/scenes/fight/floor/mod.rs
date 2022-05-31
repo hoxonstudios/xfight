@@ -37,7 +37,7 @@ pub fn job_spawn_floor(scene: &mut FightScene, params: FightJobParameters) {
                 entity,
                 action: PositionAction::None,
                 x: 400.0,
-                y: 550.0,
+                y: 500.0,
             },
         );
         scene.drawing.store.insert_component(
@@ -53,7 +53,7 @@ pub fn job_spawn_floor(scene: &mut FightScene, params: FightJobParameters) {
             entity,
             CollisionComponent {
                 entity,
-                padding: 0,
+                padding: (0, 500, 0, 0),
                 kinds: &[],
             },
         );
